@@ -1,0 +1,30 @@
+* {
+  padding: 0px;
+  margin: 0px;
+  font-family: 'Roboto', sans-serif;
+  box-sizing: border-box;
+}
+
+:root {
+  --shadow: #39302C;
+  --placeholder: #a9a7af;
+  --midtone: #656469;
+  --midtone-dark: #515055;
+  --highlight: #CED4D8;
+  --highlight-light: rgb(231, 234, 236);
+  --accent: #8E30BD;
+  --accent-other: rgb(182, 42, 128);
+}
+
+a {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+ul {
+  list-style: none;
+}
+
+::placeholder {
+  color: var(--placeholder);
+}
