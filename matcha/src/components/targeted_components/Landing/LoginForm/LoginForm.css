@@ -1,23 +1,23 @@
 .landing-form-login-body {
   padding: 20px;
   min-width: 270px;
+  max-width: 230px;
 }
 
 .login-form h2 {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   color: var(--midtone-dark);
   font-size: 35px;
 }
 
 .login-form-input {
   display: block;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   padding: 10px;
   font-size: 15px;
   border: none;
   width: 100%;
-  box-sizing: border-box;
   border-radius: 3px;
 }
 
@@ -31,18 +31,17 @@
   padding: 5px;
   color: var(--highlight-light);
   background-color: var(--accent);
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
-.switch-text {
+.switch-to-register-text {
   color: var(--midtone);
   text-align: center;
   width: 100%;
   font-size: 15px;
-  margin-bottom: 25px;
 }
 
-.switch-form {
+.switch-to-register {
   cursor: pointer;
 }
 
@@ -51,8 +50,27 @@
   text-align: center;
   width: 100%;
   font-size: 15px;
+  margin-bottom: 20px;
 }
 
 .reset-form {
   cursor: pointer;
+}
+
+.login-correct-errors-message {
+  display: flex;
+  height: 48px;
+  background: rgb(255, 135, 135);
+  box-shadow: 0px 0px 1px 1px red;
+  color: rgb(133, 0, 0);
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.login-correct-errors-message p {
+  font-size: 15px;
+  text-align: center;
 }

@@ -2,28 +2,30 @@ import React, { Component } from 'react'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 
-import './LoginForm.css'
+import './ResetSendEmailForm.css'
 
-export class LoginForm extends Component {
+export class ResetSendEmailForm extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
       email: '',
-      password: '',
       emailValid: true,
-      passwordValid: true,
-      showError: false,
       errorToShow: ''
     }
 
     this.pendingPromises = []
 
     this.handleChangeDecorator = this.handleChangeDecorator.bind(this)
-    this.switchFormDecorator = this.switchFormDecorator.bind(this)
+    this.showCorrectErrors = this.showCorrectErrors.bind(this)
     this.handleSubmitErrors = this.handleSubmitErrors.bind(this)
     this.handleInitialSubmit = this.handleInitialSubmit.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+  }
+
+  componentWillUnmount() {
+
+    this.pendingPromises.map(p => p.cancel())
   }
 
   handleChangeDecorator(targetState, validationFunc) {
@@ -44,25 +46,7 @@ export class LoginForm extends Component {
     }
   }
 
-  switchFormDecorator(formToSwitchTo) {
-    
-    return (e) => {
-      e.preventDefault()
-
-      this.props.switchForm(formToSwitchTo)
-    }
-  }
-
-  componentWillUnmount() {
-
-    this.pendingPromises.map(p => p.cancel())
-  }
-
   showCorrectErrors() {
-
-    this.setState({
-      showError: !this.state.showError
-    })
 
     const cancelableResetPromise = PromiseCancel.makeCancelable(
       new Promise(res => setTimeout(() => res(true), 3000))
@@ -74,7 +58,6 @@ export class LoginForm extends Component {
       .then(() => {
 
         this.setState({
-          showError: !this.state.showError,
           errorToShow: ''
         })
       })
@@ -90,19 +73,10 @@ export class LoginForm extends Component {
       return
     }
 
-    if (!this.state.passwordValid) {
-      
-      this.setState({ errorToShow: 'Password field contains invalid characters or is empty' })
-      this.showCorrectErrors()
-      return
-    }
-
     return true
   }
 
   handleInitialSubmit() {
-
-    let errorsFound = false;
 
     if (this.state.emailValid && this.state.email === '') {
       
@@ -110,34 +84,21 @@ export class LoginForm extends Component {
         emailValid: false
       })
 
-      errorsFound = true
-    }
-
-    if (this.state.passwordValid && this.state.password === '') {
-
-      this.setState({
-        passwordValid: false
-      })
-
-      errorsFound = true
-    }
-
-    if (errorsFound) {
-
       return true
     }
   }
 
+
   handleSubmit(e) {
     e.preventDefault()
-
-    if (this.state.showError) {
-
+    
+    if (this.state.errorToShow.length) {
+      
       return
     }
 
     if (!this.handleSubmitErrors()) {
-
+      
       return
     }
 
@@ -145,12 +106,11 @@ export class LoginForm extends Component {
 
       return
     }
-
-    if (this.state.emailValid && this.state.passwordValid) {
+    
+    if (this.state.emailValid) {
 
       console.log(`email: ${this.state.email}`)
-      console.log(`password: ${this.state.password}`)
-      console.log('Login form submitted!')
+      console.log('Reset send email form submitted!')
 
       // TODO: Call provider here.
     }
@@ -158,12 +118,17 @@ export class LoginForm extends Component {
 
   render() {
     return (
-      <div className="landing-form-login-body">
-        <form className="login-form" onSubmit={this.handleSubmit}>
-          <h2>Login</h2>
+      <div className="reset-send-email-body">
+        <form onSubmit={this.handleSubmit}>
+          <h2>Reset</h2>
+          <p
+            className="reset-send-email-message"
+          >
+            Please enter your email address and we'll send you instructions on how to reset your password
+          </p>
           <input
             className={
-              `login-form-input ${
+              `reset-send-email-input ${
                 this.state.emailValid
                   ? ''
                   : 'input-bad'
@@ -180,61 +145,24 @@ export class LoginForm extends Component {
               )
             }
           />
-          <input
-            className={
-              `login-form-input ${
-                this.state.passwordValid
-                  ? ''
-                  : 'input-bad'
-              }`
-            }
-            type="password"
-            name="password"
-            value={this.state.password}
-            placeholder="Password"
-            onChange={
-              this.handleChangeDecorator(
-                'passwordValid',
-                InputValidation.isValidPassword
-              )
-            }
-          />
-          <p className="reset-text">
-            <a
-              className="reset-form"
-              href="/#"
-              onClick={this.switchFormDecorator('resetSendEmail')}
-            >
-              Forgot password?
-            </a>
-          </p>
           {
-            this.state.showError
-              ? <div className="correct-errors-message">
+            this.state.errorToShow.length
+              ? <div className="reset-send-email-correct-errors-message">
                   <p>{this.state.errorToShow}</p>
                 </div>
-              : ''
+              : null
           }
           <button
-            className="login-form-button"
+            className="reset-send-email-button"
             type="submit"
             value="Submit"
           >
-            Login
+            Submit
           </button>
-          <p className="switch-to-register-text">
-            Not a member? <a
-              className="switch-to-register"
-              href="/#"
-              onClick={this.switchFormDecorator('register')}
-            >
-              Register here
-            </a>
-          </p>
         </form>
       </div>
     )
   }
 }
 
-export default LoginForm
+export default ResetSendEmailForm

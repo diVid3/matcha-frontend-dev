@@ -1,4 +1,156 @@
 .landing-form-register-body {
-  padding: 30px;
-  min-width: 218px;
+  padding: 20px;
+  min-width: 270px;
+}
+
+.register-form h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--midtone-dark);
+  font-size: 35px;
+}
+
+.register-split-block {
+  width: 100%;
+  display: flex;
+  margin-bottom: 25px;
+}
+
+.register-split-item {
+  padding: 10px;
+  font-size: 15px;
+  border: none;
+  border-radius: 3px;
+  width: 186px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0px;
+}
+
+.register-split-item:first-child {
+  margin-right: 15px;
+}
+
+.register-form-block {
+  display: block;
+  margin-bottom: 25px;
+  padding: 10px;
+  font-size: 15px;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
+}
+
+.register-form-radio-buttons {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px;
+}
+
+.register-form-radio-group {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.register-form-radio-group label {
+  color: var(--midtone-dark);
+}
+
+input[type="radio"] {
+  margin-right: 5px;
+}
+
+.register-form-button {
+  border-style: none;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 20px;
+  padding: 5px;
+  color: var(--highlight-light);
+  background-color: var(--accent);
+  margin-bottom: 25px;
+  min-height: 48px;
+}
+
+.switch-to-login-text {
+  color: var(--midtone);
+  text-align: center;
+  width: 100%;
+  font-size: 15px;
+}
+
+.switch-to-login {
+  cursor: pointer;
+}
+
+.correct-errors-message {
+  display: flex;
+  width: 100%;
+  height: 48px;
+  background: rgb(255, 135, 135);
+  box-shadow: 0px 0px 1px 1px red;
+  color: rgb(133, 0, 0);
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  margin-bottom: 25px;
+  padding: 10px;
+  max-width: 387px;
+}
+
+.correct-errors-message p {
+  font-size: 15px;
+  text-align: center;
+}
+
+@media only screen and (max-height: 568px) {
+  .landing-form-register-body {
+    padding: 15px;
+  }
+  .register-form h2 {
+    margin-bottom: 15px;
+  }
+  .register-split-block {
+    margin-bottom: 15px;
+  }
+  .register-form-block {
+    margin-bottom: 15px;
+  }
+  .register-form-button {
+    margin-bottom: 15px;
+  }
+  .correct-errors-message {
+    margin-bottom: 15px;
+  }
+}
+
+@media only screen and (min-width: 320px) {
+  .register-split-block {
+    width: 250px;
+  }
+  .register-form-block {
+    width: 250px;
+  }
+}
+
+@media only screen and (min-width: 360px) {
+  .register-split-block {
+    width: 300px;
+  }
+  .register-form-block {
+    width: 300px;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .register-split-block {
+    width: 387px;
+  }
+  .register-form-block {
+    width: 387px;
+  }
 }
