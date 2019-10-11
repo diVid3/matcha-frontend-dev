@@ -5,7 +5,6 @@ import './Landing.css'
 import LoginForm from '../../components/targeted_components/Landing/LoginForm/LoginForm'
 import RegisterForm from '../../components/targeted_components/Landing/RegisterForm/RegisterForm'
 import ResetSendEmailForm from '../../components/targeted_components/Landing/ResetSendEmailForm/ResetSendEmailForm'
-import ResetChangePassForm from '../../components/targeted_components/Landing/ResetChangePassForm/ResetChangePassForm'
 
 export class Landing extends Component {
   constructor(props) {
@@ -35,11 +34,6 @@ export class Landing extends Component {
 
       this.setState({ formToShow: 'resetSendEmail' })
     }
-
-    if (formString === 'resetChangePass') {
-
-      this.setState({ formToShow: 'resetChangePass' })
-    }
   }
 
   getForm() {
@@ -55,9 +49,6 @@ export class Landing extends Component {
         break
       case "resetSendEmail":
         formToReturn = <ResetSendEmailForm switchForm={this.switchForm}/>
-        break
-      case "resetChangePass":
-        formToReturn = null
         break
       default:
         formToReturn = null

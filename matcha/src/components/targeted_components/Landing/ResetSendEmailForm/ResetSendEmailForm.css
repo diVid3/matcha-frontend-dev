@@ -1,5 +1,5 @@
 .reset-send-email-body {
-  max-width: 270px;
+  width: 270px;
   padding: 20px;
 }
 
@@ -19,13 +19,13 @@
 }
 
 .reset-send-email-input {
-    display: block;
-    margin-bottom: 20px;
-    padding: 10px;
-    font-size: 15px;
-    border: none;
-    width: 100%;
-    border-radius: 3px;
+  display: block;
+  margin-bottom: 20px;
+  padding: 10px;
+  font-size: 15px;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
 }
 
 .reset-send-email-correct-errors-message {
@@ -56,4 +56,24 @@
   padding: 5px;
   color: var(--highlight-light);
   background-color: var(--accent);
+}
+
+.show-email-sent-container {
+
+}
+
+.show-email-sent-message {
+  font-size: 15px;
+  text-align: center;
+  color: var(--midtone-dark);
+  line-height: 1.3;
+  margin-bottom: 20px;
+}
+
+.show-email-sent-container img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 115px;
+  margin-bottom: 10px
 }

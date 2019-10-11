@@ -3,6 +3,7 @@ import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 
 import './ResetSendEmailForm.css'
+import checkmark from '../../../../assets/tick4.png'
 
 export class ResetSendEmailForm extends Component {
   constructor(props) {
@@ -11,7 +12,8 @@ export class ResetSendEmailForm extends Component {
     this.state = {
       email: '',
       emailValid: true,
-      errorToShow: ''
+      errorToShow: '',
+      showEmailSent: false
     }
 
     this.pendingPromises = []
@@ -112,54 +114,84 @@ export class ResetSendEmailForm extends Component {
       console.log(`email: ${this.state.email}`)
       console.log('Reset send email form submitted!')
 
+      this.setState({
+        showEmailSent: true
+      })
+
       // TODO: Call provider here.
+
+      // TODO: Remove this after provider code is in.
+      // const cancelableShowEmailSentPromise = PromiseCancel.makeCancelable(
+      //   new Promise(res => setTimeout(() => res(true), 7000))
+      // )
+
+      // this.pendingPromises.push(cancelableShowEmailSentPromise)
+
+      // cancelableShowEmailSentPromise.promise
+      //   .then(() => {
+  
+      //     this.setState({
+      //       showEmailSent: false
+      //     })
+      //   })
+      //   .catch(() => {})
     }
   }
 
   render() {
     return (
       <div className="reset-send-email-body">
-        <form onSubmit={this.handleSubmit}>
-          <h2>Reset</h2>
-          <p
-            className="reset-send-email-message"
-          >
-            Please enter your email address and we'll send you instructions on how to reset your password
-          </p>
-          <input
-            className={
-              `reset-send-email-input ${
-                this.state.emailValid
-                  ? ''
-                  : 'input-bad'
-              }`
-            }
-            type="text"
-            name="email"
-            value={this.state.email}
-            placeholder="Email"
-            onChange={
-              this.handleChangeDecorator(
-                'emailValid',
-                InputValidation.isValidEmail
-              )
-            }
-          />
-          {
-            this.state.errorToShow.length
-              ? <div className="reset-send-email-correct-errors-message">
-                  <p>{this.state.errorToShow}</p>
-                </div>
-              : null
-          }
-          <button
-            className="reset-send-email-button"
-            type="submit"
-            value="Submit"
-          >
-            Submit
-          </button>
-        </form>
+        {
+          !this.state.showEmailSent
+            ? <form onSubmit={this.handleSubmit}>
+                <h2>Reset</h2>
+                <p
+                  className="reset-send-email-message"
+                >
+                  Please enter your email address and we'll send you instructions on how to reset your password
+                </p>
+                <input
+                  className={
+                    `reset-send-email-input ${
+                      this.state.emailValid
+                        ? ''
+                        : 'input-bad'
+                    }`
+                  }
+                  type="text"
+                  name="email"
+                  value={this.state.email}
+                  placeholder="Email"
+                  onChange={
+                    this.handleChangeDecorator(
+                      'emailValid',
+                      InputValidation.isValidEmail
+                    )
+                  }
+                />
+                {
+                  this.state.errorToShow.length
+                    ? <div className="reset-send-email-correct-errors-message">
+                        <p>{this.state.errorToShow}</p>
+                      </div>
+                    : null
+                }
+                <button
+                  className="reset-send-email-button"
+                  type="submit"
+                  value="Submit"
+                >
+                  Submit
+                </button>
+              </form>
+            : <div className="show-email-sent-container">
+                <p className="show-email-sent-message">
+                  Please see the instructions in the email sent to you to reset your password
+                </p>
+                <img src={checkmark} alt="checkmark"/>
+              </div>
+            
+      }
       </div>
     )
   }
