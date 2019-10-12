@@ -56,24 +56,30 @@
   padding: 5px;
   color: var(--highlight-light);
   background-color: var(--accent);
-}
-
-.show-email-sent-container {
-
+  margin-bottom: 15px;
 }
 
 .show-email-sent-message {
   font-size: 15px;
-  text-align: center;
+  text-align: left;
   color: var(--midtone-dark);
   line-height: 1.3;
-  margin-bottom: 20px;
 }
 
 .show-email-sent-container img {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 115px;
-  margin-bottom: 10px
+  width: 230px;
+}
+
+.reset-send-email-back {
+  color: var(--midtone);
+  text-align: right;
+  width: 100%;
+  font-size: 15px;
+}
+
+.reset-send-email-back-link {
+  cursor: pointer;
 }

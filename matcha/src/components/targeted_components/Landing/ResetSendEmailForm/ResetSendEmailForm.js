@@ -3,7 +3,7 @@ import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 
 import './ResetSendEmailForm.css'
-import checkmark from '../../../../assets/tick4.png'
+import checkmark from '../../../../assets/sent2.png'
 
 export class ResetSendEmailForm extends Component {
   constructor(props) {
@@ -20,6 +20,7 @@ export class ResetSendEmailForm extends Component {
 
     this.handleChangeDecorator = this.handleChangeDecorator.bind(this)
     this.showCorrectErrors = this.showCorrectErrors.bind(this)
+    this.switchFormDecorator = this.switchFormDecorator.bind(this)
     this.handleSubmitErrors = this.handleSubmitErrors.bind(this)
     this.handleInitialSubmit = this.handleInitialSubmit.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -64,6 +65,18 @@ export class ResetSendEmailForm extends Component {
         })
       })
       .catch(() => {})
+  }
+
+  switchFormDecorator(formToSwitchTo) {
+    
+    return (e) => {
+
+      if (e) {
+        e.preventDefault()
+      }
+
+      this.props.switchForm(formToSwitchTo)
+    }
   }
 
   handleSubmitErrors() {
@@ -121,19 +134,14 @@ export class ResetSendEmailForm extends Component {
       // TODO: Call provider here.
 
       // TODO: Remove this after provider code is in.
-      // const cancelableShowEmailSentPromise = PromiseCancel.makeCancelable(
+      // const cancelableSwitchFormPromise = PromiseCancel.makeCancelable(
       //   new Promise(res => setTimeout(() => res(true), 7000))
       // )
 
-      // this.pendingPromises.push(cancelableShowEmailSentPromise)
+      // this.pendingPromises.push(cancelableSwitchFormPromise)
 
-      // cancelableShowEmailSentPromise.promise
-      //   .then(() => {
-  
-      //     this.setState({
-      //       showEmailSent: false
-      //     })
-      //   })
+      // cancelableSwitchFormPromise.promise
+      //   .then(() => { (this.switchFormDecorator('login'))() })
       //   .catch(() => {})
     }
   }
@@ -183,6 +191,15 @@ export class ResetSendEmailForm extends Component {
                 >
                   Submit
                 </button>
+                <p className="reset-send-email-back">
+                  <a
+                    className="reset-send-email-back-link"
+                    href="/#"
+                    onClick={this.switchFormDecorator('login')}
+                  >
+                    Back
+                  </a>
+                </p>
               </form>
             : <div className="show-email-sent-container">
                 <p className="show-email-sent-message">

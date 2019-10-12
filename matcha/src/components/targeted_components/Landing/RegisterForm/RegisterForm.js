@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
+import RegistrationProvider from '../../../../providers/RegistrationProvider'
 
 import './RegisterForm.css'
 
@@ -290,15 +291,37 @@ export class RegisterForm extends Component {
       this.state.passwordsMatch
     ) {
 
-      console.log(this.state.firstName)
-      console.log(this.state.lastName)
-      console.log(this.state.username)
-      console.log(this.state.age)
-      console.log(this.state.email)
-      console.log(this.state.password)
-      console.log(this.state.passwordConfirm)
+      // console.log(this.state.firstName)
+      // console.log(this.state.lastName)
+      // console.log(this.state.username)
+      // console.log(this.state.age)
+      // console.log(this.state.email)
+      // console.log(this.state.password)
+      // console.log(this.state.passwordConfirm)
 
-      // TODO: Call provider to submit form here.
+      RegistrationProvider.registerUser({
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        username: this.state.username,
+        age: this.state.age,
+        email: this.state.email,
+        password: this.state.password,
+        passwordConfirm: this.state.passwordConfirm,
+        gender: this.state.gender
+      })
+      // .then((response) => {
+      //   console.log(response)
+      //   response.json()
+      // })
+      .then((data) => {
+        console.log('RegisterForm Component data received:')
+        console.log(data)
+        // TODO: Check if data contains success: true
+      })
+      .catch((err) => {
+
+        // Would preferably contact sentry.io here.
+      })
     }
   }
 
