@@ -299,6 +299,8 @@ export class RegisterForm extends Component {
       // console.log(this.state.password)
       // console.log(this.state.passwordConfirm)
 
+      // TODO: Need to include default biography, default fame-rating, latitude, longitude and last seen.
+
       RegistrationProvider.registerUser({
         firstName: this.state.firstName,
         lastName: this.state.lastName,
