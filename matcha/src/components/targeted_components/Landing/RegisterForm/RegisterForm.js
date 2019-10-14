@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import uuidv4 from 'uuid/v4'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import RegistrationProvider from '../../../../providers/RegistrationProvider'
+import LocationProvider from '../../../../providers/LocationProvider'
 
 import './RegisterForm.css'
 
@@ -28,7 +30,13 @@ export class RegisterForm extends Component {
       passwordsMatch: true,
       showCorrectErrorsMessage: false,
       errorToShow: '',
-      errorBeingShown: false
+      errorBeingShown: false,
+      biography: 'No Bio',
+      fameRating: '0',
+      latitude: '',
+      longitude: '',
+      lastSeen: new Date().getTime() + '',
+      verified: '0'
     }
 
     this.pendingPromises = []
@@ -112,6 +120,100 @@ export class RegisterForm extends Component {
         })
       })
       .catch(() => {})
+  }
+
+  componentDidMount() {
+
+    // Wizardry on point.
+    if (navigator && navigator.geolocation) {
+
+      const cancelableLocationPromise = PromiseCancel.makeCancelable(
+        new Promise((res, rej) => {
+
+          navigator.geolocation.getCurrentPosition((position) => {
+            
+            res(() => {
+
+              const latitude = position.coords.latitude + ''
+              const longitude = position.coords.longitude + ''
+
+              this.setState({
+                latitude,
+                longitude
+              })
+            })
+          }, (err) => {
+
+            if (err.code === 1) {
+
+              LocationProvider.getLocation()
+              .then((data) => {
+
+                res(() => {
+
+                  const latitude = data.lat + ''
+                  const longitude = data.lon + ''
+    
+                  this.setState({
+                    latitude,
+                    longitude
+                  })
+                })
+              })
+              .catch((err) => {
+                rej(err)
+              })
+            }
+            else if (err.code === 2) {
+
+              LocationProvider.getLocation()
+              .then((data) => {
+
+                const latitude = data.lat + ''
+                const longitude = data.lon + ''
+  
+                this.setState({
+                  latitude,
+                  longitude
+                })
+              })
+              .catch((err) => {
+                rej(err)
+              })
+            }
+            else {
+              rej('Some weird obscure error occured.')
+            }
+          })
+        })
+      )
+
+      this.pendingPromises.push(cancelableLocationPromise)
+
+      cancelableLocationPromise.promise
+      .then((func) => {
+        func()
+      })
+      .catch(() => {})
+    }
+    else {
+
+      const cancelableLocationPromise = PromiseCancel.makeCancelable(
+        LocationProvider.getLocation()
+      )
+
+      this.pendingPromises.push(cancelableLocationPromise)
+
+      cancelableLocationPromise.promise
+      .then((data) => {
+
+        this.setState({
+          latitude: data.lat + '',
+          longitude: data.lon + ''
+        })
+      })
+      .catch((err) => {})
+    }
   }
 
   componentWillUnmount() {
@@ -291,38 +393,57 @@ export class RegisterForm extends Component {
       this.state.passwordsMatch
     ) {
 
-      // console.log(this.state.firstName)
-      // console.log(this.state.lastName)
-      // console.log(this.state.username)
-      // console.log(this.state.age)
-      // console.log(this.state.email)
-      // console.log(this.state.password)
-      // console.log(this.state.passwordConfirm)
+      const verifyUUID = uuidv4()
 
-      // TODO: Need to include default biography, default fame-rating, latitude, longitude and last seen.
+      // TODO: Query backend to check if non-taken username.
+
+      // TODO: Make cancelable.
 
       RegistrationProvider.registerUser({
         firstName: this.state.firstName,
         lastName: this.state.lastName,
+        gender: this.state.gender,
+        biography: this.state.biography,
         username: this.state.username,
-        age: this.state.age,
         email: this.state.email,
         password: this.state.password,
-        passwordConfirm: this.state.passwordConfirm,
-        gender: this.state.gender
+        fameRating: this.state.fameRating,
+        latitude: this.state.latitude,
+        longitude: this.state.longitude,
+        lastSeen: this.state.lastSeen,
+        age: this.state.age,
+        verifyToken: verifyUUID,
+        verified: this.state.verified
       })
-      // .then((response) => {
-      //   console.log(response)
-      //   response.json()
-      // })
       .then((data) => {
-        console.log('RegisterForm Component data received:')
-        console.log(data)
-        // TODO: Check if data contains success: true
+
+        if (data.success === false) {
+          
+          throw new Error('Could\'t register successfully')
+        }
+      })
+      .then(() => {
+
+        // TODO: Make cancelable.
+
+        RegistrationProvider.sendEmail({
+          email: this.state.email,
+          verifyToken: verifyUUID
+        })
+        .then(() => {
+
+          // TODO: Uncomment this.
+          // this.props.switchForm('registrationSuccess')
+        })
+        .catch((err) => {
+
+          throw new Error('Could\'t send email successfully')
+        })
       })
       .catch((err) => {
 
-        // Would preferably contact sentry.io here.
+        this.setState({ errorToShow: 'Oops something went wrong... Please try again later...' })
+        this.showCorrectErrors()
       })
     }
   }

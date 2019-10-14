@@ -6,7 +6,7 @@ export class RegistrationProvider {
 
     return new Promise((res, rej) => {
 
-      fetch(`${Config.localhost}/api/v1.0/users`, {
+      fetch(`${Config.backend}/api/v1.0/users`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -16,11 +16,41 @@ export class RegistrationProvider {
       })
       .then((response) => {
 
-        // TODO: Check response here, i.e. status codes, if invalid, send success: false
-        console.log(response)
-        res(response.json())
+        if (!response.ok) {
+
+          throw new Error('Response from the backend wasn\'t ok!')
+        }
+
+        response.json()
       })
-      .catch((err) => rej(err))
+      .then((data) => res(data))
+      .catch((err) => rej({ success: false }))
+    })
+  }
+
+  static sendEmail(body) {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/send-registration-email`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+      .then((response) => {
+
+        if (!response.ok) {
+
+          throw new Error('Response from the backend wasn\'t ok!')
+        }
+
+        response.json()
+      })
+      .then((data) => res(data))
+      .catch((err) => rej({ success: false }))
     })
   }
 }

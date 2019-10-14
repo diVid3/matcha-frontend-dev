@@ -124,9 +124,6 @@ export class ResetSendEmailForm extends Component {
     
     if (this.state.emailValid) {
 
-      console.log(`email: ${this.state.email}`)
-      console.log('Reset send email form submitted!')
-
       this.setState({
         showEmailSent: true
       })

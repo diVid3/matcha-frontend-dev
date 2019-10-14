@@ -1,0 +1,18 @@
+.registration-success-body {
+  width: 270px;
+  padding: 20px;
+}
+
+.registration-success-message {
+  font-size: 15px;
+  text-align: left;
+  color: var(--midtone-dark);
+  line-height: 1.3;
+}
+
+.registration-success-container img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 230px;
+}
