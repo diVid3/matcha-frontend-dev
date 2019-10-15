@@ -4,6 +4,7 @@ import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import RegistrationProvider from '../../../../providers/RegistrationProvider'
 import LocationProvider from '../../../../providers/LocationProvider'
+import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
 
 import './RegisterForm.css'
 
@@ -36,7 +37,8 @@ export class RegisterForm extends Component {
       latitude: '',
       longitude: '',
       lastSeen: new Date().getTime() + '',
-      verified: '0'
+      verified: '0',
+      isLoading: false
     }
 
     this.pendingPromises = []
@@ -397,50 +399,57 @@ export class RegisterForm extends Component {
 
       // TODO: Query backend to check if non-taken username.
 
-      // TODO: Make cancelable.
+      const cancelableRegistrationPromise = PromiseCancel.makeCancelable(
+        RegistrationProvider.registerUser({
+          firstName: this.state.firstName,
+          lastName: this.state.lastName,
+          gender: this.state.gender,
+          biography: this.state.biography,
+          username: this.state.username,
+          email: this.state.email,
+          password: this.state.password,
+          fameRating: this.state.fameRating,
+          latitude: this.state.latitude,
+          longitude: this.state.longitude,
+          lastSeen: this.state.lastSeen,
+          age: this.state.age,
+          verifyToken: verifyUUID,
+          verified: this.state.verified
+        })
+      )
 
-      RegistrationProvider.registerUser({
-        firstName: this.state.firstName,
-        lastName: this.state.lastName,
-        gender: this.state.gender,
-        biography: this.state.biography,
-        username: this.state.username,
-        email: this.state.email,
-        password: this.state.password,
-        fameRating: this.state.fameRating,
-        latitude: this.state.latitude,
-        longitude: this.state.longitude,
-        lastSeen: this.state.lastSeen,
-        age: this.state.age,
-        verifyToken: verifyUUID,
-        verified: this.state.verified
-      })
-      .then((data) => {
+      this.pendingPromises.push(cancelableRegistrationPromise)
 
-        if (data.success === false) {
-          
-          throw new Error('Could\'t register successfully')
-        }
+      cancelableRegistrationPromise.promise
+      .then(() => {
+
+        const cancelableSendRegEmailPromise = PromiseCancel.makeCancelable(
+          RegistrationProvider.sendEmail({
+            email: this.state.email,
+            verifyToken: verifyUUID,
+            username: this.state.username
+          })
+        )
+
+        this.pendingPromises.push(cancelableSendRegEmailPromise)
+
+        this.setState({
+          isLoading: true
+        })
+
+        return cancelableSendRegEmailPromise.promise
       })
       .then(() => {
 
-        // TODO: Make cancelable.
-
-        RegistrationProvider.sendEmail({
-          email: this.state.email,
-          verifyToken: verifyUUID
-        })
-        .then(() => {
-
-          // TODO: Uncomment this.
-          // this.props.switchForm('registrationSuccess')
-        })
-        .catch((err) => {
-
-          throw new Error('Could\'t send email successfully')
-        })
+        this.props.switchForm('registrationSuccess')
       })
       .catch((err) => {
+
+        this.setState({
+          isLoading: false
+        })
+
+        // TODO: Could possibly signal backend to delete registration if email send fails.
 
         this.setState({ errorToShow: 'Oops something went wrong... Please try again later...' })
         this.showCorrectErrors()
@@ -451,193 +460,197 @@ export class RegisterForm extends Component {
   render() {
     return (
       <div className="landing-form-register-body">
-        <form className="register-form" onSubmit={this.handelSubmit}>
-          <h2>Register</h2>
-          <div className="register-split-block">
-            <input
-              className={
-                `register-split-item ${
-                  this.state.firstNameValid
-                    ? ''
-                    : 'input-bad'
-                }`
-              }
-              name="firstName"
-              value={this.state.firstName}
-              type="text"
-              onChange={
-                this.handleChangeDecorator(
-                  'firstNameValid',
-                  InputValidation.isValidName
-                )
-              }
-              placeholder="First Name"
-            />
-            <input
-              className={
-                `register-split-item ${
-                  this.state.lastNameValid
-                    ? ''
-                    : 'input-bad'
-                }`
-              }
-              name="lastName"
-              value={this.state.lastName}
-              type="text"
-              onChange={
-                this.handleChangeDecorator(
-                  'lastNameValid',
-                  InputValidation.isValidName
-                )
-              }
-              placeholder="Last Name"
-            />
-          </div>
-          <input
-            className={
-              `register-form-block ${
-                this.state.usernameValid
-                  ? ''
-                  : 'input-bad'
-              }`
-            }
-            name="username"
-            value={this.state.username}
-            type="text"
-            onChange={
-              this.handleChangeDecorator(
-                'usernameValid',
-                InputValidation.isValidName
-              )
-            }
-            placeholder="Username"
-          />
-          <input
-            className={
-              `register-form-block ${
-                this.state.ageValid
-                  ? ''
-                  : 'input-bad'
-              }`
-            }
-            name="age"
-            value={this.state.age}
-            type="text"
-            onChange={
-              this.handleChangeDecorator(
-                'ageValid',
-                InputValidation.isValidAge
-              )
-            }
-            placeholder="Age"
-          />
-          <input
-            className={
-              `register-form-block ${
-                this.state.emailValid
-                  ? ''
-                  : 'input-bad'
-              }`
-            }
-            name="email"
-            value={this.state.email}
-            type="text"
-            onChange={
-              this.handleChangeDecorator(
-                'emailValid',
-                InputValidation.isValidEmail
-              )
-            }
-            placeholder="Email"
-          />
-          <div className="register-split-block">
-            <input
-              className={
-                `register-split-item ${
-                  this.state.passwordValid
-                    ? ''
-                    : 'input-bad'
-                }`
-              }
-              name="password"
-              value={this.state.password}
-              type="password"
-              onChange={this.handlePasswordChange}
-              placeholder="Password"
-            />
-            <input
-              className={
-                `register-split-item ${
-                  (this.state.passwordConfirmValid &&
-                  this.state.passwordsMatch)
-                    ? ''
-                    : 'input-bad'
-                }`
-              }
-              name="passwordConfirm"
-              value={this.state.passwordConfirm}
-              type="password"
-              onChange={this.handlePasswordConfirmChange}
-              placeholder="Confirm Password"
-            />
-          </div>
-          <div className="register-form-block register-form-radio-buttons">
-            <div className="register-form-radio-group">
-              <input
-                id="register-male"
-                name="gender"
-                value="0"
-                type="radio"
-                onChange={this.handleChangeDecorator()}
-                defaultChecked
-              />
-              <label htmlFor="register-male">Male</label>
-            </div>
-            <div className="register-form-radio-group">
-              <input
-                id="register-female"
-                name="gender"
-                value="1"
-                type="radio"
-                onChange={this.handleChangeDecorator()}
-              />
-              <label htmlFor="register-female">Female</label>
-            </div>
-            <div className="register-form-radio-group">
-              <input
-                id="register-other"
-                name="gender"
-                value="2"
-                type="radio"
-                onChange={this.handleChangeDecorator()}
-              />
-              <label htmlFor="register-other">Other</label>
-            </div>
-          </div>
-          {
-            this.state.showCorrectErrorsMessage
-              ? <div className="correct-errors-message">
-                  <p>{this.state.errorToShow}</p>
+        {
+          this.state.isLoading
+            ? <LoadingSpinner />
+            : <form className="register-form" onSubmit={this.handelSubmit}>
+                <h2>Register</h2>
+                <div className="register-split-block">
+                  <input
+                    className={
+                      `register-split-item ${
+                        this.state.firstNameValid
+                          ? ''
+                          : 'input-bad'
+                      }`
+                    }
+                    name="firstName"
+                    value={this.state.firstName}
+                    type="text"
+                    onChange={
+                      this.handleChangeDecorator(
+                        'firstNameValid',
+                        InputValidation.isValidName
+                      )
+                    }
+                    placeholder="First Name"
+                  />
+                  <input
+                    className={
+                      `register-split-item ${
+                        this.state.lastNameValid
+                          ? ''
+                          : 'input-bad'
+                      }`
+                    }
+                    name="lastName"
+                    value={this.state.lastName}
+                    type="text"
+                    onChange={
+                      this.handleChangeDecorator(
+                        'lastNameValid',
+                        InputValidation.isValidName
+                      )
+                    }
+                    placeholder="Last Name"
+                  />
                 </div>
-              : ''
-          }
-          <button
-            className="register-form-button"
-            type="submit"
-            value="Submit"
-          >
-            Register
-          </button>
-          <p className="switch-to-login-text">
-            Already registered? <a
-              className="switch-to-login"
-              href="/#"
-              onClick={this.switchFormDecorator('login')}
-            >
-              Log in here
-            </a>
-          </p>
-        </form>
+                <input
+                  className={
+                    `register-form-block ${
+                      this.state.usernameValid
+                        ? ''
+                        : 'input-bad'
+                    }`
+                  }
+                  name="username"
+                  value={this.state.username}
+                  type="text"
+                  onChange={
+                    this.handleChangeDecorator(
+                      'usernameValid',
+                      InputValidation.isValidName
+                    )
+                  }
+                  placeholder="Username"
+                />
+                <input
+                  className={
+                    `register-form-block ${
+                      this.state.ageValid
+                        ? ''
+                        : 'input-bad'
+                    }`
+                  }
+                  name="age"
+                  value={this.state.age}
+                  type="text"
+                  onChange={
+                    this.handleChangeDecorator(
+                      'ageValid',
+                      InputValidation.isValidAge
+                    )
+                  }
+                  placeholder="Age"
+                />
+                <input
+                  className={
+                    `register-form-block ${
+                      this.state.emailValid
+                        ? ''
+                        : 'input-bad'
+                    }`
+                  }
+                  name="email"
+                  value={this.state.email}
+                  type="text"
+                  onChange={
+                    this.handleChangeDecorator(
+                      'emailValid',
+                      InputValidation.isValidEmail
+                    )
+                  }
+                  placeholder="Email"
+                />
+                <div className="register-split-block">
+                  <input
+                    className={
+                      `register-split-item ${
+                        this.state.passwordValid
+                          ? ''
+                          : 'input-bad'
+                      }`
+                    }
+                    name="password"
+                    value={this.state.password}
+                    type="password"
+                    onChange={this.handlePasswordChange}
+                    placeholder="Password"
+                  />
+                  <input
+                    className={
+                      `register-split-item ${
+                        (this.state.passwordConfirmValid &&
+                        this.state.passwordsMatch)
+                          ? ''
+                          : 'input-bad'
+                      }`
+                    }
+                    name="passwordConfirm"
+                    value={this.state.passwordConfirm}
+                    type="password"
+                    onChange={this.handlePasswordConfirmChange}
+                    placeholder="Confirm Password"
+                  />
+                </div>
+                <div className="register-form-block register-form-radio-buttons">
+                  <div className="register-form-radio-group">
+                    <input
+                      id="register-male"
+                      name="gender"
+                      value="0"
+                      type="radio"
+                      onChange={this.handleChangeDecorator()}
+                      defaultChecked
+                    />
+                    <label htmlFor="register-male">Male</label>
+                  </div>
+                  <div className="register-form-radio-group">
+                    <input
+                      id="register-female"
+                      name="gender"
+                      value="1"
+                      type="radio"
+                      onChange={this.handleChangeDecorator()}
+                    />
+                    <label htmlFor="register-female">Female</label>
+                  </div>
+                  <div className="register-form-radio-group">
+                    <input
+                      id="register-other"
+                      name="gender"
+                      value="2"
+                      type="radio"
+                      onChange={this.handleChangeDecorator()}
+                    />
+                    <label htmlFor="register-other">Other</label>
+                  </div>
+                </div>
+                {
+                  this.state.showCorrectErrorsMessage
+                    ? <div className="correct-errors-message">
+                        <p>{this.state.errorToShow}</p>
+                      </div>
+                    : ''
+                }
+                <button
+                  className="register-form-button"
+                  type="submit"
+                  value="Submit"
+                >
+                  Register
+                </button>
+                <p className="switch-to-login-text">
+                  Already registered? <a
+                    className="switch-to-login"
+                    href="/#"
+                    onClick={this.switchFormDecorator('login')}
+                  >
+                    Log in here
+                  </a>
+                </p>
+              </form>
+        }
       </div>
     )
   }

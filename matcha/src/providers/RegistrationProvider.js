@@ -16,15 +16,16 @@ export class RegistrationProvider {
       })
       .then((response) => {
 
+        console.log(response.status)
+
         if (!response.ok) {
 
-          throw new Error('Response from the backend wasn\'t ok!')
+          rej(true)
         }
 
-        response.json()
+        res(true)
       })
-      .then((data) => res(data))
-      .catch((err) => rej({ success: false }))
+      .catch((err) => rej(true))
     })
   }
 
@@ -44,13 +45,12 @@ export class RegistrationProvider {
 
         if (!response.ok) {
 
-          throw new Error('Response from the backend wasn\'t ok!')
+          rej(true)
         }
 
-        response.json()
+        res(true)
       })
-      .then((data) => res(data))
-      .catch((err) => rej({ success: false }))
+      .catch((err) => rej(true))
     })
   }
 }

@@ -1,0 +1,75 @@
+.loading-spinner-body {
+  width: 100%;
+}
+
+.loading-spinner-outer {
+  height: 230px;
+  width: 230px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--accent-other), var(--accent));
+  position: relative;
+}
+
+.loading-spinner-inner {
+  box-shadow: none;
+  height: 85%;
+  width: 85%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--highlight);
+  border-radius: 50%;
+}
+
+.loading-spinner-inner-inner {
+  height: 100%;
+  width: 100%;
+  background-color: var(--highlight);
+  border-radius: 50%;
+  box-shadow: none;
+  transition: 1.5s;
+  animation: loading-spinner-rotateZ 1s linear infinite;
+}
+
+.loading-spinner-bar1 {
+  height: 30px;
+  width: 65%;
+  background-color: var(--highlight);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(0%, -50%);
+  border-radius: 0px;
+  box-shadow: none;
+}
+
+.loading-spinner-bar2 {
+  height: 30px;
+  width: 75%;
+  background-color: var(--highlight);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 120%) rotateZ(90deg);
+  border-radius: 0px;
+  box-shadow: none;
+}
+
+@keyframes loading-spinner-rotateZ {
+  from {
+
+  }
+  to {
+    transform: rotateZ(360deg);
+  }
+}
+
+@keyframes loading-spinner-pulse {
+  from {
+    box-shadow: none;
+  }
+  to {
+    box-shadow: 0px 0px 50px 0px var(--accent);
+  }
+}
