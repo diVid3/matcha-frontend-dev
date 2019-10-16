@@ -16,8 +16,6 @@ export class RegistrationProvider {
       })
       .then((response) => {
 
-        console.log(response.status)
-
         if (!response.ok) {
 
           rej(true)
@@ -34,6 +32,31 @@ export class RegistrationProvider {
     return new Promise((res, rej) => {
 
       fetch(`${Config.backend}/api/v1.0/send-registration-email`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+      .then((response) => {
+
+        if (!response.ok) {
+
+          rej(true)
+        }
+
+        res(true)
+      })
+      .catch((err) => rej(true))
+    })
+  }
+
+  static verifyRegistration(body) {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/verify-registration`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

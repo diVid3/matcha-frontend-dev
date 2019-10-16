@@ -107,6 +107,19 @@ input[type="radio"] {
   text-align: center;
 }
 
+.landing-form-register-body-spinner-container {
+  margin: auto;
+  width: 160px;
+  height: 160px;
+}
+
+.landing-form-register-body-loading h2 {
+  text-align: center;
+  color: var(--midtone-dark);
+  font-size: 25px;
+  margin-bottom: 20px;
+}
+
 @media only screen and (max-height: 568px) {
   .landing-form-register-body {
     padding: 15px;

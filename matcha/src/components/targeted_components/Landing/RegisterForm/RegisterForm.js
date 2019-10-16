@@ -462,7 +462,12 @@ export class RegisterForm extends Component {
       <div className="landing-form-register-body">
         {
           this.state.isLoading
-            ? <LoadingSpinner />
+            ? <div className="landing-form-register-body-loading">
+                <h2>Registering...</h2>
+                <div className="landing-form-register-body-spinner-container">
+                  <LoadingSpinner />
+                </div>
+              </div>
             : <form className="register-form" onSubmit={this.handelSubmit}>
                 <h2>Register</h2>
                 <div className="register-split-block">

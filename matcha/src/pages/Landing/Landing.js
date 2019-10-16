@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import queryString from 'query-string'
+import InputValidation from '../../helpers/InputValidation'
 
 import './Landing.css'
 
@@ -6,17 +8,37 @@ import LoginForm from '../../components/targeted_components/Landing/LoginForm/Lo
 import RegisterForm from '../../components/targeted_components/Landing/RegisterForm/RegisterForm'
 import ResetSendEmailForm from '../../components/targeted_components/Landing/ResetSendEmailForm/ResetSendEmailForm'
 import RegistrationSuccess from '../../components/targeted_components/Landing/RegistrationSuccess/RegistrationSuccess'
+import VerifyRegistration from '../../components/targeted_components/Landing/VerifyRegistration/VerifyRegistration'
 
 export class Landing extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      formToShow: 'login'
+      formToShow: 'login',
+      uuid: ''
     }
 
     this.switchForm = this.switchForm.bind(this)
     this.getForm = this.getForm.bind(this)
+  }
+  
+  componentDidMount() {
+
+    const parsedQueryString = queryString.parse(this.props.location.search);
+
+    if (
+      parsedQueryString.verify &&
+      typeof parsedQueryString.verify === 'string' &&
+      parsedQueryString.verify !== '' &&
+      InputValidation.isValidUuid(parsedQueryString.verify)
+    ) {
+
+      this.setState({
+        formToShow: 'verifyRegistration',
+        uuid: parsedQueryString.verify
+      })
+    }
   }
 
   switchForm(formString) {
@@ -54,10 +76,13 @@ export class Landing extends Component {
         formToReturn = <RegisterForm switchForm={this.switchForm} />
         break
       case "resetSendEmail":
-        formToReturn = <ResetSendEmailForm switchForm={this.switchForm}/>
+        formToReturn = <ResetSendEmailForm switchForm={this.switchForm} />
         break
       case "registrationSuccess":
-        formToReturn = <RegistrationSuccess switchForm={this.switchForm}/>
+        formToReturn = <RegistrationSuccess switchForm={this.switchForm} />
+        break
+      case "verifyRegistration":
+        formToReturn = <VerifyRegistration switchForm={this.switchForm} uuid={this.state.uuid}/>
         break
       default:
         formToReturn = null
