@@ -25,19 +25,21 @@ export class VerifyRegistration extends Component {
   componentDidMount() {
     
     const cancelableVerifyRegistrationPromise = PromiseCancel.makeCancelable(
-      RegistrationProvider.verifyRegistration({ uuid: this.props.uuid })
+      RegistrationProvider.verifyRegistration({ verifyToken: this.props.uuid })
     )
 
     this.pendingPromises.push(cancelableVerifyRegistrationPromise)
 
     cancelableVerifyRegistrationPromise.promise
-    .then(() => {
+    .then((json) => {
 
       this.setState({
         verified: true
       })
     })
-    .catch(() => {
+    .catch((json) => {
+
+      sessionStorage.setItem('viewError', '1')
       
       this.setState({
         redirectTo: '/oops'

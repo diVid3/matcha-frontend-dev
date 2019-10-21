@@ -17,13 +17,17 @@ export class RegistrationProvider {
       .then((response) => {
 
         if (!response.ok) {
-
-          rej(true)
+          return rej(response.json())
         }
 
-        res(true)
+        res(response.json())
       })
-      .catch((err) => rej(true))
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, registering new user.' }]
+        })
+      })
     })
   }
 
@@ -42,13 +46,17 @@ export class RegistrationProvider {
       .then((response) => {
 
         if (!response.ok) {
-
-          rej(true)
+          return rej(response.json())
         }
 
-        res(true)
+        res(response.json())
       })
-      .catch((err) => rej(true))
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, sending registration email.' }]
+        })
+      })
     })
   }
 
@@ -56,7 +64,7 @@ export class RegistrationProvider {
 
     return new Promise((res, rej) => {
 
-      fetch(`${Config.backend}/api/v1.0/verify-registration`, {
+      fetch(`${Config.backend}/api/v1.0/users/verify-registration`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -67,13 +75,17 @@ export class RegistrationProvider {
       .then((response) => {
 
         if (!response.ok) {
-
-          rej(true)
+          return rej(response.json())
         }
 
-        res(true)
+        res(response.json())
       })
-      .catch((err) => rej(true))
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, verifying user registration.' }]
+        })
+      })
     })
   }
 }

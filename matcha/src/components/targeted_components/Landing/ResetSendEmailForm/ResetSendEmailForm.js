@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
+import ResetProvider from '../../../../providers/ResetProvider'
 
 import './ResetSendEmailForm.css'
 import checkmark from '../../../../assets/sent2.png'
@@ -58,13 +59,13 @@ export class ResetSendEmailForm extends Component {
     this.pendingPromises.push(cancelableResetPromise)
 
     cancelableResetPromise.promise
-      .then(() => {
+    .then(() => {
 
-        this.setState({
-          errorToShow: ''
-        })
+      this.setState({
+        errorToShow: ''
       })
-      .catch(() => {})
+    })
+    .catch(() => {})
   }
 
   switchFormDecorator(formToSwitchTo) {
@@ -103,7 +104,6 @@ export class ResetSendEmailForm extends Component {
     }
   }
 
-
   handleSubmit(e) {
     e.preventDefault()
     
@@ -124,22 +124,51 @@ export class ResetSendEmailForm extends Component {
     
     if (this.state.emailValid) {
 
-      this.setState({
-        showEmailSent: true
+      const cancelableGetUserByEmailPromise = PromiseCancel.makeCancelable(
+        ResetProvider.getUserByEmail({email: this.state.email})
+      )
+
+      this.pendingPromises.push(cancelableGetUserByEmailPromise)
+
+      cancelableGetUserByEmailPromise.promise
+      .then((json) => {
+
+        if (!json.rows.length) {
+
+          throw new Error('empty rows')
+        }
       })
+      .then(() => {
 
-      // TODO: Call provider here.
+        const cancelableSendResetEmailPromise = PromiseCancel.makeCancelable(
+          ResetProvider.sendResetEmail({email: this.state.email})
+        )
 
-      // TODO: Remove this after provider code is in.
-      // const cancelableSwitchFormPromise = PromiseCancel.makeCancelable(
-      //   new Promise(res => setTimeout(() => res(true), 7000))
-      // )
+        this.pendingPromises.push(cancelableSendResetEmailPromise)
 
-      // this.pendingPromises.push(cancelableSwitchFormPromise)
+        return cancelableSendResetEmailPromise.promise
+      })
+      .then((json) => {
 
-      // cancelableSwitchFormPromise.promise
-      //   .then(() => { (this.switchFormDecorator('login'))() })
-      //   .catch(() => {})
+        this.setState({
+          showEmailSent: true
+        })
+      })
+      .catch((json) => {
+
+        if (json && json instanceof Error && json.message === 'empty rows') {
+          this.setState({
+            errorToShow: 'That email isn\'t registered'
+          })
+          this.showCorrectErrors()
+        }
+        else {
+          this.setState({
+            errorToShow: 'Oops something went wrong... Please try again later...'
+          })
+          this.showCorrectErrors()
+        }
+      })
     }
   }
 

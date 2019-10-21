@@ -375,7 +375,7 @@ export class RegisterForm extends Component {
     }
 
     if (!this.handleSubmitErrors()) {
-      
+
       return
     }
 
@@ -421,7 +421,7 @@ export class RegisterForm extends Component {
       this.pendingPromises.push(cancelableRegistrationPromise)
 
       cancelableRegistrationPromise.promise
-      .then(() => {
+      .then((json) => {
 
         const cancelableSendRegEmailPromise = PromiseCancel.makeCancelable(
           RegistrationProvider.sendEmail({
@@ -439,11 +439,11 @@ export class RegisterForm extends Component {
 
         return cancelableSendRegEmailPromise.promise
       })
-      .then(() => {
+      .then((json) => {
 
         this.props.switchForm('registrationSuccess')
       })
-      .catch((err) => {
+      .catch((json) => {
 
         this.setState({
           isLoading: false

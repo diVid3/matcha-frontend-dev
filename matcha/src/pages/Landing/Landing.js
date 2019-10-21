@@ -9,6 +9,7 @@ import RegisterForm from '../../components/targeted_components/Landing/RegisterF
 import ResetSendEmailForm from '../../components/targeted_components/Landing/ResetSendEmailForm/ResetSendEmailForm'
 import RegistrationSuccess from '../../components/targeted_components/Landing/RegistrationSuccess/RegistrationSuccess'
 import VerifyRegistration from '../../components/targeted_components/Landing/VerifyRegistration/VerifyRegistration'
+// TODO: Import VerifyReset component. That component will do a request to verify uuid, if so, display pass reset form.
 
 export class Landing extends Component {
   constructor(props) {
@@ -38,6 +39,20 @@ export class Landing extends Component {
         formToShow: 'verifyRegistration',
         uuid: parsedQueryString.verify
       })
+    }
+
+    if (
+      parsedQueryString.reset &&
+      typeof parsedQueryString.reset === 'string' &&
+      parsedQueryString.reset !== '' &&
+      InputValidation.isValidUuid(parsedQueryString.reset)
+    ) {
+
+      // TODO: setState to new verifyReset component with its uuid.
+      // this.setState({
+      //   formToShow: 'verifyRegistration',
+      //   uuid: parsedQueryString.verify
+      // })
     }
   }
 
@@ -84,6 +99,10 @@ export class Landing extends Component {
       case "verifyRegistration":
         formToReturn = <VerifyRegistration switchForm={this.switchForm} uuid={this.state.uuid}/>
         break
+      // TODO: Enable this after component has been built (similar to one above) and imported.
+      // case "verifyReset":
+      //   formToReturn = <VerifyReset switchForm={this.switchForm} uuid={this.state.uuid}/>
+      //   break
       default:
         formToReturn = null
     }
