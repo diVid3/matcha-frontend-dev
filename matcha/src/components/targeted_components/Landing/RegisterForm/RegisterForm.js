@@ -365,7 +365,7 @@ export class RegisterForm extends Component {
       return true
     }
   }
-  
+
   handelSubmit(e) {
     e.preventDefault()
 

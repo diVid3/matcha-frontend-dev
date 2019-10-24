@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
+import PromiseCancel from '../../../../helpers/PromiseCancel'
+import RegistrationProvider from '../../../../providers/RegistrationProvider'
+import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
 
 import './VerifyRegistration.css'
 import verified from '../../../../assets/verified2.png'
 
-import PromiseCancel from '../../../../helpers/PromiseCancel'
-import RegistrationProvider from '../../../../providers/RegistrationProvider'
-import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
 
 export class VerifyRegistration extends Component {
   constructor(props) {

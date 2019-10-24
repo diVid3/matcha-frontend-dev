@@ -58,6 +58,35 @@ export class ResetProvider {
       })
     })
   }
+
+  static verifyReset(body) {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/users/verify-reset`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+      .then((response) => {
+
+        if (!response.ok) {
+          return rej(response.json())
+        }
+
+        res(response.json())
+      })
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, verifying user registration.' }]
+        })
+      })
+    })
+  }
 }
 
 export default ResetProvider

@@ -51,7 +51,7 @@ export class Landing extends Component {
       // TODO: setState to new verifyReset component with its uuid.
       // this.setState({
       //   formToShow: 'verifyRegistration',
-      //   uuid: parsedQueryString.verify
+      //   uuid: parsedQueryString.reset
       // })
     }
   }
