@@ -50,7 +50,7 @@ export class RegisterForm extends Component {
     this.showCorrectErrors = this.showCorrectErrors.bind(this)
     this.handleSubmitErrors = this.handleSubmitErrors.bind(this)
     this.handleInitialSubmit = this.handleInitialSubmit.bind(this)
-    this.handelSubmit = this.handelSubmit.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   switchFormDecorator(formToSwitchTo) {
@@ -366,7 +366,7 @@ export class RegisterForm extends Component {
     }
   }
 
-  handelSubmit(e) {
+  handleSubmit(e) {
     e.preventDefault()
 
     if (this.state.errorBeingShown) {
@@ -468,7 +468,7 @@ export class RegisterForm extends Component {
                   <LoadingSpinner />
                 </div>
               </div>
-            : <form className="register-form" onSubmit={this.handelSubmit}>
+            : <form className="register-form" onSubmit={this.handleSubmit}>
                 <h2>Register</h2>
                 <div className="register-split-block">
                   <input

@@ -2,3 +2,71 @@
   width: 270px;
   padding: 20px;
 }
+
+.verify-reset-body-loading h2 {
+  text-align: center;
+  color: var(--midtone-dark);
+  font-size: 25px;
+  margin-bottom: 20px;
+}
+
+.verify-reset-body-spinner-container {
+  margin: auto;
+  width: 160px;
+  height: 160px;
+}
+
+.verify-reset-password-form h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: var(--midtone-dark);
+  font-size: 35px;
+}
+
+.verify-reset-password-form-message {
+  color: var(--midtone);
+  text-align: center;
+  width: 100%;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.verify-reset-password-form-input {
+  display: block;
+  margin-bottom: 20px;
+  padding: 10px;
+  font-size: 15px;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
+}
+
+.verify-reset-password-form-correct-errors-message {
+  display: flex;
+  height: 48px;
+  background: rgb(255, 135, 135);
+  box-shadow: 0px 0px 1px 1px red;
+  color: rgb(133, 0, 0);
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.verify-reset-password-form-correct-errors-message p {
+  font-size: 15px;
+  text-align: center;
+}
+
+.verify-reset-password-form-button {
+  border-style: none;
+  height: 48px;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 20px;
+  padding: 5px;
+  color: var(--highlight-light);
+  background-color: var(--accent);
+}

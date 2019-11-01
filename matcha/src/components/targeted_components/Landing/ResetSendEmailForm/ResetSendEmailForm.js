@@ -5,6 +5,7 @@ import ResetProvider from '../../../../providers/ResetProvider'
 
 import './ResetSendEmailForm.css'
 import checkmark from '../../../../assets/sent2.png'
+import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
 
 export class ResetSendEmailForm extends Component {
   constructor(props) {
@@ -14,7 +15,8 @@ export class ResetSendEmailForm extends Component {
       email: '',
       emailValid: true,
       errorToShow: '',
-      showEmailSent: false
+      showEmailSent: false,
+      isLoading: false
     }
 
     this.pendingPromises = []
@@ -137,11 +139,15 @@ export class ResetSendEmailForm extends Component {
 
           throw new Error('empty rows')
         }
+
+        this.setState({
+          isLoading: true
+        })
       })
       .then(() => {
 
         const cancelableSendResetEmailPromise = PromiseCancel.makeCancelable(
-          ResetProvider.sendResetEmail({email: this.state.email})
+          ResetProvider.sendResetEmail({ email: this.state.email })
         )
 
         this.pendingPromises.push(cancelableSendResetEmailPromise)
@@ -151,6 +157,7 @@ export class ResetSendEmailForm extends Component {
       .then((json) => {
 
         this.setState({
+          isLoading: false,
           showEmailSent: true
         })
       })
@@ -158,12 +165,14 @@ export class ResetSendEmailForm extends Component {
 
         if (json && json instanceof Error && json.message === 'empty rows') {
           this.setState({
+            isLoading: false,
             errorToShow: 'That email isn\'t registered'
           })
           this.showCorrectErrors()
         }
         else {
           this.setState({
+            isLoading: false,
             errorToShow: 'Oops something went wrong... Please try again later...'
           })
           this.showCorrectErrors()
@@ -176,7 +185,27 @@ export class ResetSendEmailForm extends Component {
     return (
       <div className="reset-send-email-body">
         {
-          !this.state.showEmailSent
+          this.state.isLoading
+            ? <div className="reset-send-email-body-loading">
+                <h2>Sending...</h2>
+                <div className="reset-send-email-body-spinner-container">
+                  <LoadingSpinner />
+                </div>
+              </div>
+            : null
+        }
+        {
+          this.state.showEmailSent && !this.state.isLoading
+            ? <div className="show-email-sent-container">
+                <p className="show-email-sent-message">
+                  Please see the instructions in the email sent to you to reset your password
+                </p>
+                <img src={checkmark} alt="checkmark"/>
+              </div>
+            : null
+        }
+        {
+          !this.state.showEmailSent && !this.state.isLoading
             ? <form onSubmit={this.handleSubmit}>
                 <h2>Reset</h2>
                 <p
@@ -227,14 +256,8 @@ export class ResetSendEmailForm extends Component {
                   </a>
                 </p>
               </form>
-            : <div className="show-email-sent-container">
-                <p className="show-email-sent-message">
-                  Please see the instructions in the email sent to you to reset your password
-                </p>
-                <img src={checkmark} alt="checkmark"/>
-              </div>
-            
-      }
+            : null
+        }
       </div>
     )
   }

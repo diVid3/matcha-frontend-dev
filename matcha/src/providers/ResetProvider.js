@@ -9,8 +9,7 @@ export class ResetProvider {
       fetch(`${Config.backend}/api/v1.0/users/email/${body.email}`, {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Accept': 'application/json'
         }
       })
       .then((response) => {
@@ -63,13 +62,11 @@ export class ResetProvider {
 
     return new Promise((res, rej) => {
 
-      fetch(`${Config.backend}/api/v1.0/users/verify-reset`, {
-        method: 'POST',
+      fetch(`${Config.backend}/api/v1.0/users/reset-token/${body.resetToken}`, {
+        method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
+          'Accept': 'application/json'
+        }
       })
       .then((response) => {
 
@@ -82,7 +79,7 @@ export class ResetProvider {
       .catch((err) => {
 
         rej({
-          errors: [{ code: 'PROVIDER', message: 'Fetch failed, verifying user registration.' }]
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, verifying user password reset.' }]
         })
       })
     })
