@@ -10,7 +10,12 @@ export class LocationProvider {
           'Accept': 'application/json'
         }
       })
-      .then((response) => res(response.json()))
+      .then((response) => {
+        response.json()
+        .then((data) => {
+          res(data)
+        })
+      })
       .catch((err) => rej(err))
     })
   }

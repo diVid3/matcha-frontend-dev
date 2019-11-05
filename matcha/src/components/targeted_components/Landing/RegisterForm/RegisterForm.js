@@ -3,6 +3,7 @@ import uuidv4 from 'uuid/v4'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import RegistrationProvider from '../../../../providers/RegistrationProvider'
+import UsersProvider from '../../../../providers/UsersProvider'
 import LocationProvider from '../../../../providers/LocationProvider'
 import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
 
@@ -397,30 +398,64 @@ export class RegisterForm extends Component {
 
       const verifyUUID = uuidv4()
 
-      // TODO: Query backend to check if non-taken username.
-
-      const cancelableRegistrationPromise = PromiseCancel.makeCancelable(
-        RegistrationProvider.registerUser({
-          firstName: this.state.firstName,
-          lastName: this.state.lastName,
-          gender: this.state.gender,
-          biography: this.state.biography,
-          username: this.state.username,
-          email: this.state.email,
-          password: this.state.password,
-          fameRating: this.state.fameRating,
-          latitude: this.state.latitude,
-          longitude: this.state.longitude,
-          lastSeen: this.state.lastSeen,
-          age: this.state.age,
-          verifyToken: verifyUUID,
-          verified: this.state.verified
+      const cancelableGetUserByEmailPromise = PromiseCancel.makeCancelable(
+        UsersProvider.getUserByEmail({
+          email: this.state.email
         })
       )
 
-      this.pendingPromises.push(cancelableRegistrationPromise)
+      this.pendingPromises.push(cancelableGetUserByEmailPromise)
 
-      cancelableRegistrationPromise.promise
+      cancelableGetUserByEmailPromise.promise
+      .then((json) => {
+
+        if (json.rows.length) {
+          throw new Error('email taken')
+        }
+
+        console.log(this.state.username)
+
+        const cancelableGetUserByUsernamePromise = PromiseCancel.makeCancelable(
+          UsersProvider.getUserByUsername({
+            username: this.state.username
+          })
+        )
+
+        this.pendingPromises.push(cancelableGetUserByUsernamePromise)
+
+        return cancelableGetUserByUsernamePromise.promise
+      })
+      .then((json) => {
+
+        if (json.rows.length) {
+          throw new Error('username taken')
+        }
+      })
+      .then(() => {
+
+        const cancelableRegistrationPromise = PromiseCancel.makeCancelable(
+          RegistrationProvider.registerUser({
+            firstName: this.state.firstName,
+            lastName: this.state.lastName,
+            gender: this.state.gender,
+            biography: this.state.biography,
+            username: this.state.username,
+            email: this.state.email,
+            password: this.state.password,
+            fameRating: this.state.fameRating,
+            latitude: this.state.latitude,
+            longitude: this.state.longitude,
+            lastSeen: this.state.lastSeen,
+            age: this.state.age,
+            verifyToken: verifyUUID,
+            verified: this.state.verified
+          })
+        )
+  
+        this.pendingPromises.push(cancelableRegistrationPromise)
+
+        return cancelableRegistrationPromise.promise
+      })
       .then((json) => {
 
         const cancelableSendRegEmailPromise = PromiseCancel.makeCancelable(
@@ -445,14 +480,29 @@ export class RegisterForm extends Component {
       })
       .catch((json) => {
 
+        console.log(json)
+
+        // TODO: Could possibly signal backend to delete registration if email send fails.
+
         this.setState({
           isLoading: false
         })
 
-        // TODO: Could possibly signal backend to delete registration if email send fails.
+        if (json && json instanceof Error && json.message === 'email taken') {
 
-        this.setState({ errorToShow: 'Oops something went wrong... Please try again later...' })
-        this.showCorrectErrors()
+          this.setState({ errorToShow: 'That email is taken, please try another email address' })
+          this.showCorrectErrors()
+        }
+        else if (json && json instanceof Error && json.message === 'username taken') {
+
+          this.setState({ errorToShow: 'That username is taken, please try another username' })
+          this.showCorrectErrors()
+        }
+        else {
+
+          this.setState({ errorToShow: 'Oops something went wrong... Please try again later...' })
+          this.showCorrectErrors()
+        }
       })
     }
   }

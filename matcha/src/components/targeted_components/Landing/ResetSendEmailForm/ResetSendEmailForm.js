@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import ResetProvider from '../../../../providers/ResetProvider'
+import UsersProvider from '../../../../providers/UsersProvider'
 
 import './ResetSendEmailForm.css'
 import checkmark from '../../../../assets/sent2.png'
@@ -127,7 +128,7 @@ export class ResetSendEmailForm extends Component {
     if (this.state.emailValid) {
 
       const cancelableGetUserByEmailPromise = PromiseCancel.makeCancelable(
-        ResetProvider.getUserByEmail({email: this.state.email})
+        UsersProvider.getUserByEmail({email: this.state.email})
       )
 
       this.pendingPromises.push(cancelableGetUserByEmailPromise)

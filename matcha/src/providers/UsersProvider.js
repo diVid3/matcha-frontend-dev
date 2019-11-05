@@ -1,18 +1,16 @@
 import Config from '../config/Config'
 
-export class RegistrationProvider {
+export class UsersProvider {
 
-  static registerUser(data) {
+  static getUserByUsername(body) {
 
     return new Promise((res, rej) => {
 
-      fetch(`${Config.backend}/api/v1.0/users`, {
-        method: 'POST',
+      fetch(`${Config.backend}/api/v1.0/users/username/${body.username}`, {
+        method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+          'Accept': 'application/json'
+        }
       })
       .then((response) => {
 
@@ -29,18 +27,49 @@ export class RegistrationProvider {
       .catch((err) => {
 
         rej({
-          errors: [{ code: 'PROVIDER', message: 'Fetch failed, registering new user.' }]
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, getting user by username.' }]
         })
       })
     })
   }
 
-  static sendEmail(body) {
+  static getUserByEmail(body) {
 
     return new Promise((res, rej) => {
 
-      fetch(`${Config.backend}/api/v1.0/send-registration-email`, {
-        method: 'POST',
+      fetch(`${Config.backend}/api/v1.0/users/email/${body.email}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      .then((response) => {
+
+        response.json()
+        .then((data) => {
+
+          if (!response.ok) {
+            return rej(data)
+          }
+
+          res(data)
+        })
+      })
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, getting user by email.' }]
+        })
+      })
+    })
+  }
+
+  static patchUserByEmail(body) {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/users/email`, {
+        method: 'PATCH',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
@@ -62,44 +91,11 @@ export class RegistrationProvider {
       .catch((err) => {
 
         rej({
-          errors: [{ code: 'PROVIDER', message: 'Fetch failed, sending registration email.' }]
-        })
-      })
-    })
-  }
-
-  static verifyRegistration(body) {
-
-    return new Promise((res, rej) => {
-
-      fetch(`${Config.backend}/api/v1.0/users/verify-registration`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      })
-      .then((response) => {
-
-        response.json()
-        .then((data) => {
-
-          if (!response.ok) {
-            return rej(data)
-          }
-
-          res(data)
-        })
-      })
-      .catch((err) => {
-
-        rej({
-          errors: [{ code: 'PROVIDER', message: 'Fetch failed, verifying user registration.' }]
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, patching user by email.' }]
         })
       })
     })
   }
 }
 
-export default RegistrationProvider
+export default UsersProvider

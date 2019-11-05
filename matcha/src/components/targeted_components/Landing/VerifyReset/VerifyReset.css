@@ -70,3 +70,22 @@
   color: var(--highlight-light);
   background-color: var(--accent);
 }
+
+.verify-reset-body-success-message {
+  font-size: 15px;
+  text-align: center;
+  color: var(--midtone-dark);
+  line-height: 1.3;
+  margin-bottom: 20px;
+}
+
+.verify-reset-body-success-container img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 230px;
+}
+
+.verify-reset-body-switch-to-login {
+  cursor: pointer;
+}

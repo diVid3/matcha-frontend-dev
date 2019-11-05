@@ -2,33 +2,6 @@ import Config from '../config/Config'
 
 export class ResetProvider {
 
-  static getUserByEmail(body) {
-
-    return new Promise((res, rej) => {
-
-      fetch(`${Config.backend}/api/v1.0/users/email/${body.email}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        }
-      })
-      .then((response) => {
-
-        if (!response.ok) {
-          return rej(response.json())
-        }
-
-        res(response.json())
-      })
-      .catch((err) => {
-
-        rej({
-          errors: [{ code: 'PROVIDER', message: 'Fetch failed, getting user by email.' }]
-        })
-      })
-    })
-  }
-
   static sendResetEmail(body) {
 
     return new Promise((res, rej) => {
@@ -43,11 +16,15 @@ export class ResetProvider {
       })
       .then((response) => {
 
-        if (!response.ok) {
-          return rej(response.json())
-        }
+        response.json()
+        .then((data) => {
 
-        res(response.json())
+          if (!response.ok) {
+            return rej(data)
+          }
+
+          res(data)
+        })
       })
       .catch((err) => {
 
@@ -70,11 +47,15 @@ export class ResetProvider {
       })
       .then((response) => {
 
-        if (!response.ok) {
-          return rej(response.json())
-        }
+        response.json()
+        .then((data) => {
 
-        res(response.json())
+          if (!response.ok) {
+            return rej(data)
+          }
+
+          res(data)
+        })
       })
       .catch((err) => {
 

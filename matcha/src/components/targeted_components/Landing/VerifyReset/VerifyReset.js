@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import ResetProvider from '../../../../providers/ResetProvider'
+import UsersProvider from '../../../../providers/UsersProvider'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import InputValidation from '../../../../helpers/InputValidation'
 
 import './VerifyReset.css'
 import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
+import shield from '../../../../assets/shield2.png'
 
 export class VerifyReset extends Component {
   constructor(props) {
@@ -19,7 +21,9 @@ export class VerifyReset extends Component {
       passwordConfirm: '',
       passwordConfirmValid: true,
       passwordsMatch: true,
-      errorToShow: ''
+      errorToShow: '',
+      isResetting: false,
+      didReset: false
     }
 
     this.pendingPromises = []
@@ -30,6 +34,7 @@ export class VerifyReset extends Component {
     this.handleSubmitErrors = this.handleSubmitErrors.bind(this)
     this.handleInitialSubmit = this.handleInitialSubmit.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.switchFormDecorator = this.switchFormDecorator.bind(this)
   }
 
   componentDidMount() {
@@ -63,17 +68,25 @@ export class VerifyReset extends Component {
     })
     .catch((json) => {
 
-      sessionStorage.setItem('viewError', '1')
-      
       this.setState({
-        redirectTo: '/oops'
+        redirectTo: '/'
       })
+      this.props.switchForm('login')
     })
   }
 
   componentWillUnmount() {
 
     this.pendingPromises.map(p => p.cancel())
+  }
+
+  switchFormDecorator(formToSwitchTo) {
+    
+    return (e) => {
+      e.preventDefault()
+
+      this.props.switchForm(formToSwitchTo)
+    }
   }
 
   handlePasswordChange(e) {
@@ -185,14 +198,38 @@ export class VerifyReset extends Component {
       this.state.passwordsMatch
     ) {
 
-      console.log('Password reset form submitted!')
+      const cancelablePatchUserByEmailPromise = PromiseCancel.makeCancelable(
+        UsersProvider.patchUserByEmail({
+          email: this.state.email,
+          password: this.state.password,
+          resetToken: null
+        })
+      )
+  
+      this.pendingPromises.push(cancelablePatchUserByEmailPromise)
 
-      // TODO: Call provider here.
+      this.setState({
+        isResetting: true
+      })
+
+      cancelablePatchUserByEmailPromise.promise
+      .then(() => {
+
+        this.setState({
+          isResetting: false,
+          didReset: true
+        })
+      })
+      .catch(() => {
+
+        sessionStorage.setItem('viewError', '1')
+      
+        this.setState({
+          redirectTo: '/oops'
+        })
+      })
     }
   }
-
-  // TODO: Finish this, this will need to display the loading spinner whilst verifying the resetToken, if verified
-  // display the reset form.
 
   render() {
     return (
@@ -213,7 +250,7 @@ export class VerifyReset extends Component {
             : null
         }
         {
-          this.state.email.length
+          this.state.email.length && !this.state.isResetting && !this.state.didReset
             ? <form className="verify-reset-password-form" onSubmit={this.handleSubmit}>
                 <h2>Reset Pass</h2>
                 <p className="verify-reset-password-form-message">
@@ -263,6 +300,32 @@ export class VerifyReset extends Component {
                   Reset
                 </button>
               </form>
+            : null
+        }
+        {
+          this.state.isResetting
+            ? <div className="verify-reset-body-loading">
+                <h2>Resetting...</h2>
+                <div className="verify-reset-body-spinner-container">
+                  <LoadingSpinner />
+                </div>
+              </div>
+            : null
+        }
+        {
+          this.state.didReset
+            ? <div className="verify-reset-body-success-container">
+                <p className="verify-reset-body-success-message">
+                  Password changed! You can now login! <a
+                    className="verify-reset-body-switch-to-login"
+                    href="/#"
+                    onClick={this.switchFormDecorator('login')}
+                  >
+                    Log in here
+                  </a>
+                </p>
+                <img src={shield} alt="successfully-reset-password"/>
+              </div>
             : null
         }
       </div>
