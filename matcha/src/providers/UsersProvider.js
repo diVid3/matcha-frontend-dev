@@ -23,6 +23,12 @@ export class UsersProvider {
 
           res(data)
         })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, getting user by username.' }]
+          })
+        })
       })
       .catch((err) => {
 
@@ -53,6 +59,12 @@ export class UsersProvider {
           }
 
           res(data)
+        })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, getting user by email.' }]
+          })
         })
       })
       .catch((err) => {
@@ -86,6 +98,12 @@ export class UsersProvider {
           }
 
           res(data)
+        })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, patching user by email.' }]
+          })
         })
       })
       .catch((err) => {

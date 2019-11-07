@@ -413,8 +413,6 @@ export class RegisterForm extends Component {
           throw new Error('email taken')
         }
 
-        console.log(this.state.username)
-
         const cancelableGetUserByUsernamePromise = PromiseCancel.makeCancelable(
           UsersProvider.getUserByUsername({
             username: this.state.username
@@ -479,8 +477,6 @@ export class RegisterForm extends Component {
         this.props.switchForm('registrationSuccess')
       })
       .catch((json) => {
-
-        console.log(json)
 
         // TODO: Could possibly signal backend to delete registration if email send fails.
 

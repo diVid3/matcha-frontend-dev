@@ -25,6 +25,12 @@ export class ResetProvider {
 
           res(data)
         })
+        .catch((err) => {
+
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, sending password reset email.' }]
+          })
+        })
       })
       .catch((err) => {
 
@@ -55,6 +61,12 @@ export class ResetProvider {
           }
 
           res(data)
+        })
+        .catch((err) => {
+
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, verifying user password reset.' }]
+          })
         })
       })
       .catch((err) => {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
+import SessionProvider from '../../../../providers/SessionProvider'
 
 import './LoginForm.css'
 
@@ -148,11 +149,18 @@ export class LoginForm extends Component {
 
     if (this.state.emailValid && this.state.passwordValid) {
 
-      console.log(`email: ${this.state.email}`)
-      console.log(`password: ${this.state.password}`)
-      console.log('Login form submitted!')
-
-      // TODO: Call provider here.
+      // TODO: After successful login, either call a prop to switch to /profile, or do a setState with the redirect
+      // component.
+      SessionProvider.login({
+        email: this.state.email,
+        password: this.state.password
+      })
+      .then((json) => {
+        console.log(json)
+      })
+      .catch((json) => {
+        console.log(json)
+      })
     }
   }
 

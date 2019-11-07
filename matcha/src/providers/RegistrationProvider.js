@@ -25,6 +25,12 @@ export class RegistrationProvider {
 
           res(data)
         })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, registering new user.' }]
+          })
+        })
       })
       .catch((err) => {
 
@@ -58,6 +64,12 @@ export class RegistrationProvider {
 
           res(data)
         })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, sending registration email.' }]
+          })
+        })
       })
       .catch((err) => {
 
@@ -90,6 +102,12 @@ export class RegistrationProvider {
           }
 
           res(data)
+        })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, verifying user registration.' }]
+          })
         })
       })
       .catch((err) => {

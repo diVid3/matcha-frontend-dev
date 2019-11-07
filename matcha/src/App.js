@@ -8,7 +8,7 @@ import Profile from './pages/Profile/Profile'
 import Oops from './pages/Oops/Oops'
 
 function App() {
-  
+
   return (
     <Router>
       <div className="App">
