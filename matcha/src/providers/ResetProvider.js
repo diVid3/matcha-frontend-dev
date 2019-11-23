@@ -12,6 +12,7 @@ export class ResetProvider {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(body)
       })
       .then((response) => {
@@ -49,7 +50,8 @@ export class ResetProvider {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
-        }
+        },
+        credentials: 'include'
       })
       .then((response) => {
 

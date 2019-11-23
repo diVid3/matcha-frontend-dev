@@ -185,7 +185,7 @@ export class RegisterForm extends Component {
               })
             }
             else {
-              rej('Some weird obscure error occured.')
+              rej('FRONTEND - Geolocation error, it\'s weird')
             }
           })
         })

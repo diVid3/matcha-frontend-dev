@@ -32,3 +32,9 @@ input:focus {
 .input-bad {
   box-shadow: 0px 0px 2px 1px red;
 }
+
+.App header {
+  position: sticky;
+  top: 0px;
+  width: 100%;
+}

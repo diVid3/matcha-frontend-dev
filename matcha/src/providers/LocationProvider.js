@@ -8,7 +8,8 @@ export class LocationProvider {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
-        }
+        },
+        credentials: 'include'
       })
       .then((response) => {
         response.json()

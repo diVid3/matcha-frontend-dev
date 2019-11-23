@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import SessionProvider from '../../../../providers/SessionProvider'
+import { Redirect } from "react-router-dom";
 
 import './LoginForm.css'
 
@@ -15,7 +16,8 @@ export class LoginForm extends Component {
       emailValid: true,
       passwordValid: true,
       showError: false,
-      errorToShow: ''
+      errorToShow: '',
+      redirectTo: ''
     }
 
     this.pendingPromises = []
@@ -149,17 +151,37 @@ export class LoginForm extends Component {
 
     if (this.state.emailValid && this.state.passwordValid) {
 
-      // TODO: After successful login, either call a prop to switch to /profile, or do a setState with the redirect
-      // component.
-      SessionProvider.login({
-        email: this.state.email,
-        password: this.state.password
-      })
+      const cancelableLogInPromise = PromiseCancel.makeCancelable(
+        SessionProvider.login({
+          email: this.state.email,
+          password: this.state.password
+        })
+      )
+  
+      this.pendingPromises.push(cancelableLogInPromise)
+
+      cancelableLogInPromise.promise
       .then((json) => {
-        console.log(json)
+
+        if (json.status) {
+
+          this.setState({
+            redirectTo: '/profile'
+          })
+        }
+        else {
+
+          this.setState({ errorToShow: 'Incorrect Details' })
+          this.showCorrectErrors()
+        }
       })
       .catch((json) => {
-        console.log(json)
+
+        sessionStorage.setItem('viewError', '1')
+
+        this.setState({
+          redirectTo: '/oops'
+        })
       })
     }
   }
@@ -167,6 +189,11 @@ export class LoginForm extends Component {
   render() {
     return (
       <div className="landing-form-login-body">
+        {
+          this.state.redirectTo
+            ? <Redirect to='/profile' />
+            : null
+        }
         <form className="login-form" onSubmit={this.handleSubmit}>
           <h2>Login</h2>
           <input

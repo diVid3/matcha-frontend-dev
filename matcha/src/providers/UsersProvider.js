@@ -10,7 +10,8 @@ export class UsersProvider {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
-        }
+        },
+        credentials: 'include'
       })
       .then((response) => {
 
@@ -47,7 +48,8 @@ export class UsersProvider {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
-        }
+        },
+        credentials: 'include'
       })
       .then((response) => {
 
@@ -86,6 +88,7 @@ export class UsersProvider {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(body)
       })
       .then((response) => {
