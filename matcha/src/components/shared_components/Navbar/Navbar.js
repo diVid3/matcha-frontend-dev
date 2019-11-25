@@ -71,10 +71,30 @@ export class Navbar extends Component {
         }
         <div className="nav-burger-container">
           <div className="nav-app-name">
-            <h2>Matcha</h2>
+            <div><NavLink className="nav-logo" to="/profile"></NavLink></div>
+            <div><NavLink className="nav-logo-h2" to="/profile">atcha</NavLink></div>
           </div>
+          <ul className="nav-desk-items nav-desk-items-left">
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="/profile">Profile</NavLink></li>
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Browse</NavLink></li>
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Search</NavLink></li>
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to="/lol"></NavLink></li>
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-notification" to=""></NavLink></li>
+          </ul>
           <div className="nav-spacer"></div>
-          <div className="nav-burger" onClick={this.toggleMobileMenu}>
+          <ul className="nav-desk-items nav-desk-items-right">
+            <li className="nav-desk-item nav-desk-item-right"><NavLink className="nav-desk-item-icon-setting" to=""></NavLink></li>
+            <li className="nav-desk-item nav-desk-item-right"><NavLink className="nav-desk-item-link" to="">Logout</NavLink></li>
+          </ul>
+          {/* <div className="nav-burger" onClick={this.toggleMobileMenu}> */}
+          <div
+            className={
+              `nav-burger ${
+                this.state.mobileMenuOpen
+                  ? 'nav-burger-open'
+                  : ''
+              }
+            `} onClick={this.toggleMobileMenu}>
             <div className="nav-burger-bar"></div>
             <div className="nav-burger-bar"></div>
             <div className="nav-burger-bar"></div>
@@ -91,8 +111,8 @@ export class Navbar extends Component {
         >
           <ul className="nav-items">
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/profile">Profile</NavLink></li>
-            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/lol">Chat</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Browse</NavLink></li>
+            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/lol">Chat</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Notifications</NavLink></li>
           </ul>
           <ul className="nav-items">

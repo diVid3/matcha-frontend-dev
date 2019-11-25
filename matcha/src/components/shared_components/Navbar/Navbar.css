@@ -1,5 +1,7 @@
 nav {
   position: relative;
+  background: linear-gradient(90deg, var(--accent-other), var(--accent));
+  border-bottom: 3px solid var(--highlight);
 }
 
 .nav-items-wrapper {
@@ -8,7 +10,8 @@ nav {
   width: 100%;
   top: -300px;
   box-sizing: border-box;
-  transition: 0.5s;
+  transition: 0.25s;
+  border-bottom: 3px solid var(--highlight);
 }
 
 .nav-items-wrapper-open {
@@ -22,36 +25,36 @@ nav {
 .nav-link {
   display: block;
   text-decoration: none;
-  color: var(--highlight);
-  background-color: var(--midtone);
+  color: var(--midtone-dark);
+  background-color: var(--highlight-light);
   padding: 10px;
 }
 
 .nav-burger-container {
   display: flex;
-  background-color: var(--midtone);
+  max-width: 900px;
+  margin: 0px auto;
 }
 
 .nav-burger-container .nav-app-name {
   display: flex;
   align-items: center;
   height: 48px;
+  padding: 0px 40px 0px 10px
 }
 
-/* .nav-burger-container .nav-app-name .logo {
+.nav-burger-container .nav-app-name .nav-logo {
   display: inline-block;
   height: 32px;
   width: 32px;
-  margin: 0px 0px 0px 10px;
-  background-image: url(icons/matcha-highlight.png);
+  background-image: url('../../../assets/m2.png');
   background-size: cover;
-} */
+}
 
-.nav-burger-container .nav-app-name h2 {
-  display: inline-block;
-  text-align: center;
-  padding: 10px 10px 10px 10px;
-  color: var(--highlight);
+.nav-logo-h2 {
+  color: var(--highlight-light);
+  font-size: 16px;
+  padding-left: 4px
 }
 
 .nav-burger-container .nav-spacer {
@@ -65,21 +68,104 @@ nav {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  background-color: var(--midtone);
   cursor: pointer;
   padding: 10px;
   box-sizing: border-box;
+  transition: 0.1s;
+  transition-timing-function: linear;
 }
 
 .nav-burger-container .nav-burger .nav-burger-bar {
   width: 100%;
   height: 2px;
-  background-color: var(--highlight);
+  background-color: var(--highlight-light);
   border-radius: 5px;
-  transition: 0.25s;
 }
 
-.nav-burger-bar-open {
-  box-shadow: 0px 0px 7px 1px var(--accent);
-  color: var(--shadow);
+.nav-burger-open {
+  transform: rotateZ(90deg);
+}
+
+.nav-desk-items {
+  display: flex;
+}
+
+.nav-desk-items-left {
+  padding-left: 10px;
+}
+
+.nav-desk-items-right {
+  padding-right: 10px;
+}
+
+.nav-desk-item-left {
+  padding-right: 16px;
+}
+
+.nav-desk-item-left:last-child {
+  padding-right: 0px;
+}
+
+.nav-desk-item-right {
+  padding-left: 16px;
+}
+
+.nav-desk-item-right:first-child {
+  padding-left: 0px;
+}
+
+.nav-desk-item {
+  display: flex;
+  height: 48px;
+  align-items: center;
+}
+
+.nav-desk-item-link {
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  color: var(--highlight-light);
+}
+
+.nav-desk-item-icon-chat {
+  height: 22px;
+  width: 22px;
+  background-image: url('../../../assets/chat2.png');
+  background-size: cover;
+}
+
+.nav-desk-item-icon-notification {
+  height: 22px;
+  width: 22px;
+  background-image: url('../../../assets/notification2.png');
+  background-size: cover;
+}
+
+.nav-desk-item-icon-search {
+  height: 22px;
+  width: 22px;
+  background-image: url('../../../assets/search2.png');
+  background-size: cover;
+}
+
+.nav-desk-item-icon-setting {
+  height: 22px;
+  width: 22px;
+  background-image: url('../../../assets/setting2.png');
+  background-size: cover;
+}
+
+@media only screen and (min-width: 700px) {
+  .nav-items-wrapper {
+    display: none;
+  }
+  .nav-burger-container .nav-burger {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 699px) {
+  .nav-desk-items {
+    display: none;
+  }
 }
