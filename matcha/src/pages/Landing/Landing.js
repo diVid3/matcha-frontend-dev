@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Redirect } from "react-router-dom";
 import queryString from 'query-string'
 import InputValidation from '../../helpers/InputValidation'
 
@@ -16,6 +17,7 @@ export class Landing extends Component {
     super(props)
 
     this.state = {
+      redirectTo: '',
       formToShow: 'login',
       uuid: ''
     }
@@ -25,6 +27,20 @@ export class Landing extends Component {
   }
   
   componentDidMount() {
+
+    // Redirect to profile if user is already logged in.
+    if (
+      document.cookie &&
+      document.cookie.includes('=') &&
+      document.cookie.split('=')[0] === 'sid' &&
+      (document.cookie.split('=')[1]).length >= 80 &&
+      (document.cookie.split('=')[1]).length <= 100
+    ) {
+
+      return this.setState({
+        redirectTo: '/profile'
+      })
+    }
 
     const parsedQueryString = queryString.parse(this.props.location.search);
 
@@ -111,9 +127,18 @@ export class Landing extends Component {
   render() {
     return (
       <div className="landing-body">
-        <div className="landing-form-container">
-          { this.getForm() }
-        </div>
+        {
+          this.state.redirectTo
+            ? <Redirect to={`${this.state.redirectTo}`}/>
+            : null
+        }
+        {
+          !this.state.redirectTo
+            ? <div className="landing-form-container">
+                { this.getForm() }
+              </div>
+            : null
+        }
       </div>
     )
   }

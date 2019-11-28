@@ -3,6 +3,7 @@ import InputValidation from '../../../../helpers/InputValidation'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import SessionProvider from '../../../../providers/SessionProvider'
 import { Redirect } from "react-router-dom";
+import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
 
 import './LoginForm.css'
 
@@ -17,7 +18,8 @@ export class LoginForm extends Component {
       passwordValid: true,
       showError: false,
       errorToShow: '',
-      redirectTo: ''
+      redirectTo: '',
+      isBusy: false
     }
 
     this.pendingPromises = []
@@ -160,18 +162,26 @@ export class LoginForm extends Component {
   
       this.pendingPromises.push(cancelableLogInPromise)
 
+      this.setState({
+        isBusy: true
+      })
+
       cancelableLogInPromise.promise
       .then((json) => {
 
         if (json.status) {
 
           this.setState({
+            isBusy: false,
             redirectTo: '/profile'
           })
         }
         else {
 
-          this.setState({ errorToShow: 'Incorrect Details' })
+          this.setState({
+            isBusy: false,
+            errorToShow: 'Incorrect Details'
+          })
           this.showCorrectErrors()
         }
       })
@@ -180,6 +190,7 @@ export class LoginForm extends Component {
         sessionStorage.setItem('viewError', '1')
 
         this.setState({
+          isBusy: false,
           redirectTo: '/oops'
         })
       })
@@ -194,79 +205,88 @@ export class LoginForm extends Component {
             ? <Redirect to='/profile' />
             : null
         }
-        <form className="login-form" onSubmit={this.handleSubmit}>
-          <h2>Login</h2>
-          <input
-            className={
-              `login-form-input ${
-                this.state.emailValid
-                  ? ''
-                  : 'input-bad'
-              }`
-            }
-            type="text"
-            name="email"
-            value={this.state.email}
-            placeholder="Email"
-            onChange={
-              this.handleChangeDecorator(
-                'emailValid',
-                InputValidation.isValidEmail
-              )
-            }
-          />
-          <input
-            className={
-              `login-form-input ${
-                this.state.passwordValid
-                  ? ''
-                  : 'input-bad'
-              }`
-            }
-            type="password"
-            name="password"
-            value={this.state.password}
-            placeholder="Password"
-            onChange={
-              this.handleChangeDecorator(
-                'passwordValid',
-                InputValidation.isValidPassword
-              )
-            }
-          />
-          <p className="reset-text">
-            <a
-              className="reset-form"
-              href="/#"
-              onClick={this.switchFormDecorator('resetSendEmail')}
-            >
-              Forgot password?
-            </a>
-          </p>
-          {
-            this.state.showError
-              ? <div className="correct-errors-message">
-                  <p>{this.state.errorToShow}</p>
+        {
+          this.state.isBusy
+            ? <div className="login-form-loading">
+                <h2>Logging in...</h2>
+                <div className="login-form-loading-container">
+                  <LoadingSpinner/>
                 </div>
-              : ''
-          }
-          <button
-            className="login-form-button"
-            type="submit"
-            value="Submit"
-          >
-            Login
-          </button>
-          <p className="switch-to-register-text">
-            Not a member? <a
-              className="switch-to-register"
-              href="/#"
-              onClick={this.switchFormDecorator('register')}
-            >
-              Register here
-            </a>
-          </p>
-        </form>
+              </div>
+            : <form className="login-form" onSubmit={this.handleSubmit}>
+                <h2>Login</h2>
+                <input
+                  className={
+                    `login-form-input ${
+                      this.state.emailValid
+                        ? ''
+                        : 'input-bad'
+                    }`
+                  }
+                  type="text"
+                  name="email"
+                  value={this.state.email}
+                  placeholder="Email"
+                  onChange={
+                    this.handleChangeDecorator(
+                      'emailValid',
+                      InputValidation.isValidEmail
+                    )
+                  }
+                />
+                <input
+                  className={
+                    `login-form-input ${
+                      this.state.passwordValid
+                        ? ''
+                        : 'input-bad'
+                    }`
+                  }
+                  type="password"
+                  name="password"
+                  value={this.state.password}
+                  placeholder="Password"
+                  onChange={
+                    this.handleChangeDecorator(
+                      'passwordValid',
+                      InputValidation.isValidPassword
+                    )
+                  }
+                />
+                <p className="reset-text">
+                  <a
+                    className="reset-form"
+                    href="/#"
+                    onClick={this.switchFormDecorator('resetSendEmail')}
+                  >
+                    Forgot password?
+                  </a>
+                </p>
+                {
+                  this.state.showError
+                    ? <div className="correct-errors-message">
+                        <p>{this.state.errorToShow}</p>
+                      </div>
+                    : ''
+                }
+                <button
+                  className="login-form-button"
+                  type="submit"
+                  value="Submit"
+                >
+                  Login
+                </button>
+                <p className="switch-to-register-text">
+                  Not a member? <a
+                    className="switch-to-register"
+                    href="/#"
+                    onClick={this.switchFormDecorator('register')}
+                  >
+                    Register here
+                  </a>
+                </p>
+              </form>
+        }
       </div>
     )
   }

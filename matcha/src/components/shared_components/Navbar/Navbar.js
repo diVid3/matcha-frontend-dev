@@ -78,26 +78,27 @@ export class Navbar extends Component {
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="/profile">Profile</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Browse</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Search</NavLink></li>
-            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to="/lol"></NavLink></li>
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to=""></NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-notification" to=""></NavLink></li>
           </ul>
           <div className="nav-spacer"></div>
           <ul className="nav-desk-items nav-desk-items-right">
             <li className="nav-desk-item nav-desk-item-right"><NavLink className="nav-desk-item-icon-setting" to=""></NavLink></li>
-            <li className="nav-desk-item nav-desk-item-right"><NavLink className="nav-desk-item-link" to="">Logout</NavLink></li>
+            <li className="nav-desk-item nav-desk-item-right"><a className="nav-desk-item-link" onClick={this.logOut} href="/#">Logout</a></li>
           </ul>
-          {/* <div className="nav-burger" onClick={this.toggleMobileMenu}> */}
-          <div
-            className={
-              `nav-burger ${
-                this.state.mobileMenuOpen
-                  ? 'nav-burger-open'
-                  : ''
-              }
-            `} onClick={this.toggleMobileMenu}>
-            <div className="nav-burger-bar"></div>
-            <div className="nav-burger-bar"></div>
-            <div className="nav-burger-bar"></div>
+          <div className="nav-burger-wrapper">
+            <div
+              className={
+                `nav-burger ${
+                  this.state.mobileMenuOpen
+                    ? 'nav-burger-open'
+                    : ''
+                }
+              `} onClick={this.toggleMobileMenu}>
+              <div className="nav-burger-bar"></div>
+              <div className="nav-burger-bar"></div>
+              <div className="nav-burger-bar"></div>
+            </div>
           </div>
         </div>
         <div

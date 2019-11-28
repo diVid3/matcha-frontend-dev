@@ -74,3 +74,16 @@
   font-size: 15px;
   text-align: center;
 }
+
+.login-form-loading-container {
+  margin: auto;
+  width: 160px;
+  height: 160px;
+}
+
+.login-form-loading h2 {
+  text-align: center;
+  color: var(--midtone-dark);
+  font-size: 25px;
+  margin-bottom: 20px;
+}

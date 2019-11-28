@@ -33,8 +33,14 @@ input:focus {
   box-shadow: 0px 0px 2px 1px red;
 }
 
+.App {
+  min-height: 100vh;
+  background-color: var(--highlight-light);
+}
+
 .App header {
   position: sticky;
   top: 0px;
   width: 100%;
+  z-index: 2;
 }

@@ -11,7 +11,7 @@ nav {
   top: -300px;
   box-sizing: border-box;
   transition: 0.25s;
-  border-bottom: 3px solid var(--highlight);
+  box-shadow: 0px 3px 2px 0px silver;
 }
 
 .nav-items-wrapper-open {
@@ -54,23 +54,29 @@ nav {
 .nav-logo-h2 {
   color: var(--highlight-light);
   font-size: 16px;
-  padding-left: 4px
+  padding-left: 3px
 }
 
 .nav-burger-container .nav-spacer {
   flex-grow: 1;
 }
 
-.nav-burger-container .nav-burger {
+.nav-burger-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 48px;
   height: 48px;
+}
+
+.nav-burger-container .nav-burger {
+  width: 32px;
+  height: 32px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
   cursor: pointer;
-  padding: 10px;
-  box-sizing: border-box;
   transition: 0.1s;
   transition-timing-function: linear;
 }
@@ -127,45 +133,77 @@ nav {
   color: var(--highlight-light);
 }
 
+.nav-desk-item-link:hover {
+  border-bottom: 1px solid var(--highlight-light);
+}
+
 .nav-desk-item-icon-chat {
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
   background-image: url('../../../assets/chat2.png');
   background-size: cover;
+  transition: 0.1s;
+  transition-timing-function: linear;
 }
 
 .nav-desk-item-icon-notification {
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
   background-image: url('../../../assets/notification2.png');
   background-size: cover;
 }
 
-.nav-desk-item-icon-search {
-  height: 22px;
-  width: 22px;
-  background-image: url('../../../assets/search2.png');
-  background-size: cover;
-}
-
 .nav-desk-item-icon-setting {
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
   background-image: url('../../../assets/setting2.png');
   background-size: cover;
+  transition: 0.1s;
+  transition-timing-function: linear;
 }
 
-@media only screen and (min-width: 700px) {
+.nav-desk-item-icon-chat:hover {
+  transform: scale(1.15);
+}
+
+.nav-desk-item-icon-notification:hover {
+  animation: shake 0.35s linear 0s 1 forwards normal;
+}
+
+.nav-desk-item-icon-setting:hover {
+  transform: rotateZ(25deg);
+}
+
+@media only screen and (min-width: 600px) {
   .nav-items-wrapper {
     display: none;
   }
-  .nav-burger-container .nav-burger {
+  .nav-burger-wrapper {
     display: none;
   }
 }
 
-@media only screen and (max-width: 699px) {
+@media only screen and (max-width: 599px) {
   .nav-desk-items {
     display: none;
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: rotateZ(0deg);
+    transform-origin: 50% 0%;
+  }
+  25% {
+    transform: rotateZ(15deg);
+    transform-origin: 50% 0%;
+  }
+  50% {
+    transform: rotateZ(-15deg);
+    transform-origin: 50% 0%;
+  }
+  100% {
+    transform: rotateZ(0deg);
+    transform-origin: 50% 0%;
   }
 }
