@@ -5,25 +5,23 @@
 
 .profile-page-grid {
   display: grid;
-  padding: 20px 10px 20px 10px;
-  grid-template-columns: repeat(8, 1fr);
-  /* grid-auto-rows: minmax(50px, auto); */
+  padding: 20px 20px 20px 20px;
+  grid-template-columns: repeat(10, 1fr);
   grid-gap: 20px;
   grid-template-areas:
-  "stats stats stats stats stats stats stats stats"
-  "picts picts picts picts picts picts picts picts"
-  "butns butns butns butns butns butns butns butns";
+  "stats stats stats stats stats stats stats stats stats stats"
+  "picts picts picts picts picts picts picts picts picts picts"
+  "butns butns butns butns butns butns butns butns butns butns";
 }
 
 .profile-page-grid-component {
   border-radius: 5px;
   background-color: white;
-  box-shadow: 0px 3px 2px 0px silver;
+  box-shadow: 0px 4px 3px 1px lightgray;
 }
 
 .profile-page-grid-stats {
   grid-area: stats;
-  padding: 10px
 }
 
 .profile-page-grid-buttons {
@@ -42,21 +40,20 @@
 
 .profile-page-stats-title {
   width: 100%;
-  height: 60px;
+  height: 54px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .profile-page-stats-name {
-  font-weight: lighter;
-  font-size: 24px;
+  font-size: 20px;
   text-align: center;
 }
 
 .profile-page-stats-username {
-  font-weight: lighter;
+  font-size: 14px;
   text-align: center;
   color: silver;
 }
@@ -68,16 +65,20 @@
 }
 
 .profile-page-stats-pp {
-  height: 60%;
-  width: 60%;
+  height: 75%;
+  width: 75%;
   border-radius: 50%;
-  box-shadow: 0px 0px 3px 2px silver;
+  box-shadow: 0px 0px 7px 0px silver;
+}
+
+.profile-page-stats-pp:hover {
+  cursor: pointer;
 }
 
 .profile-page-stats-stats-container {
   margin-top: 20px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
 }
 
 .profile-page-stat-container {
@@ -85,39 +86,164 @@
 }
 
 .profile-page-stat-heading {
-  font-weight: lighter;
   color: silver;
   font-size: 12px;
   text-align: center;
 }
 
 .profile-page-stat-stat {
-  font-weight: lighter;
-  font-size: 16px;
+  font-size: 14px;
   margin-top: 5px;
   text-align: center;
+}
+
+.profile-page-stats-map-container {
+  box-shadow: 0px 0px 7px 0px silver;
+  margin: 28px 0px 28px 0px;
+}
+
+.profile-page-grid-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 30px;
+}
+
+.profile-page-grid-buttons-button {
+  height: 48px;
+  width: 100px;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+  margin: 20px 0px;
+  border: none;
+  box-shadow: 0px 0px 7px 0px silver;
+}
+
+.profile-page-grid-buttons-button:hover {
+  cursor: pointer;
+}
+
+.profile-page-grid-viewed-button {
+  background: linear-gradient(45deg, var(--accent-other), var(--accent));
+}
+
+.profile-page-grid-edit-button {
+  color: gray;
+  background-color: var(--highlight-light)
+}
+
+.profile-page-grid-pictures {
+  padding: 30px;
+}
+
+.profile-page-pictures-bio-container {
+  min-height: 25%;
+}
+
+.profile-page-pictures-bio-heading {
+  color: silver;
+  font-size: 12px;
+}
+
+.profile-page-pictures-bio-text {
+  margin: 5px 0px 20px 0px;
+  font-size: 14px;
+}
+
+.profile-page-pictures-pictures-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.profile-page-pictures-picture {
+  display: inline-block;
+  height: 21%;
+  width: 21%;
+  border-radius: 5px;
+  box-shadow: 0px 0px 7px 0px silver;
+}
+
+.profile-page-pictures-picture:hover {
+  cursor: pointer;
+}
+
+.profile-page-pictures-picture-1 {
+
+}
+
+.profile-page-pictures-picture-2 {
+
+}
+
+.profile-page-pictures-picture-3 {
+
+}
+
+.profile-page-pictures-picture-4 {
+
+}
+
+.profile-page-modal-image {
+  border-radius: 5px;
+  padding: 10px;
+  height: 300px;
+  width: 300px;
 }
 
 @media only screen and (min-width: 500px) {
   .profile-page-grid {
     grid-template-areas:
-    "stats stats stats stats butns butns butns butns"
-    "stats stats stats stats butns butns butns butns"
-    "stats stats stats stats picts picts picts picts"
-    "stats stats stats stats picts picts picts picts"
-    "stats stats stats stats picts picts picts picts"
-    "stats stats stats stats picts picts picts picts";
+    "stats stats stats stats picts picts picts picts picts picts"
+    "stats stats stats stats picts picts picts picts picts picts"
+    "stats stats stats stats picts picts picts picts picts picts"
+    "stats stats stats stats picts picts picts picts picts picts"
+    "stats stats stats stats picts picts picts picts picts picts"
+    "stats stats stats stats butns butns butns butns butns butns";
+  }
+  .profile-page-grid-buttons {
+    justify-content: space-between;
+  }
+  .profile-page-grid-buttons-button {
+    margin: 0px;
+    width: 100px;
+  }
+  .profile-page-grid-viewed-button {
+    margin-left: 0px;
+  }
+  .profile-page-grid-edit-button {
+    margin-left: 0px;
+  }
+  .profile-page-pictures-bio-container {
+    min-height: 31%;
   }
 }
 
 @media only screen and (min-width: 700px) {
   .profile-page-grid {
     grid-template-areas:
-    "stats stats stats butns butns butns butns butns"
-    "stats stats stats butns butns butns butns butns"
-    "stats stats stats picts picts picts picts picts"
-    "stats stats stats picts picts picts picts picts"
-    "stats stats stats picts picts picts picts picts"
-    "stats stats stats picts picts picts picts picts";
+    "stats stats stats picts picts picts picts picts picts picts"
+    "stats stats stats picts picts picts picts picts picts picts"
+    "stats stats stats picts picts picts picts picts picts picts"
+    "stats stats stats picts picts picts picts picts picts picts"
+    "stats stats stats picts picts picts picts picts picts picts"
+    "stats stats stats butns butns butns butns butns butns butns";
+  }
+  .profile-page-grid-buttons {
+    justify-content: flex-end;
+  }
+  .profile-page-grid-buttons-button {
+    margin: 0px;
+    width: 120px;
+  }
+  .profile-page-grid-viewed-button {
+    margin-right: 30px;
+  }
+  .profile-page-grid-edit-button {
+    /* margin-right: 30px; */
+  }
+  .profile-page-pictures-bio-container {
+    min-height: 24%;
   }
 }

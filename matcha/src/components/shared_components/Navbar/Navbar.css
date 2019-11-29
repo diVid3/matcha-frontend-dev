@@ -27,20 +27,21 @@ nav {
   text-decoration: none;
   color: var(--midtone-dark);
   background-color: var(--highlight-light);
-  padding: 10px;
+  padding: 10px 20px;
 }
 
 .nav-burger-container {
   display: flex;
   max-width: 900px;
   margin: 0px auto;
+  padding: 0px 20px 0px 20px
 }
 
 .nav-burger-container .nav-app-name {
   display: flex;
   align-items: center;
   height: 48px;
-  padding: 0px 40px 0px 10px
+  padding: 0px 40px 0px 0px
 }
 
 .nav-burger-container .nav-app-name .nav-logo {
@@ -94,14 +95,6 @@ nav {
 
 .nav-desk-items {
   display: flex;
-}
-
-.nav-desk-items-left {
-  padding-left: 10px;
-}
-
-.nav-desk-items-right {
-  padding-right: 10px;
 }
 
 .nav-desk-item-left {

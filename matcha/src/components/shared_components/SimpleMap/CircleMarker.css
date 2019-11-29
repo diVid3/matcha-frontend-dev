@@ -1,0 +1,7 @@
+.map-circle-marker {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: 2px solid silver
+}

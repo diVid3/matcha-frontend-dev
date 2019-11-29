@@ -6,9 +6,29 @@ import ViewersProvider from '../../providers/ViewersProvider'
 import PromiseCancel from '../../helpers/PromiseCancel'
 import LoadingBlocks from '../../components/shared_components/LoadingBlocks/LoadingBlocks'
 import ParseUserInfo from '../../helpers/ParseUserInfo'
+import SimpleMap from '../../components/shared_components/SimpleMap/SimpleMap'
+import Modal from 'react-modal'
 
 import './Profile.css';
-import defaultpp from '../../assets/user2.png'
+import defaultpp from '../../assets/placeholder.png'
+import defaultPic from '../../assets/placeholder.png'
+
+Modal.setAppElement('#root');
+
+const modalStyle = {
+  overlay: {
+    backgroundColor: 'rgba(0,0,0,0.5)'
+  },
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '10px'
+  }
+}
 
 export class Profile extends Component {
   constructor(props) {
@@ -19,17 +39,54 @@ export class Profile extends Component {
       userInfo: null,
       pictures: null,
       tags: null,
-      viewers: null
+      viewers: null,
+      modalOpen: false,
+      modalImage: ''
     }
 
     this.pendingPromises = []
 
-    // TODO: Bind functions here
+    this.handleImageClickDecorator = this.handleImageClickDecorator.bind(this)
+  }
+
+  handleImageClickDecorator(path) {
+
+    return (e) => {
+
+      if (path === 'default') {
+        
+        this.setState({
+          modalOpen: true,
+          modalImage: 'default'
+        })
+      }
+      else {
+
+        this.setState({
+          modalOpen: true,
+          modalImage: path
+        })
+      }
+    }
   }
 
   componentDidMount() {
 
-    // TODO: If not all promises resolved, display isBusy animation, quick and dirty spinner.
+    // TODO: If viewing someone else's profile, you can't get info by session, need to user another function
+    // from these providers, you need to get using their username, since usernames are unique.
+
+    // TODO: Remember that certain statuses like friends / liked will show if you're viewing anothers profile,
+    // the corresponding buttons will need to be enabled, can double up HTML if you want.
+
+    // TODO: When viewing anothers profile, react should pull the username from query params, and on mount will
+    // fetch the related data.
+
+    // TODO: The Viewed button can enable the popup again, with the related viewers, i.e. their usernames. The
+    // Viewed component would be better off making a request rather than working on old data, since a profile
+    // can be loaded, and after a while, a user can receive a view. The Viewers component will need to be scroll
+    // able.
+
+    // TODO: The edit button will need to show it's own component view instead of the grid.
 
     const cancelableUserInfoPromise = PromiseCancel.makeCancelable(UsersProvider.getUserBySession())
     const cancelablePicturesPromise = PromiseCancel.makeCancelable(PicturesProvider.getPicturesBySession())
@@ -41,12 +98,18 @@ export class Profile extends Component {
     this.pendingPromises.push(cancelableTagsPromise)
     this.pendingPromises.push(cancelableViewersPromise)
 
-    Promise.all([
-      cancelableUserInfoPromise.promise,
-      cancelablePicturesPromise.promise,
-      cancelableTagsPromise.promise,
-      cancelableViewersPromise.promise
-    ])
+    const cancelableGetUserDataPromise = PromiseCancel.makeCancelable(
+      Promise.all([
+        cancelableUserInfoPromise.promise,
+        cancelablePicturesPromise.promise,
+        cancelableTagsPromise.promise,
+        cancelableViewersPromise.promise
+      ])
+    )
+
+    this.pendingPromises.push(cancelableGetUserDataPromise)
+
+    cancelableGetUserDataPromise.promise
     .then((obj) => {
 
       console.log(obj)
@@ -70,9 +133,29 @@ export class Profile extends Component {
     })
   }
 
+  componentWillUnmount() {
+
+    this.pendingPromises.forEach(p => p.cancel())
+  }
+
   render() {
     return (
       <div className="profile-page">
+        <Modal
+          isOpen={this.state.modalOpen}
+          style={modalStyle}
+          shouldCloseOnOverlayClick={true}
+          onRequestClose={() => this.setState({ modalOpen: false })}
+        >
+          <img className="profile-page-modal-image"
+            src={
+              this.state.modalImage === 'default'
+                ? defaultPic
+                : this.state.modalImage
+            }
+            alt="Modal"
+          />
+        </Modal>
         {
           !this.state.isBusy
             ? <div className="profile-page-grid">
@@ -88,11 +171,16 @@ export class Profile extends Component {
                   <div className="profile-page-stats-pp-container">
                     <img className="profile-page-stats-pp"
                       src={
-                        this.state.profile_pic_path
+                        this.state.userInfo.profile_pic_path
                           ? null
                           : defaultpp
                       }
                       alt="Profile"
+                      onClick={this.handleImageClickDecorator(`${
+                        this.state.userInfo.profile_pic_path
+                          ? this.state.userInfo.profile_pic_path
+                          : 'default'
+                      }`)}
                     />
                   </div>
                   <div className="profile-page-stats-stats-container">
@@ -121,12 +209,90 @@ export class Profile extends Component {
                       </p>
                     </div>
                   </div>
+                  <div className="profile-page-stats-map-container">
+                    <SimpleMap
+                      center={{
+                        lat: this.state.userInfo.latitude - 0,
+                        lng: this.state.userInfo.longitude - 0
+                      }}
+                    />
+                  </div>
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-buttons">
-                  buttons
+                  <button
+                    className="profile-page-grid-buttons-button profile-page-grid-viewed-button"
+                    type="button"
+                  >
+                    Viewed
+                  </button>
+                  <button
+                    className="profile-page-grid-buttons-button profile-page-grid-edit-button"
+                    type="button"
+                  >
+                    Edit
+                  </button> 
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-pictures">
-                  pictures
+                  <div className="profile-page-pictures-bio-container">
+                    <p className="profile-page-pictures-bio-heading">Bio</p>
+                    <p className="profile-page-pictures-bio-text">
+                      { this.state.userInfo.biography }
+                    </p>
+                  </div>
+                  <div className="profile-page-pictures-pictures-container">
+                    <img className="profile-page-pictures-picture profile-page-pictures-picture-1"
+                      src={
+                        this.state.pictures[0] && this.state.pictures[0].pic_path
+                          ? null
+                          : defaultPic
+                      }
+                      alt="Something"
+                      onClick={this.handleImageClickDecorator(`${
+                        this.state.pictures[0] && this.state.pictures[0].pic_path
+                          ? this.state.pictures[0].pic_path
+                          : 'default'
+                      }`)}
+                    />
+                    <img className="profile-page-pictures-picture profile-page-pictures-picture-2"
+                      src={
+                        this.state.pictures[1] && this.state.pictures[1].pic_path
+                          ? null
+                          : defaultPic
+                      }
+                      alt="Something"
+                      onClick={this.handleImageClickDecorator(`${
+                        this.state.pictures[0] && this.state.pictures[1].pic_path
+                          ? this.state.pictures[1].pic_path
+                          : 'default'
+                      }`)}
+                    />
+                    <img className="profile-page-pictures-picture profile-page-pictures-picture-3"
+                      src={
+                        this.state.pictures[2] && this.state.pictures[2].pic_path
+                          ? null
+                          : defaultPic
+                      }
+                      alt="Something"
+                      onClick={this.handleImageClickDecorator(`${
+                        this.state.pictures[0] && this.state.pictures[2].pic_path
+                          ? this.state.pictures[2].pic_path
+                          : 'default'
+                      }`)}
+                    />
+                    <img className="profile-page-pictures-picture profile-page-pictures-picture-4"
+                      src={
+                        this.state.pictures[3] && this.state.pictures[3].pic_path
+                          ? null
+                          : defaultPic
+                      }
+                      alt="Something"
+                      onClick={this.handleImageClickDecorator(`${
+                        this.state.pictures[0] && this.state.pictures[3].pic_path
+                          ? this.state.pictures[3].pic_path
+                          : 'default'
+                      }`)}
+                    />
+                  </div>
                 </div>
               </div>
             : <div className="profile-page-loading-container">
