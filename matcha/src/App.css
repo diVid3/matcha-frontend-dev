@@ -44,3 +44,7 @@ input:focus {
   width: 100%;
   z-index: 1;
 }
+
+.ReactModal__Overlay {
+  z-index: 1;
+}

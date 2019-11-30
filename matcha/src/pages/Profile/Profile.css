@@ -44,7 +44,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .profile-page-stats-name {
@@ -59,7 +59,7 @@
 }
 
 .profile-page-stats-pp-container {
-  margin-top: 20px;
+  margin-top: 12%;
   display: flex;
   justify-content: center;
 }
@@ -67,7 +67,7 @@
 .profile-page-stats-pp {
   height: 75%;
   width: 75%;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   box-shadow: 0px 0px 7px 0px silver;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .profile-page-stats-stats-container {
-  margin-top: 20px;
+  margin: 20px 0px 20px 0px;
   display: flex;
   justify-content: space-evenly;
 }
@@ -99,12 +99,12 @@
 
 .profile-page-stats-map-container {
   box-shadow: 0px 0px 7px 0px silver;
-  margin: 28px 0px 28px 0px;
+  margin: 20px 0px 0px 0px;
 }
 
 .profile-page-grid-buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding: 0px 30px;
 }
@@ -137,8 +137,9 @@
   padding: 30px;
 }
 
+/* 9px because tags have bottom padding of 11px */
 .profile-page-pictures-bio-container {
-  min-height: 25%;
+  margin-top: 9px;
 }
 
 .profile-page-pictures-bio-heading {
@@ -147,7 +148,7 @@
 }
 
 .profile-page-pictures-bio-text {
-  margin: 5px 0px 20px 0px;
+  margin-top: 5px;
   font-size: 14px;
 }
 
@@ -169,27 +170,31 @@
   cursor: pointer;
 }
 
-.profile-page-pictures-picture-1 {
-
-}
-
-.profile-page-pictures-picture-2 {
-
-}
-
-.profile-page-pictures-picture-3 {
-
-}
-
-.profile-page-pictures-picture-4 {
-
-}
-
 .profile-page-modal-image {
   border-radius: 5px;
   padding: 10px;
-  height: 300px;
-  width: 300px;
+  height: 280px;
+  width: 280px;
+}
+
+.profile-page-pictures-tags-container {
+  margin-top: 20px;
+}
+
+.profile-page-pictures-tags-heading {
+  color: silver;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.profile-page-pictures-tags-tag {
+  display: inline-block;
+  margin: 0px 8px 8px 0px;
+  padding: 3px 10px 3px 10px;
+  font-size: 12px;
+  border-radius: 500px;
+  color: gray;
+  background-color: var(--highlight-light);
 }
 
 @media only screen and (min-width: 500px) {
@@ -199,24 +204,19 @@
     "stats stats stats stats picts picts picts picts picts picts"
     "stats stats stats stats picts picts picts picts picts picts"
     "stats stats stats stats picts picts picts picts picts picts"
-    "stats stats stats stats picts picts picts picts picts picts"
+    "stats stats stats stats butns butns butns butns butns butns"
     "stats stats stats stats butns butns butns butns butns butns";
   }
   .profile-page-grid-buttons {
-    justify-content: space-between;
+    justify-content: flex-end;
   }
   .profile-page-grid-buttons-button {
     margin: 0px;
     width: 100px;
   }
-  .profile-page-grid-viewed-button {
-    margin-left: 0px;
-  }
-  .profile-page-grid-edit-button {
-    margin-left: 0px;
-  }
-  .profile-page-pictures-bio-container {
-    min-height: 31%;
+  .profile-page-pictures-tags-tag {
+    margin: 0px 8px 8px 0px;
+    font-size: 12px;
   }
 }
 
@@ -227,7 +227,7 @@
     "stats stats stats picts picts picts picts picts picts picts"
     "stats stats stats picts picts picts picts picts picts picts"
     "stats stats stats picts picts picts picts picts picts picts"
-    "stats stats stats picts picts picts picts picts picts picts"
+    "stats stats stats butns butns butns butns butns butns butns"
     "stats stats stats butns butns butns butns butns butns butns";
   }
   .profile-page-grid-buttons {
@@ -237,13 +237,8 @@
     margin: 0px;
     width: 120px;
   }
-  .profile-page-grid-viewed-button {
-    margin-right: 30px;
-  }
-  .profile-page-grid-edit-button {
-    /* margin-right: 30px; */
-  }
-  .profile-page-pictures-bio-container {
-    min-height: 24%;
+  .profile-page-pictures-tags-tag {
+    margin: 0px 11px 11px 0px;
+    font-size: 14px;
   }
 }

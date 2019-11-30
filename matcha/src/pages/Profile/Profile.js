@@ -13,6 +13,64 @@ import './Profile.css';
 import defaultpp from '../../assets/placeholder.png'
 import defaultPic from '../../assets/placeholder.png'
 
+const someTags = [
+  {
+    id: 1,
+    user_id: 5,
+    tag: 'matcha'
+  },
+  {
+    id: 2,
+    user_id: 5,
+    tag: 'cooking'
+  },
+  {
+    id: 3,
+    user_id: 5,
+    tag: 'gaming'
+  },
+  {
+    id: 4,
+    user_id: 5,
+    tag: 'fishing'
+  },
+  {
+    id: 5,
+    user_id: 5,
+    tag: 'women'
+  },
+  {
+    id: 6,
+    user_id: 5,
+    tag: 'cats'
+  },
+  {
+    id: 7,
+    user_id: 5,
+    tag: 'partying'
+  },
+  {
+    id: 8,
+    user_id: 5,
+    tag: 'eipsteinDidn\'tKillHimself'
+  },
+  {
+    id: 9,
+    user_id: 5,
+    tag: 'stars'
+  },
+  {
+    id: 10,
+    user_id: 5,
+    tag: 'science'
+  },
+  {
+    id: 11,
+    user_id: 5,
+    tag: 'coffee'
+  }
+]
+
 Modal.setAppElement('#root');
 
 const modalStyle = {
@@ -118,7 +176,8 @@ export class Profile extends Component {
         isBusy: false,
         userInfo: obj[0].rows[0],
         pictures: obj[1].rows,
-        tags: obj[2].rows,
+        tags: someTags,
+        // tags: obj[2].rows,
         viewers: obj[3].rows
       })
     })
@@ -160,14 +219,6 @@ export class Profile extends Component {
           !this.state.isBusy
             ? <div className="profile-page-grid">
                 <div className="profile-page-grid-component profile-page-grid-stats">
-                  <div className="profile-page-stats-title">
-                    <p className="profile-page-stats-name">
-                      { this.state.userInfo.first_name + ' ' + this.state.userInfo.last_name }
-                    </p>
-                    <p className="profile-page-stats-username">
-                      { this.state.userInfo.username }
-                    </p>
-                  </div>
                   <div className="profile-page-stats-pp-container">
                     <img className="profile-page-stats-pp"
                       src={
@@ -181,6 +232,22 @@ export class Profile extends Component {
                           ? this.state.userInfo.profile_pic_path
                           : 'default'
                       }`)}
+                    />
+                  </div>
+                  <div className="profile-page-stats-title">
+                    <p className="profile-page-stats-name">
+                      { this.state.userInfo.first_name + ' ' + this.state.userInfo.last_name }
+                    </p>
+                    <p className="profile-page-stats-username">
+                      { this.state.userInfo.username }
+                    </p>
+                  </div>
+                  <div className="profile-page-stats-map-container">
+                    <SimpleMap
+                      center={{
+                        lat: this.state.userInfo.latitude - 0,
+                        lng: this.state.userInfo.longitude - 0
+                      }}
                     />
                   </div>
                   <div className="profile-page-stats-stats-container">
@@ -209,14 +276,6 @@ export class Profile extends Component {
                       </p>
                     </div>
                   </div>
-                  <div className="profile-page-stats-map-container">
-                    <SimpleMap
-                      center={{
-                        lat: this.state.userInfo.latitude - 0,
-                        lng: this.state.userInfo.longitude - 0
-                      }}
-                    />
-                  </div>
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-buttons">
                   <button
@@ -225,20 +284,8 @@ export class Profile extends Component {
                   >
                     Viewed
                   </button>
-                  <button
-                    className="profile-page-grid-buttons-button profile-page-grid-edit-button"
-                    type="button"
-                  >
-                    Edit
-                  </button> 
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-pictures">
-                  <div className="profile-page-pictures-bio-container">
-                    <p className="profile-page-pictures-bio-heading">Bio</p>
-                    <p className="profile-page-pictures-bio-text">
-                      { this.state.userInfo.biography }
-                    </p>
-                  </div>
                   <div className="profile-page-pictures-pictures-container">
                     <img className="profile-page-pictures-picture profile-page-pictures-picture-1"
                       src={
@@ -292,6 +339,22 @@ export class Profile extends Component {
                           : 'default'
                       }`)}
                     />
+                  </div>
+                  <div className="profile-page-pictures-tags-container">
+                    <p className="profile-page-pictures-tags-heading">Tags</p>
+                    {
+                      this.state.tags.map(
+                        tag => <div className="profile-page-pictures-tags-tag" key={tag.id}>
+                          {tag.tag}
+                        </div>
+                      )
+                    }
+                  </div>
+                  <div className="profile-page-pictures-bio-container">
+                    <p className="profile-page-pictures-bio-heading">Bio</p>
+                    <p className="profile-page-pictures-bio-text">
+                      { this.state.userInfo.biography }
+                    </p>
                   </div>
                 </div>
               </div>
