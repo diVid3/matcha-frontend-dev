@@ -8,6 +8,7 @@ export class InputValidation {
   static isValidEmail = (email) => /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(email)
   static isValidPassword = (password) => /^(?:\w|[a-z0-9!#$%&'*+/=?^_`{|}~-]){6,200}$/.test(password)
   static isValidUuid = (uuid) => uuidv4Checker.is(uuid)
+  static isValidBio = (bio) => /[\w \n\r\-[\]'.,;:+_=|{}<>()!\\/@#$%^&*~?]*$/.test(bio)
 }
 
 export default InputValidation

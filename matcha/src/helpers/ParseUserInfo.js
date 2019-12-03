@@ -2,6 +2,10 @@ export class ParseUserInfo {
 
   static getGender(gender) {
 
+    if (typeof gender === 'string') {
+      gender -= 0
+    }
+
     let genderString = ''
 
     switch (gender) {
@@ -22,6 +26,10 @@ export class ParseUserInfo {
   }
 
   static getSexuality(sexuality) {
+
+    if (typeof sexuality === 'string') {
+      sexuality -= 0
+    }
 
     let sexualityString = ''
 

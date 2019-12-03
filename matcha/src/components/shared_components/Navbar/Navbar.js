@@ -83,7 +83,7 @@ export class Navbar extends Component {
           </ul>
           <div className="nav-spacer"></div>
           <ul className="nav-desk-items nav-desk-items-right">
-            <li className="nav-desk-item nav-desk-item-right"><NavLink className="nav-desk-item-icon-setting" to=""></NavLink></li>
+            <li className="nav-desk-item nav-desk-item-right"><NavLink className="nav-desk-item-icon-setting" to="/settings"></NavLink></li>
             <li className="nav-desk-item nav-desk-item-right"><a className="nav-desk-item-link" onClick={this.logOut} href="/#">Logout</a></li>
           </ul>
           <div className="nav-burger-wrapper">
@@ -118,7 +118,7 @@ export class Navbar extends Component {
           </ul>
           <ul className="nav-items">
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Search</NavLink></li>
-            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Settings</NavLink></li>
+            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/settings">Settings</NavLink></li>
             <li><a className="nav-link" onClick={this.logOut} href="/#">Logout</a></li>
           </ul>
         </div>

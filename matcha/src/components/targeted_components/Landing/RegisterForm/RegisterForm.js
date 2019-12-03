@@ -647,6 +647,7 @@ export class RegisterForm extends Component {
                 <div className="register-form-block register-form-radio-buttons">
                   <div className="register-form-radio-group">
                     <input
+                      className="register-form-radio-button"
                       id="register-male"
                       name="gender"
                       value="0"
@@ -658,6 +659,7 @@ export class RegisterForm extends Component {
                   </div>
                   <div className="register-form-radio-group">
                     <input
+                      className="register-form-radio-button"
                       id="register-female"
                       name="gender"
                       value="1"
@@ -668,6 +670,7 @@ export class RegisterForm extends Component {
                   </div>
                   <div className="register-form-radio-group">
                     <input
+                      className="register-form-radio-button"
                       id="register-other"
                       name="gender"
                       value="2"

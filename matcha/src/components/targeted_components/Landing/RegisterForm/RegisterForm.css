@@ -59,7 +59,7 @@
   color: var(--midtone-dark);
 }
 
-input[type="radio"] {
+.register-form-radio-button {
   margin-right: 5px;
 }
 

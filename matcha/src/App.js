@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import ProtectedRoute from './components/shared_components/ProtectedRoute/ProtectedRoute'
 import Landing from './pages/Landing/Landing'
 import Profile from './pages/Profile/Profile'
+import Settings from './pages/Settings/Settings'
 import Oops from './pages/Oops/Oops'
 import Navbar from './components/shared_components/Navbar/Navbar'
 
@@ -22,6 +23,7 @@ function App() {
               <Navbar />
             </header>
             <Route path="/profile" component={Profile}/>
+            <Route path="/settings" component={Settings}/>
           </ProtectedRoute>
         </Switch>
       </Router>

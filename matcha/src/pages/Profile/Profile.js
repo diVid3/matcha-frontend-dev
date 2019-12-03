@@ -144,8 +144,6 @@ export class Profile extends Component {
     // can be loaded, and after a while, a user can receive a view. The Viewers component will need to be scroll
     // able.
 
-    // TODO: The edit button will need to show it's own component view instead of the grid.
-
     const cancelableUserInfoPromise = PromiseCancel.makeCancelable(UsersProvider.getUserBySession())
     const cancelablePicturesPromise = PromiseCancel.makeCancelable(PicturesProvider.getPicturesBySession())
     const cancelableTagsPromise = PromiseCancel.makeCancelable(TagsProvider.getTagsBySession())
