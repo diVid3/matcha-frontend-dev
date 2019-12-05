@@ -203,7 +203,7 @@ export class VerifyReset extends Component {
           email: this.state.email,
           password: this.state.password,
           resetToken: null
-        })
+        }, this.state.email)
       )
   
       this.pendingPromises.push(cancelablePatchUserByEmailPromise)

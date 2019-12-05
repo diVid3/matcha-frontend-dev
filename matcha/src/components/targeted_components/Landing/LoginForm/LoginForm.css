@@ -75,6 +75,10 @@
   text-align: center;
 }
 
+.login-form-loading {
+  margin-bottom: 14px;
+}
+
 .login-form-loading-container {
   margin: auto;
   width: 160px;

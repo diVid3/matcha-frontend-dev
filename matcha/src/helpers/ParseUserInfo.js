@@ -35,10 +35,10 @@ export class ParseUserInfo {
 
     switch (sexuality) {
       case 0:
-        sexualityString = 'Heterosexual'
+        sexualityString = 'Straight'
         break
       case 1:
-        sexualityString = 'Homosexual'
+        sexualityString = 'Gay'
         break
       case 2:
         sexualityString = 'Bisexual'

@@ -116,11 +116,11 @@ export class UsersProvider {
     })
   }
 
-  static patchUserByEmail(body) {
+  static patchUserByEmail(body, targetEmail) {
 
     return new Promise((res, rej) => {
 
-      fetch(`${Config.backend}/api/v1.0/users/email`, {
+      fetch(`${Config.backend}/api/v1.0/users/email/${targetEmail}`, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',

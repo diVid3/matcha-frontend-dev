@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import InputValidation from '../../helpers/InputValidation'
 import PromiseCancel from '../../helpers/PromiseCancel'
+import ParseUserInfo from '../../helpers/ParseUserInfo'
 import UsersProvider from '../../providers/UsersProvider'
 import TagsProvider from '../../providers/TagsProvider'
 import PicturesProvider from '../../providers/PicturesProvider'
@@ -79,12 +80,14 @@ export class Settings extends Component {
       lastNameValid: true,
       username: '',
       usernameValid: true,
+      usernameTaken: false,
       age: '',
       ageValid: true,
       biography: '',
       biographyValid: true,
       email: '',
       emailValid: true,
+      emailTaken: false,
       password: '',
       passwordValid: true,
       passwordConfirm: '',
@@ -94,15 +97,26 @@ export class Settings extends Component {
       sexPref: '0',
       userInfo: null,
       pictures: null,
-      tags: null
+      tags: null,
+      savedForm: false,
+      part1ErrorToShow: '',
+      part2ErrorToShow: ''
     }
 
     this.pendingPromises = []
+
+    this.usernameDebounceTimer = undefined
+    this.emailDebounceTimer = undefined
+    this.canSubmit = true
 
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleChangeDecorator = this.handleChangeDecorator.bind(this)
     this.handlePasswordChange = this.handlePasswordChange.bind(this)
     this.handlePasswordConfirmChange = this.handlePasswordConfirmChange.bind(this)
+    this.handleUsernameChange = this.handleUsernameChange.bind(this)
+    this.handleEmailChange = this.handleEmailChange.bind(this)
+    this.showError = this.showError.bind(this)
+    this.handleInitialSubmit = this.handleInitialSubmit.bind(this)
   }
 
   handleChangeDecorator(targetState, validationFunc) {
@@ -143,13 +157,237 @@ export class Settings extends Component {
     })
   }
 
+  handleUsernameChange(targetState, validationFunc) {
+
+    return (e) => {
+      const { name, value } = e.target
+
+      this.setState({
+        [name]: value,
+        [targetState]: validationFunc(value)
+      })
+
+      clearTimeout(this.usernameDebounceTimer)
+
+      this.usernameDebounceTimer = setTimeout(() => {
+
+        if (this.state.usernameValid) {
+
+          const cancelableUsernameTakenPromise = PromiseCancel.makeCancelable(
+            UsersProvider.getUserByUsername({
+              username: this.state.username
+            })
+          )
+  
+          this.pendingPromises.push(cancelableUsernameTakenPromise)
+  
+          cancelableUsernameTakenPromise.promise
+          .then((json) => {
+  
+            if (json.rows.length) {
+  
+              this.setState({
+                usernameTaken: true,
+                usernameValid: false
+              })
+            }
+            else {
+  
+              this.setState({
+                usernameTaken: false,
+                usernameValid: true
+              })
+            }
+          })
+          .catch((json) => {
+
+            this.setState({
+              part1ErrorToShow: 'Oops something went wrong... Please try again later...'
+            })
+            this.showError('part1ErrorToShow')
+          })
+        }
+      }, 600)
+    }
+  }
+
+  handleEmailChange(targetState, validationFunc) {
+
+    return (e) => {
+      const { name, value } = e.target
+
+      this.setState({
+        [name]: value,
+        [targetState]: validationFunc(value)
+      })
+
+      clearTimeout(this.emailDebounceTimer)
+
+      this.emailDebounceTimer = setTimeout(() => {
+
+        if (this.state.emailValid) {
+
+          const cancelableEmailTakenPromise = PromiseCancel.makeCancelable(
+            UsersProvider.getUserByEmail({
+              email: this.state.email
+            })
+          )
+  
+          this.pendingPromises.push(cancelableEmailTakenPromise)
+  
+          cancelableEmailTakenPromise.promise
+          .then((json) => {
+  
+            if (json.rows.length) {
+  
+              this.setState({
+                emailTaken: true,
+                emailValid: false
+              })
+            }
+            else {
+  
+              this.setState({
+                emailTaken: false,
+                emailValid: true
+              })
+            }
+          })
+          .catch((json) => {
+  
+            this.setState({
+              part1ErrorToShow: 'Oops something went wrong... Please try again later...'
+            })
+            this.showError('part1ErrorToShow')
+          })  
+        }
+      }, 600)
+    }
+  }
+
+  showError(errorState) {
+
+    const cancelableResetPromise = PromiseCancel.makeCancelable(
+      new Promise(res => setTimeout(() => res(true), 5000))
+    )
+
+    this.pendingPromises.push(cancelableResetPromise)
+
+    cancelableResetPromise.promise
+    .then(() => {
+
+      this.setState({
+        [errorState]: ''
+      })
+    })
+    .catch(() => {})
+  }
+
+  handleInitialSubmit() {
+
+    let hadToSetState = false
+
+    if (this.state.passwordValid && this.state.password === '') {
+      
+      this.setState({
+        passwordValid: false
+      })
+
+      hadToSetState = true
+    }
+
+    if (this.state.passwordConfirmValid && this.state.passwordConfirm === '') {
+      
+      this.setState({
+        passwordConfirmValid: false
+      })
+
+      hadToSetState = true
+    }
+
+    if (hadToSetState) {
+
+      return true
+    }
+  }
+
   handleSubmit(e) {
     e.preventDefault()
 
+    if (this.handleInitialSubmit()) {
 
+      return
+    }
+
+    if (
+      this.canSubmit &&
+      this.state.firstNameValid &&
+      this.state.lastNameValid &&
+      this.state.usernameValid &&
+      this.state.ageValid &&
+      this.state.biographyValid &&
+      this.state.emailValid &&
+      this.state.passwordValid &&
+      this.state.passwordConfirmValid &&
+      this.state.passwordsMatch
+    ) {
+
+      this.canSubmit = false
+      setTimeout(() => { this.canSubmit = true }, 3000)
+
+      const cancelablePatchUserByEmailPromise = PromiseCancel.makeCancelable(
+        UsersProvider.patchUserByEmail({
+          firstName: this.state.firstName,
+          lastName: this.state.lastName,
+          username: this.state.username,
+          age: this.state.age + '',
+          biography: this.state.biography,
+          email: this.state.email,
+          password: this.state.password,
+          gender: this.state.gender + '',
+          sexPref: this.state.sexPref + '',
+        }, this.state.userInfo.email)
+      )
+  
+      this.pendingPromises.push(cancelablePatchUserByEmailPromise)
+
+      // TODO: Could perhaps add a loading animation to the button, like a clock spinner here.
+
+      cancelablePatchUserByEmailPromise.promise
+      .then((json) => {
+
+        this.setState({
+          savedForm: true
+        })
+
+        const cancelableResetSavedFormPromise = PromiseCancel.makeCancelable(
+          new Promise((res, rej) => {
+            setTimeout(() => {
+              this.setState({
+                savedForm: false
+              })
+              res()
+            }, 3000)
+          })
+        )
+
+        this.pendingPromises.push(cancelableResetSavedFormPromise)
+
+        cancelableResetSavedFormPromise.promise
+        .then(() => {})
+        .catch(() => {})
+      })
+      .catch((json) => {
+
+        sessionStorage.setItem('viewError', '1')
+
+        this.setState({
+          isBusy: false,
+          redirectTo: '/oops'
+        })
+      })
+    }
   }
-
-  // TODO: Debounce and check if username + email is not taken.
 
   componentDidMount() {
 
@@ -220,152 +458,202 @@ export class Settings extends Component {
                   <div className="settings-page-part-1-container">
                     <form className="settings-page-part-1-form" onSubmit={this.handleSubmit}>
                       <div className="settings-page-part-1-form-left">
-                        <input
-                          className={
-                            `settings-page-form-input ${
-                              this.state.firstNameValid
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="firstName"
-                          value={this.state.firstName}
-                          type="text"
-                          onChange={
-                            this.handleChangeDecorator(
-                              'firstNameValid',
-                              InputValidation.isValidName
-                            )
-                          }
-                          placeholder="First Name"
-                        />
-                        <input
-                          className={
-                            `settings-page-form-input ${
-                              this.state.lastNameValid
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="lastName"
-                          value={this.state.lastName}
-                          type="text"
-                          onChange={
-                            this.handleChangeDecorator(
-                              'lastNameValid',
-                              InputValidation.isValidName
-                            )
-                          }
-                          placeholder="Last Name"
-                        />
-                        <input
-                          className={
-                            `settings-page-form-input ${
-                              this.state.usernameValid
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="username"
-                          value={this.state.username}
-                          type="text"
-                          onChange={
-                            this.handleChangeDecorator(
-                              'usernameValid',
-                              InputValidation.isValidName
-                            )
-                          }
-                          placeholder="Username"
-                        />
-                        <input
-                          className={
-                            `settings-page-form-input ${
-                              this.state.ageValid
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="age"
-                          value={this.state.age}
-                          type="text"
-                          onChange={
-                            this.handleChangeDecorator(
-                              'ageValid',
-                              InputValidation.isValidAge
-                            )
-                          }
-                          placeholder="Age"
-                        />
-                        <textarea
-                          className={
-                            `settings-page-form-textarea ${
-                              this.state.biographyValid
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="biography"
-                          value={this.state.biography}
-                          onChange={
-                            this.handleChangeDecorator(
-                              'biographyValid',
-                              InputValidation.isValidBio
-                            )
-                          }
-                          placeholder="Biography"
-                        />
+                        <div className="settings-page-input-container">
+                          <div className="settings-page-input-error-container">
+                            <p className="settings-page-input-error-container-heading">Username</p>
+                            <p
+                              className={
+                                `settings-page-input-error ${
+                                  this.state.username !== this.state.userInfo.username && this.state.usernameTaken
+                                    ? ''
+                                    : 'settings-page-input-error-disable'
+                                }`
+                              }
+                            >
+                              Username Taken
+                            </p>
+                          </div>
+                          <input
+                            className={
+                              `settings-page-form-input ${
+                                this.state.usernameValid
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="username"
+                            value={this.state.username}
+                            type="text"
+                            onChange={
+                              this.handleUsernameChange(
+                                'usernameValid',
+                                InputValidation.isValidName
+                              )
+                            }
+                            placeholder="Username"
+                          />
+                        </div>
+                        <div className="settings-page-input-container">
+                          <p className="settings-page-input-container-heading">First Name</p>
+                          <input
+                            className={
+                              `settings-page-form-input ${
+                                this.state.firstNameValid
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="firstName"
+                            value={this.state.firstName}
+                            type="text"
+                            onChange={
+                              this.handleChangeDecorator(
+                                'firstNameValid',
+                                InputValidation.isValidName
+                              )
+                            }
+                            placeholder="First Name"
+                          />
+                        </div>
+                        <div className="settings-page-input-container">
+                          <p className="settings-page-input-container-heading">Last Name</p>
+                          <input
+                            className={
+                              `settings-page-form-input ${
+                                this.state.lastNameValid
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="lastName"
+                            value={this.state.lastName}
+                            type="text"
+                            onChange={
+                              this.handleChangeDecorator(
+                                'lastNameValid',
+                                InputValidation.isValidName
+                              )
+                            }
+                            placeholder="Last Name"
+                          />
+                        </div>
+                        <div className="settings-page-input-container">
+                          <p className="settings-page-input-container-heading">Age</p>
+                          <input
+                            className={
+                              `settings-page-form-input ${
+                                this.state.ageValid
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="age"
+                            value={this.state.age}
+                            type="text"
+                            onChange={
+                              this.handleChangeDecorator(
+                                'ageValid',
+                                InputValidation.isValidAge
+                              )
+                            }
+                            placeholder="Age"
+                          />
+                        </div>
+                        <div className="settings-page-input-container">
+                          <p className="settings-page-input-container-heading">Biography</p>
+                          <textarea
+                            className={
+                              `settings-page-form-textarea ${
+                                this.state.biographyValid
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="biography"
+                            value={this.state.biography}
+                            onChange={
+                              this.handleChangeDecorator(
+                                'biographyValid',
+                                InputValidation.isValidBio
+                              )
+                            }
+                            placeholder="Biography"
+                          />
+                        </div>
                       </div>
                       <div className="settings-page-part-1-form-right">
-                        <input
-                          className={
-                            `settings-page-form-input ${
-                              this.state.emailValid
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="email"
-                          value={this.state.email}
-                          type="text"
-                          onChange={
-                            this.handleChangeDecorator(
-                              'emailValid',
-                              InputValidation.isValidEmail
-                            )
-                          }
-                          placeholder="Email"
-                        />
-                        <input
-                          className={
-                            `settings-page-form-input ${
-                              this.state.passwordValid
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="password"
-                          value={this.state.password}
-                          type="password"
-                          onChange={this.handlePasswordChange}
-                          placeholder="Password"
-                        />
-                        <input
-                          className={
-                            `settings-page-form-input ${
-                              (this.state.passwordConfirmValid &&
-                              this.state.passwordsMatch)
-                                ? ''
-                                : 'input-bad'
-                            }`
-                          }
-                          name="passwordConfirm"
-                          value={this.state.passwordConfirm}
-                          type="password"
-                          onChange={this.handlePasswordConfirmChange}
-                          placeholder="Confirm Password"
-                        />
+                        <div className="settings-page-input-container">
+                          <div className="settings-page-input-error-container">
+                            <p className="settings-page-input-error-container-heading">Email</p>
+                            <p
+                              className={
+                                `settings-page-input-error ${
+                                  this.state.email !== this.state.userInfo.email && this.state.emailTaken
+                                    ? ''
+                                    : 'settings-page-input-error-disable'
+                                }`
+                              }
+                            >
+                              Email Taken
+                            </p>
+                          </div>
+                          <input
+                            className={
+                              `settings-page-form-input ${
+                                this.state.emailValid
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="email"
+                            value={this.state.email}
+                            type="text"
+                            onChange={
+                              this.handleEmailChange(
+                                'emailValid',
+                                InputValidation.isValidEmail
+                              )
+                            }
+                            placeholder="Email"
+                          />
+                        </div>
+                        <div className="settings-page-input-container">
+                          <p className="settings-page-input-container-heading">Password</p>
+                          <input
+                            className={
+                              `settings-page-form-input ${
+                                this.state.passwordValid
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="password"
+                            value={this.state.password}
+                            type="password"
+                            onChange={this.handlePasswordChange}
+                            placeholder="Password"
+                          />
+                        </div>
+                        <div className="settings-page-input-container">
+                          <p className="settings-page-input-container-heading">Confirm Password</p>
+                          <input
+                            className={
+                              `settings-page-form-input ${
+                                (this.state.passwordConfirmValid &&
+                                this.state.passwordsMatch)
+                                  ? ''
+                                  : 'input-bad'
+                              }`
+                            }
+                            name="passwordConfirm"
+                            value={this.state.passwordConfirm}
+                            type="password"
+                            onChange={this.handlePasswordConfirmChange}
+                            placeholder="Confirm Password"
+                          />
+                        </div>
                         <div className="settings-page-form-radio-group settings-page-form-radio-group-sex">
-                          <p className="settings-page-element-heading">Sex</p>
+                          <p className="settings-page-input-container-heading">Sex</p>
                           <div className="settings-page-form-radio-sub-group">
                             <input
                               className="settings-page-form-radio-button"
@@ -404,7 +692,7 @@ export class Settings extends Component {
                           </div>
                         </div>
                         <div className="settings-page-form-radio-group settings-page-form-radio-group-sex-pref">
-                          <p className="settings-page-element-heading">Sexual Preference</p>
+                          <p className="settings-page-input-container-heading">Sexual Preference</p>
                           <div className="settings-page-form-radio-sub-group">
                             <input
                               className="settings-page-form-radio-button"
@@ -415,7 +703,7 @@ export class Settings extends Component {
                               onChange={this.handleChangeDecorator()}
                               checked={this.state.sexPref === '0'}
                             />
-                            <label htmlFor="settings-page-heterosexual">Heterosexual</label>
+                            <label htmlFor="settings-page-heterosexual">{ ParseUserInfo.getSexuality(0) }</label>
                           </div>
                           <div className="settings-page-form-radio-sub-group">
                             <input
@@ -427,7 +715,7 @@ export class Settings extends Component {
                               onChange={this.handleChangeDecorator()}
                               checked={this.state.sexPref === '1'}
                             />
-                            <label htmlFor="settings-page-homosexual">Homosexual</label>
+                            <label htmlFor="settings-page-homosexual">{ ParseUserInfo.getSexuality(1) }</label>
                           </div>
                           <div className="settings-page-form-radio-sub-group">
                             <input
@@ -439,20 +727,39 @@ export class Settings extends Component {
                               onChange={this.handleChangeDecorator()}
                               checked={this.state.sexPref === '2'}
                             />
-                            <label htmlFor="settings-page-bisexual">Bisexual</label>
+                            <label htmlFor="settings-page-bisexual">{ ParseUserInfo.getSexuality(2) }</label>
                           </div>
                         </div>
                         <div className="settings-page-form-button-container">
                           <button
-                            className="settings-page-form-button"
+                            className={
+                              `settings-page-form-button ${
+                                this.state.savedForm
+                                  ? 'settings-page-form-button-saved'
+                                  : ''
+                              }`
+                            }
                             type="submit"
                             value="Submit"
                           >
-                            Save
+                            {
+                              this.state.savedForm
+                                ? 'Saved'
+                                : 'Save'
+                            }
                           </button>
                         </div>
                       </div>
                     </form>
+                    {
+                      this.state.part1ErrorToShow.length
+                        ? <div className="settings-page-correct-errors-message-container">
+                            <p className="settings-page-correct-errors-message">
+                              {this.state.part1ErrorToShow}
+                            </p>
+                          </div>
+                        : null
+                    }
                   </div>
                 </div>
                 <div className="settings-page-part settings-page-part-2">
