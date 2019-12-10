@@ -264,7 +264,7 @@ export class LoginForm extends Component {
                 </p>
                 {
                   this.state.showError
-                    ? <div className="correct-errors-message">
+                    ? <div className="login-correct-errors-message">
                         <p>{this.state.errorToShow}</p>
                       </div>
                     : ''

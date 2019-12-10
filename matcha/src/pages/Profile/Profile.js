@@ -8,68 +8,11 @@ import LoadingBlocks from '../../components/shared_components/LoadingBlocks/Load
 import ParseUserInfo from '../../helpers/ParseUserInfo'
 import SimpleMap from '../../components/shared_components/SimpleMap/SimpleMap'
 import Modal from 'react-modal'
+import Config from '../../config/Config'
 
 import './Profile.css';
 import defaultpp from '../../assets/placeholder.png'
 import defaultPic from '../../assets/placeholder.png'
-
-const someTags = [
-  {
-    id: 1,
-    user_id: 5,
-    tag: 'matcha'
-  },
-  {
-    id: 2,
-    user_id: 5,
-    tag: 'cooking'
-  },
-  {
-    id: 3,
-    user_id: 5,
-    tag: 'gaming'
-  },
-  {
-    id: 4,
-    user_id: 5,
-    tag: 'fishing'
-  },
-  {
-    id: 5,
-    user_id: 5,
-    tag: 'women'
-  },
-  {
-    id: 6,
-    user_id: 5,
-    tag: 'cats'
-  },
-  {
-    id: 7,
-    user_id: 5,
-    tag: 'partying'
-  },
-  {
-    id: 8,
-    user_id: 5,
-    tag: 'eipsteinDidn\'tKillHimself'
-  },
-  {
-    id: 9,
-    user_id: 5,
-    tag: 'stars'
-  },
-  {
-    id: 10,
-    user_id: 5,
-    tag: 'science'
-  },
-  {
-    id: 11,
-    user_id: 5,
-    tag: 'coffee'
-  }
-]
 
 Modal.setAppElement('#root');
 
@@ -96,6 +39,11 @@ export class Profile extends Component {
       isBusy: true,
       userInfo: null,
       pictures: null,
+      profilePicPath: '',
+      picPath1: '',
+      picPath2: '',
+      picPath3: '',
+      picPath4: '',
       tags: null,
       viewers: null,
       modalOpen: false,
@@ -170,12 +118,21 @@ export class Profile extends Component {
 
       console.log(obj)
 
+      let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
+      let newPicPath1 = (obj[1].rows[0] && obj[1].rows[0].pic_path) ? (`${Config.backend}/` + obj[1].rows[0].pic_path) : ''
+      let newPicPath2 = (obj[1].rows[1] && obj[1].rows[1].pic_path) ? (`${Config.backend}/` + obj[1].rows[1].pic_path) : ''
+      let newPicPath3 = (obj[1].rows[2] && obj[1].rows[2].pic_path) ? (`${Config.backend}/` + obj[1].rows[2].pic_path) : ''
+      let newPicPath4 = (obj[1].rows[3] && obj[1].rows[3].pic_path) ? (`${Config.backend}/` + obj[1].rows[3].pic_path) : ''
+
       this.setState({
         isBusy: false,
         userInfo: obj[0].rows[0],
-        pictures: obj[1].rows,
-        tags: someTags,
-        // tags: obj[2].rows,
+        profilePicPath: newProfilePicPath,
+        picPath1: newPicPath1,
+        picPath2: newPicPath2,
+        picPath3: newPicPath3,
+        picPath4: newPicPath4,
+        tags: obj[2].rows,
         viewers: obj[3].rows
       })
     })
@@ -226,8 +183,8 @@ export class Profile extends Component {
                       }
                       alt="Profile"
                       onClick={this.handleImageClickDecorator(`${
-                        this.state.userInfo.profile_pic_path
-                          ? this.state.userInfo.profile_pic_path
+                        this.state.profilePicPath
+                          ? this.state.profilePicPath
                           : 'default'
                       }`)}
                     />
@@ -285,58 +242,87 @@ export class Profile extends Component {
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-pictures">
                   <div className="profile-page-pictures-pictures-container">
-                    <img className="profile-page-pictures-picture profile-page-pictures-picture-1"
-                      src={
-                        this.state.pictures[0] && this.state.pictures[0].pic_path
-                          ? null
-                          : defaultPic
-                      }
-                      alt="Something"
-                      onClick={this.handleImageClickDecorator(`${
-                        this.state.pictures[0] && this.state.pictures[0].pic_path
-                          ? this.state.pictures[0].pic_path
-                          : 'default'
-                      }`)}
-                    />
-                    <img className="profile-page-pictures-picture profile-page-pictures-picture-2"
-                      src={
-                        this.state.pictures[1] && this.state.pictures[1].pic_path
-                          ? null
-                          : defaultPic
-                      }
-                      alt="Something"
-                      onClick={this.handleImageClickDecorator(`${
-                        this.state.pictures[0] && this.state.pictures[1].pic_path
-                          ? this.state.pictures[1].pic_path
-                          : 'default'
-                      }`)}
-                    />
-                    <img className="profile-page-pictures-picture profile-page-pictures-picture-3"
-                      src={
-                        this.state.pictures[2] && this.state.pictures[2].pic_path
-                          ? null
-                          : defaultPic
-                      }
-                      alt="Something"
-                      onClick={this.handleImageClickDecorator(`${
-                        this.state.pictures[0] && this.state.pictures[2].pic_path
-                          ? this.state.pictures[2].pic_path
-                          : 'default'
-                      }`)}
-                    />
-                    <img className="profile-page-pictures-picture profile-page-pictures-picture-4"
-                      src={
-                        this.state.pictures[3] && this.state.pictures[3].pic_path
-                          ? null
-                          : defaultPic
-                      }
-                      alt="Something"
-                      onClick={this.handleImageClickDecorator(`${
-                        this.state.pictures[0] && this.state.pictures[3].pic_path
-                          ? this.state.pictures[3].pic_path
-                          : 'default'
-                      }`)}
-                    />
+
+                    <div className="profile-page-pictures-picture-container">
+                      <div className="profile-page-picture-aspect-container">
+                        <div className="profile-page-picture-aspect-node">
+                          <img className="profile-page-pictures-picture"
+                            src={
+                              this.state.picPath1
+                                ? this.state.picPath1
+                                : defaultPic
+                            }
+                            alt="Something"
+                            onClick={this.handleImageClickDecorator(`${
+                              this.state.picPath1
+                                ? this.state.picPath1
+                                : 'default'
+                            }`)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="profile-page-pictures-picture-container">
+                      <div className="profile-page-picture-aspect-container">
+                        <div className="profile-page-picture-aspect-node">
+                          <img className="profile-page-pictures-picture"
+                            src={
+                              this.state.picPath2
+                                ? this.state.picPath2
+                                : defaultPic
+                            }
+                            alt="Something"
+                            onClick={this.handleImageClickDecorator(`${
+                              this.state.picPath2
+                                ? this.state.picPath2
+                                : 'default'
+                            }`)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="profile-page-pictures-picture-container">
+                      <div className="profile-page-picture-aspect-container">
+                        <div className="profile-page-picture-aspect-node">
+                          <img className="profile-page-pictures-picture"
+                            src={
+                              this.state.picPath3
+                                ? this.state.picPath3
+                                : defaultPic
+                            }
+                            alt="Something"
+                            onClick={this.handleImageClickDecorator(`${
+                              this.state.picPath3
+                                ? this.state.picPath3
+                                : 'default'
+                            }`)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="profile-page-pictures-picture-container">
+                      <div className="profile-page-picture-aspect-container">
+                        <div className="profile-page-picture-aspect-node">
+                          <img className="profile-page-pictures-picture"
+                            src={
+                              this.state.picPath4
+                                ? this.state.picPath4
+                                : defaultPic
+                            }
+                            alt="Something"
+                            onClick={this.handleImageClickDecorator(`${
+                              this.state.picPath4
+                                ? this.state.picPath4
+                                : 'default'
+                            }`)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                   <div className="profile-page-pictures-tags-container">
                     <p className="profile-page-pictures-tags-heading">Tags</p>

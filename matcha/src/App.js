@@ -4,6 +4,7 @@ import './App.css'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 import ProtectedRoute from './components/shared_components/ProtectedRoute/ProtectedRoute'
+import PublicRoute from './components/shared_components/PublicRoute/PublicRoute'
 import Landing from './pages/Landing/Landing'
 import Profile from './pages/Profile/Profile'
 import Settings from './pages/Settings/Settings'
@@ -16,15 +17,17 @@ function App() {
     <div className="App">
       <Router>
         <Switch>
-          <Route path="/" exact component={Landing}/>
           <Route path="/oops" component={Oops}/>
-          <ProtectedRoute path="/">
+          <ProtectedRoute path={['/profile', '/settings']}>
             <header>
               <Navbar />
             </header>
             <Route path="/profile" component={Profile}/>
             <Route path="/settings" component={Settings}/>
           </ProtectedRoute>
+          <PublicRoute path="/">
+            <Landing />
+          </PublicRoute>
         </Switch>
       </Router>
     </div>

@@ -6,9 +6,14 @@ export class InputValidation {
   static isValidAgeChars = (age) => /^\d{1,2}$/.test(age)
   static isValidAgeRange = (age) => (age - 0) >= 18 && (age - 0) <= 99
   static isValidEmail = (email) => /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(email)
-  static isValidPassword = (password) => /^(?:\w|[a-z0-9!#$%&'*+/=?^_`{|}~-]){6,200}$/.test(password)
+  static isValidPassword = (password) => /^(?:\w|[a-z0-9!#$@%&'*+/=?^_`{|}~-]){6,200}$/.test(password)
   static isValidUuid = (uuid) => uuidv4Checker.is(uuid)
-  static isValidBio = (bio) => /[\w \n\r\-[\]'.,;:+_=|{}<>()!\\/@#$%^&*~?]*$/.test(bio)
+  static isValidBio = (bio) => /^[^\t]{1,250}$/.test(bio)
+
+  static passwordHasUpperCase = (password) => /[A-Z]/.test(password)
+  static passwordHasLowerCase = (password) => /[a-z]/.test(password)
+  static passwordHasNumbers = (password) => /[0-9]/.test(password)
+  static passwordHasOddChars = (password) => /[!@#$%^&*(){}[:;'"|,.<>+_~`=?\-/\\\]]/.test(password)
 }
 
 export default InputValidation

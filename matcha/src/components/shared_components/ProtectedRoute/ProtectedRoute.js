@@ -20,7 +20,7 @@ export class ProtectedRoute extends Component {
   
   componentDidMount() {
 
-    // Checking if sid is valid
+    // Checking if sid is valid, pass by default, redirect if found to be invalid.
     if (
       document.cookie &&
       document.cookie.includes('=') &&
@@ -67,7 +67,7 @@ export class ProtectedRoute extends Component {
 
   render() {
     return (
-      <Route path={this.props.path}>
+      <Route path={this.props.path} exact={this.props.exact ? true : undefined}>
         {
           this.state.redirectTo
             ? <Redirect to={`${this.state.redirectTo}`}/>

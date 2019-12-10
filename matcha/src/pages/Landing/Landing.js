@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Redirect } from "react-router-dom";
+// import { Redirect } from "react-router-dom";
 import queryString from 'query-string'
 import InputValidation from '../../helpers/InputValidation'
 
@@ -17,7 +17,7 @@ export class Landing extends Component {
     super(props)
 
     this.state = {
-      redirectTo: '',
+      // redirectTo: '',
       formToShow: 'login',
       uuid: ''
     }
@@ -29,18 +29,18 @@ export class Landing extends Component {
   componentDidMount() {
 
     // Redirect to profile if user is already logged in.
-    if (
-      document.cookie &&
-      document.cookie.includes('=') &&
-      document.cookie.split('=')[0] === 'sid' &&
-      (document.cookie.split('=')[1]).length >= 80 &&
-      (document.cookie.split('=')[1]).length <= 100
-    ) {
+    // if (
+    //   document.cookie &&
+    //   document.cookie.includes('=') &&
+    //   document.cookie.split('=')[0] === 'sid' &&
+    //   (document.cookie.split('=')[1]).length >= 80 &&
+    //   (document.cookie.split('=')[1]).length <= 100
+    // ) {
 
-      return this.setState({
-        redirectTo: '/profile'
-      })
-    }
+    //   return this.setState({
+    //     redirectTo: '/profile'
+    //   })
+    // }
 
     const parsedQueryString = queryString.parse(this.props.location.search);
 
@@ -75,22 +75,30 @@ export class Landing extends Component {
 
     if (formString === 'login') {
 
-      this.setState({ formToShow: 'login' })
+      this.setState({
+        formToShow: 'login'
+      })
     }
 
     if (formString === 'register') {
 
-      this.setState({ formToShow: 'register' })
+      this.setState({
+        formToShow: 'register'
+      })
     }
 
     if (formString === 'resetSendEmail') {
 
-      this.setState({ formToShow: 'resetSendEmail' })
+      this.setState({
+        formToShow: 'resetSendEmail'
+      })
     }
 
     if (formString === 'registrationSuccess') {
 
-      this.setState({ formToShow: 'registrationSuccess' })
+      this.setState({
+        formToShow: 'registrationSuccess'
+      })
     }
   }
 
@@ -127,18 +135,14 @@ export class Landing extends Component {
   render() {
     return (
       <div className="landing-body">
-        {
+        {/* {
           this.state.redirectTo
             ? <Redirect to={`${this.state.redirectTo}`}/>
             : null
-        }
-        {
-          !this.state.redirectTo
-            ? <div className="landing-form-container">
-                { this.getForm() }
-              </div>
-            : null
-        }
+        } */}
+        <div className="landing-form-container">
+          { this.getForm() }
+        </div>
       </div>
     )
   }

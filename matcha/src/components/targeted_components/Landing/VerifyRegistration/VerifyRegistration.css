@@ -3,6 +3,10 @@
     padding: 20px;
 }
 
+.verify-registration-busy-body {
+  margin-bottom: 14px;
+}
+
 .verify-registration-busy-body h2 {
   text-align: center;
   margin-bottom: 20px;

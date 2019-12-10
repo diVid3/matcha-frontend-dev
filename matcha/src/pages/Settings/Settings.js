@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Config from '../../config/Config'
 import InputValidation from '../../helpers/InputValidation'
 import PromiseCancel from '../../helpers/PromiseCancel'
 import ParseUserInfo from '../../helpers/ParseUserInfo'
@@ -6,20 +7,22 @@ import UsersProvider from '../../providers/UsersProvider'
 import TagsProvider from '../../providers/TagsProvider'
 import PicturesProvider from '../../providers/PicturesProvider'
 import LoadingBlocks from '../../components/shared_components/LoadingBlocks/LoadingBlocks'
+import PasswordMeter from '../../components/shared_components/PasswordMeter/PasswordMeter'
+import TagPicker from '../../components/targeted_components/Settings/TagPicker/TagPicker'
 
 import './Settings.css'
 import defaultPic from '../../assets/placeholder.png'
 
-const someTags = [
+const pickableTags = [
   {
     id: 1,
     user_id: 5,
-    tag: 'matcha'
+    tag: 'cats'
   },
   {
     id: 2,
     user_id: 5,
-    tag: 'cooking'
+    tag: 'coffee'
   },
   {
     id: 3,
@@ -34,12 +37,12 @@ const someTags = [
   {
     id: 5,
     user_id: 5,
-    tag: 'women'
+    tag: 'hiking'
   },
   {
     id: 6,
     user_id: 5,
-    tag: 'cats'
+    tag: 'reading'
   },
   {
     id: 7,
@@ -49,7 +52,7 @@ const someTags = [
   {
     id: 8,
     user_id: 5,
-    tag: 'eipsteinDidn\'tKillHimself'
+    tag: 'running'
   },
   {
     id: 9,
@@ -64,7 +67,7 @@ const someTags = [
   {
     id: 11,
     user_id: 5,
-    tag: 'coffee'
+    tag: 'cooking'
   }
 ]
 
@@ -96,14 +99,24 @@ export class Settings extends Component {
       gender: '0',
       sexPref: '0',
       userInfo: null,
-      pictures: null,
       tags: null,
       savedForm: false,
       part1ErrorToShow: '',
-      part2ErrorToShow: ''
+      part2ErrorToShow: '',
+      fileSelectedPP: null,
+      fileSelected1: null,
+      fileSelected2: null,
+      fileSelected3: null,
+      fileSelected4: null,
+      profilePicPath: '',
+      picPath1: '',
+      picPath2: '',
+      picPath3: '',
+      picPath4: '',
     }
 
     this.pendingPromises = []
+    this.passwordStrength = 0
 
     this.usernameDebounceTimer = undefined
     this.emailDebounceTimer = undefined
@@ -117,6 +130,60 @@ export class Settings extends Component {
     this.handleEmailChange = this.handleEmailChange.bind(this)
     this.showError = this.showError.bind(this)
     this.handleInitialSubmit = this.handleInitialSubmit.bind(this)
+    this.calcPasswordStrength = this.calcPasswordStrength.bind(this)
+    this.fileSelectedHandlerPP = this.fileSelectedHandlerPP.bind(this)
+    this.fileSelectedHandlerDecorator = this.fileSelectedHandlerDecorator.bind(this)
+    this.fileUploadSubmitPP = this.fileUploadSubmitPP.bind(this)
+    this.fileUploadSubmitDecorator = this.fileUploadSubmitDecorator.bind(this)
+    this.mapTargetStateToPicState = this.mapTargetStateToPicState.bind(this)
+  }
+
+  mapTargetStateToPicState(targetState) {
+
+    let picState = ''
+
+    switch (targetState) {
+      case 'fileSelectedPP':
+        picState = 'profilePicPath'
+        break
+      case 'fileSelected1':
+        picState = 'picPath1'
+        break
+      case 'fileSelected2':
+        picState = 'picPath2'
+        break
+      case 'fileSelected3':
+        picState = 'picPath3'
+        break
+      case 'fileSelected4':
+        picState = 'picPath4'
+        break
+      default:
+        picState = false
+    }
+
+    return picState
+  }
+
+  calcPasswordStrength() {
+
+    this.passwordStrength = 0
+
+    if (InputValidation.passwordHasLowerCase(this.state.password)) {
+      this.passwordStrength += 1
+    }
+    
+    if (InputValidation.passwordHasUpperCase(this.state.password)) {
+      this.passwordStrength += 1
+    }
+
+    if (InputValidation.passwordHasNumbers(this.state.password)) {
+      this.passwordStrength += 1
+    }
+
+    if (InputValidation.passwordHasOddChars(this.state.password)) {
+      this.passwordStrength += 1
+    }
   }
 
   handleChangeDecorator(targetState, validationFunc) {
@@ -145,6 +212,8 @@ export class Settings extends Component {
       passwordValid: InputValidation.isValidPassword(value),
       passwordsMatch: this.state.passwordConfirm === value
     })
+
+    this.calcPasswordStrength()
   }
 
   handlePasswordConfirmChange(e) {
@@ -187,15 +256,13 @@ export class Settings extends Component {
             if (json.rows.length) {
   
               this.setState({
-                usernameTaken: true,
-                usernameValid: false
+                usernameTaken: true
               })
             }
             else {
   
               this.setState({
-                usernameTaken: false,
-                usernameValid: true
+                usernameTaken: false
               })
             }
           })
@@ -241,15 +308,13 @@ export class Settings extends Component {
             if (json.rows.length) {
   
               this.setState({
-                emailTaken: true,
-                emailValid: false
+                emailTaken: true
               })
             }
             else {
   
               this.setState({
-                emailTaken: false,
-                emailValid: true
+                emailTaken: false
               })
             }
           })
@@ -262,6 +327,73 @@ export class Settings extends Component {
           })  
         }
       }, 600)
+    }
+  }
+
+  fileSelectedHandlerPP(e) {
+
+    this.setState({
+      fileSelectedPP: e.target.files[0]
+    })
+  }
+
+  fileSelectedHandlerDecorator(targetState) {
+
+    return (e) => {
+
+      this.setState({
+        [targetState]: e.target.files[0]
+      })
+    }
+  }
+
+  // TODO: This will need to contact its own provider as a patch will need to be done on the backend.
+  fileUploadSubmitPP(e) {
+    e.preventDefault()
+
+    console.log(this.state.fileSelectedPP)
+  }
+
+  fileUploadSubmitDecorator(targetState) {
+
+    return (e) => {
+      e.preventDefault()
+
+      if (!this.state[targetState]) {
+
+        return
+      }
+
+      const formData = new FormData();
+      if (this.state[this.mapTargetStateToPicState(targetState)]) {
+        formData.append('oldPicPath', this.state[this.mapTargetStateToPicState(targetState)])
+      }
+      formData.append(targetState, this.state[targetState], this.state[targetState].name)
+
+      const cancelableFileUploadPromise = PromiseCancel.makeCancelable(
+        PicturesProvider.storePictureBySession(formData)
+      )
+
+      this.pendingPromises.push(cancelableFileUploadPromise)
+
+      cancelableFileUploadPromise.promise
+      .then((json) => {
+
+        const picState = this.mapTargetStateToPicState(targetState)
+
+        if (!picState) {
+          throw new Error(`Couldn't map targetState to the correct picState.`)
+        }
+
+        this.setState({
+          [targetState]: null,
+          [picState]: `${Config.backend}/${json.picPath}`
+        })
+      })
+      .catch((json) => {
+
+        // Don't change anything.
+      })
     }
   }
 
@@ -311,10 +443,32 @@ export class Settings extends Component {
     }
   }
 
+  handlePasswordSubmit() {
+
+    if (
+      this.passwordStrength === 0 ||
+      this.passwordStrength === 1 ||
+      this.passwordStrength === 2
+    ) {
+
+      this.setState({
+        part1ErrorToShow: 'Password must be either average or strong'
+      })
+      this.showError('part1ErrorToShow')
+
+      return true
+    }
+  }
+
   handleSubmit(e) {
     e.preventDefault()
 
     if (this.handleInitialSubmit()) {
+
+      return
+    }
+
+    if (this.handlePasswordSubmit()) {
 
       return
     }
@@ -324,9 +478,11 @@ export class Settings extends Component {
       this.state.firstNameValid &&
       this.state.lastNameValid &&
       this.state.usernameValid &&
+      !this.state.usernameTaken &&
       this.state.ageValid &&
       this.state.biographyValid &&
       this.state.emailValid &&
+      !this.state.emailTaken &&
       this.state.passwordValid &&
       this.state.passwordConfirmValid &&
       this.state.passwordsMatch
@@ -350,8 +506,6 @@ export class Settings extends Component {
       )
   
       this.pendingPromises.push(cancelablePatchUserByEmailPromise)
-
-      // TODO: Could perhaps add a loading animation to the button, like a clock spinner here.
 
       cancelablePatchUserByEmailPromise.promise
       .then((json) => {
@@ -414,14 +568,22 @@ export class Settings extends Component {
 
       console.log(obj)
 
-      // TODO: Iterate over the tags and higlight them.
+      let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
+      let newPicPath1 = (obj[1].rows[0] && obj[1].rows[0].pic_path) ? (`${Config.backend}/` + obj[1].rows[0].pic_path) : ''
+      let newPicPath2 = (obj[1].rows[1] && obj[1].rows[1].pic_path) ? (`${Config.backend}/` + obj[1].rows[1].pic_path) : ''
+      let newPicPath3 = (obj[1].rows[2] && obj[1].rows[2].pic_path) ? (`${Config.backend}/` + obj[1].rows[2].pic_path) : ''
+      let newPicPath4 = (obj[1].rows[3] && obj[1].rows[3].pic_path) ? (`${Config.backend}/` + obj[1].rows[3].pic_path) : ''
+
       // TODO: The pictures will simply link to a path hosted publicly on the backend.
       this.setState({
         isBusy: false,
         userInfo: obj[0].rows[0],
-        pictures: obj[1].rows,
-        tags: someTags,
-        // tags: obj[2].rows,
+        profilePicPath: newProfilePicPath,
+        picPath1: newPicPath1,
+        picPath2: newPicPath2,
+        picPath3: newPicPath3,
+        picPath4: newPicPath4,
+        tags: obj[2].rows,
         firstName: obj[0].rows[0].first_name,
         lastName: obj[0].rows[0].last_name,
         username: obj[0].rows[0].username,
@@ -455,6 +617,308 @@ export class Settings extends Component {
           !this.state.isBusy
             ? <div>
                 <div className="settings-page-part settings-page-part-1">
+                  <div className="settings-page-part-2-container">
+                    <p className="settings-page-input-container-heading settings-page-pictures-heading">
+                      Pictures
+                    </p>
+                    <div className="settings-page-pictures-container">
+                      <div className="settings-page-picture-container settings-page-picture-container-pp">
+                        <div className="settings-page-picture-aspect-container">
+                          <div className="settings-page-picture-aspect-node">
+                              <img className="settings-page-picture settings-page-picture-pp"
+                              src={
+                                this.state.profilePicPath
+                                  ? this.state.profilePicPath
+                                  : defaultPic
+                              }
+                              alt="Something"
+                            />
+                          </div>
+                          <p className="settings-page-picture-aspect-container-pp-text">Profile pic</p>
+                        </div>
+                        <form
+                          onSubmit={this.fileUploadSubmitPP}
+                        >
+                          <label
+                            className="settings-page-file-select-input-label"
+                            htmlFor="settings-page-form-file-input-pp"
+                          >
+                            Choose file
+                          </label>
+                          <input
+                            id="settings-page-form-file-input-pp"
+                            type="file"
+                            onChange={this.fileSelectedHandlerPP}
+                          />
+                          <button
+                            className="settings-page-form-file-upload-button"
+                            type="submit"
+                            value="Submit"
+                          >
+                            Upload
+                          </button>
+                          {
+                            this.state.fileSelectedPP
+                              ? <p className="settings-page-file-select-input-text">
+                                  { this.state.fileSelectedPP.name }
+                                </p>
+                              : null
+                          }
+                        </form>
+                      </div>
+                      <div className="settings-page-picture-container settings-page-picture-container-1">
+                        <div className="settings-page-picture-aspect-container">
+                          <div className="settings-page-picture-aspect-node">
+                            <img className="settings-page-picture settings-page-picture-1"
+                              src={
+                                this.state.picPath1
+                                  ? this.state.picPath1
+                                  : defaultPic
+                              }
+                              alt="Something"
+                            />
+                          </div>
+                        </div>
+                        <form
+                          onSubmit={this.fileUploadSubmitDecorator('fileSelected1')}
+                        >
+                          <label
+                            className="settings-page-file-select-input-label"
+                            htmlFor="settings-page-form-file-input-1"
+                          >
+                            Choose file
+                          </label>
+                          <input
+                            id="settings-page-form-file-input-1"
+                            type="file"
+                            onChange={this.fileSelectedHandlerDecorator('fileSelected1')}
+                          />
+                          <button
+                            className="settings-page-form-file-upload-button"
+                            type="submit"
+                            value="Submit"
+                          >
+                            Upload
+                          </button>
+                          {
+                            this.state.fileSelected1
+                              ? <p className="settings-page-file-select-input-text">
+                                  { this.state.fileSelected1.name }
+                                </p>
+                              : null
+                          }
+                        </form>
+                      </div>
+                      <div className="settings-page-picture-container settings-page-picture-container-2">
+                        <div className="settings-page-picture-aspect-container">
+                          <div className="settings-page-picture-aspect-node">
+                            <img className="settings-page-picture settings-page-picture-2"
+                              src={
+                                this.state.picPath2
+                                  ? this.state.picPath2
+                                  : defaultPic
+                              }
+                              alt="Something"
+                            />
+                          </div>
+                        </div>
+                        <form
+                          onSubmit={this.fileUploadSubmitDecorator('fileSelected2')}
+                        >
+                          <label
+                            className="settings-page-file-select-input-label"
+                            htmlFor="settings-page-form-file-input-2"
+                          >
+                            Choose file
+                          </label>
+                          <input
+                            id="settings-page-form-file-input-2"
+                            type="file"
+                            onChange={this.fileSelectedHandlerDecorator('fileSelected2')}
+                          />
+                          <button
+                            className="settings-page-form-file-upload-button"
+                            type="submit"
+                            value="Submit"
+                          >
+                            Upload
+                          </button>
+                          {
+                            this.state.fileSelected2
+                              ? <p className="settings-page-file-select-input-text">
+                                  { this.state.fileSelected2.name }
+                                </p>
+                              : null
+                          }
+                        </form>
+                      </div>
+                      <div className="settings-page-picture-container settings-page-picture-container-3">
+                        <div className="settings-page-picture-aspect-container">
+                          <div className="settings-page-picture-aspect-node">
+                            <img className="settings-page-picture settings-page-picture-3"
+                              src={
+                                this.state.picPath3
+                                  ? this.state.picPath3
+                                  : defaultPic
+                              }
+                              alt="Something"
+                            />
+                          </div>
+                        </div>
+                        <form
+                          onSubmit={this.fileUploadSubmitDecorator('fileSelected3')}
+                        >
+                          <label
+                            className="settings-page-file-select-input-label"
+                            htmlFor="settings-page-form-file-input-3"
+                          >
+                            Choose file
+                          </label>
+                          <input
+                            id="settings-page-form-file-input-3"
+                            type="file"
+                            onChange={this.fileSelectedHandlerDecorator('fileSelected3')}
+                          />
+                          <button
+                            className="settings-page-form-file-upload-button"
+                            type="submit"
+                            value="Submit"
+                          >
+                            Upload
+                          </button>
+                          {
+                            this.state.fileSelected3
+                              ? <p className="settings-page-file-select-input-text">
+                                  { this.state.fileSelected3.name }
+                                </p>
+                              : null
+                          }
+                        </form>
+                      </div>
+                      <div className="settings-page-picture-container settings-page-picture-container-4">
+                        <div className="settings-page-picture-aspect-container">
+                          <div className="settings-page-picture-aspect-node">
+                            <img className="settings-page-picture settings-page-picture-4"
+                              src={
+                                this.state.picPath4
+                                  ? this.state.picPath4
+                                  : defaultPic
+                              }
+                              alt="Something"
+                            />
+                          </div>
+                        </div>
+                        <form
+                          onSubmit={this.fileUploadSubmitDecorator('fileSelected4')}
+                        >
+                          <label
+                            className="settings-page-file-select-input-label"
+                            htmlFor="settings-page-form-file-input-4"
+                          >
+                            Choose file
+                          </label>
+                          <input
+                            id="settings-page-form-file-input-4"
+                            type="file"
+                            onChange={this.fileSelectedHandlerDecorator('fileSelected4')}
+                          />
+                          <button
+                            className="settings-page-form-file-upload-button"
+                            type="submit"
+                            value="Submit"
+                          >
+                            Upload
+                          </button>
+                          {
+                            this.state.fileSelected4
+                              ? <p className="settings-page-file-select-input-text">
+                                  { this.state.fileSelected4.name }
+                                </p>
+                              : null
+                          }
+                        </form>
+                      </div>
+                    </div>
+                    <TagPicker
+                      pickableTags={pickableTags}
+                      tags={this.state.tags}
+                      myOnClick={(tagToTarget, canClickStates, tagIndex) => {
+
+                        return () => {
+
+                          if (canClickStates[tagIndex]) {
+
+                            // To delete tag if the tag that was clicked on is in the set of already chosen user tags.
+                            if (this.state.tags.some((userTag) => userTag.tag === tagToTarget.tag)) {
+
+                              canClickStates[tagIndex] = false
+
+                              // "Deleting" the chosen user tag by filtering it out and setting state to new ref.
+                              let filteredTags = this.state.tags.filter(tag => tag.tag !== tagToTarget.tag)
+
+                              this.setState({
+                                tags: filteredTags
+                              })
+
+                              const cancelableDeleteTagPromise = PromiseCancel.makeCancelable(
+                                TagsProvider.deleteTagBySession({ tag: tagToTarget.tag })
+                              )
+
+                              this.pendingPromises.push(cancelableDeleteTagPromise)
+
+                              cancelableDeleteTagPromise.promise
+                              .then((json) => {
+
+                                canClickStates[tagIndex] = true
+                              })
+                              .catch((json) => {
+
+                                let newArrRef = this.state.tags.slice(0)
+                                newArrRef.push(tagToTarget)
+                                this.setState({
+                                  tags: newArrRef
+                                })
+                              })
+                            }
+                            else {
+
+                              canClickStates[tagIndex] = false
+
+                              // Shallow copy as to not mutate state directly.
+                              let newArrRef = this.state.tags.slice(0)
+
+                              newArrRef.push(tagToTarget)
+
+                              this.setState({
+                                tags: newArrRef
+                              })
+
+                              const cancelableAddTagPromise = PromiseCancel.makeCancelable(
+                                TagsProvider.createTagBySession({ tag: tagToTarget.tag })
+                              )
+
+                              this.pendingPromises.push(cancelableAddTagPromise)
+
+                              cancelableAddTagPromise.promise
+                              .then((json) => {
+
+                                canClickStates[tagIndex] = true
+                              })
+                              .catch((json) => {
+
+                                let filteredTags = this.state.tags.filter(tag => tag.tag !== tagToTarget.tag)
+                                this.setState({
+                                  tags: filteredTags
+                                })
+                              })
+                            }
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="settings-page-part settings-page-part-2">
                   <div className="settings-page-part-1-container">
                     <form className="settings-page-part-1-form" onSubmit={this.handleSubmit}>
                       <div className="settings-page-part-1-form-left">
@@ -464,7 +928,7 @@ export class Settings extends Component {
                             <p
                               className={
                                 `settings-page-input-error ${
-                                  this.state.username !== this.state.userInfo.username && this.state.usernameTaken
+                                  this.state.usernameTaken
                                     ? ''
                                     : 'settings-page-input-error-disable'
                                 }`
@@ -476,9 +940,9 @@ export class Settings extends Component {
                           <input
                             className={
                               `settings-page-form-input ${
-                                this.state.usernameValid
-                                  ? ''
-                                  : 'input-bad'
+                                !this.state.usernameValid || this.state.usernameTaken
+                                  ? 'input-bad'
+                                  : ''
                               }`
                             }
                             name="username"
@@ -588,7 +1052,7 @@ export class Settings extends Component {
                             <p
                               className={
                                 `settings-page-input-error ${
-                                  this.state.email !== this.state.userInfo.email && this.state.emailTaken
+                                  this.state.emailTaken
                                     ? ''
                                     : 'settings-page-input-error-disable'
                                 }`
@@ -600,9 +1064,9 @@ export class Settings extends Component {
                           <input
                             className={
                               `settings-page-form-input ${
-                                this.state.emailValid
-                                  ? ''
-                                  : 'input-bad'
+                                !this.state.emailValid || this.state.emailTaken
+                                  ? 'input-bad'
+                                  : ''
                               }`
                             }
                             name="email"
@@ -618,7 +1082,10 @@ export class Settings extends Component {
                           />
                         </div>
                         <div className="settings-page-input-container">
-                          <p className="settings-page-input-container-heading">Password</p>
+                          <div className="settings-page-input-error-container">
+                            <p className="settings-page-input-container-heading">Password</p>
+                            <PasswordMeter displayOnlyWord={true} password={this.state.password}/>
+                          </div>
                           <input
                             className={
                               `settings-page-form-input ${
@@ -761,9 +1228,6 @@ export class Settings extends Component {
                         : null
                     }
                   </div>
-                </div>
-                <div className="settings-page-part settings-page-part-2">
-        
                 </div>
               </div>
             : <div className="settings-page-loading-container">

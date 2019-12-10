@@ -6,6 +6,7 @@ import RegistrationProvider from '../../../../providers/RegistrationProvider'
 import UsersProvider from '../../../../providers/UsersProvider'
 import LocationProvider from '../../../../providers/LocationProvider'
 import LoadingSpinner from '../../../shared_components/LoadingSpinner/LoadingSpinner'
+import PasswordMeter from '../../../shared_components/PasswordMeter/PasswordMeter'
 
 import './RegisterForm.css'
 
@@ -43,6 +44,7 @@ export class RegisterForm extends Component {
     }
 
     this.pendingPromises = []
+    this.passwordStrength = 0
 
     this.handleChangeDecorator = this.handleChangeDecorator.bind(this)
     this.switchFormDecorator = this.switchFormDecorator.bind(this)
@@ -52,6 +54,28 @@ export class RegisterForm extends Component {
     this.handleSubmitErrors = this.handleSubmitErrors.bind(this)
     this.handleInitialSubmit = this.handleInitialSubmit.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.calcPasswordStrength = this.calcPasswordStrength.bind(this)
+  }
+
+  calcPasswordStrength() {
+
+    this.passwordStrength = 0
+
+    if (InputValidation.passwordHasLowerCase(this.state.password)) {
+      this.passwordStrength += 1
+    }
+    
+    if (InputValidation.passwordHasUpperCase(this.state.password)) {
+      this.passwordStrength += 1
+    }
+
+    if (InputValidation.passwordHasNumbers(this.state.password)) {
+      this.passwordStrength += 1
+    }
+
+    if (InputValidation.passwordHasOddChars(this.state.password)) {
+      this.passwordStrength += 1
+    }
   }
 
   switchFormDecorator(formToSwitchTo) {
@@ -89,6 +113,8 @@ export class RegisterForm extends Component {
       passwordValid: InputValidation.isValidPassword(value),
       passwordsMatch: this.state.passwordConfirm === value
     })
+
+    this.calcPasswordStrength()
   }
 
   handlePasswordConfirmChange(e) {
@@ -273,6 +299,17 @@ export class RegisterForm extends Component {
     if (!this.state.passwordValid) {
 
       this.setState({ errorToShow: 'Password field contains invalid characters or is empty' })
+      this.showCorrectErrors()
+      return
+    }
+
+    if (
+      this.passwordStrength === 0 ||
+      this.passwordStrength === 1 ||
+      this.passwordStrength === 2
+    ) {
+
+      this.setState({ errorToShow: 'Password must be either average or strong' })
       this.showCorrectErrors()
       return
     }
@@ -600,6 +637,10 @@ export class RegisterForm extends Component {
                       this.state.emailValid
                         ? ''
                         : 'input-bad'
+                    } ${
+                      this.state.password.length
+                        ? 'register-form-block-email'
+                        : ''
                     }`
                   }
                   name="email"
@@ -612,6 +653,14 @@ export class RegisterForm extends Component {
                     )
                   }
                   placeholder="Email"
+                />
+                <PasswordMeter
+                  displayOnlyWord={true}
+                  password={this.state.password}
+                  customStyle={{
+                    fontSize: '11px',
+                    marginBottom: '4px'
+                  }}
                 />
                 <div className="register-split-block">
                   <input

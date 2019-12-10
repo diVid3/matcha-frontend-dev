@@ -3,6 +3,10 @@
   padding: 20px;
 }
 
+.verify-reset-body-loading {
+  margin-bottom: 14px;
+}
+
 .verify-reset-body-loading h2 {
   text-align: center;
   color: var(--midtone-dark);

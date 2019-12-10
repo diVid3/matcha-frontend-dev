@@ -9,11 +9,10 @@ export class PublicRoute extends Component {
     super(props)
 
     this.state = {
+      canView: false,
       isLoggedIn: false,
       redirectTo: ''
     }
-
-    this.pendingPromises = []
   }
   
   componentDidMount() {
@@ -31,19 +30,25 @@ export class PublicRoute extends Component {
         redirectTo: '/profile'
       })
     }
+    else {
+
+      this.setState({
+        canView: true
+      })
+    }
   }
 
   render() {
     return (
-      <Route path={this.props.path} {...this.props}>
+      <Route path={this.props.path} exact={this.props.exact ? true : undefined}>
         {
           this.state.redirectTo
             ? <Redirect to={`${this.state.redirectTo}`}/>
             : null
         }
         {
-          !this.state.isLoggedIn
-            ? this.props.children
+          !this.state.isLoggedIn && this.state.canView
+            ? React.Children.map(this.props.children, child => React.cloneElement(child, { ...this.props }))
             : null
         }
       </Route>

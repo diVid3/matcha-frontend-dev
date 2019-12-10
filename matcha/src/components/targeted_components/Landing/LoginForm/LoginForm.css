@@ -59,7 +59,7 @@
 
 .login-correct-errors-message {
   display: flex;
-  height: 48px;
+  /* height: 48px; */
   background: rgb(255, 135, 135);
   box-shadow: 0px 0px 1px 1px red;
   color: rgb(133, 0, 0);
