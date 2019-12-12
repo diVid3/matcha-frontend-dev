@@ -65,11 +65,17 @@
   justify-content: center;
 }
 
-.profile-page-stats-pp {
+.profile-page-stats-pp-pic-container {
   height: 75%;
   width: 75%;
-  /* border-radius: 50%; */
-  box-shadow: 0px 0px 5px 0px silver;
+  border-radius: 5px;
+}
+
+.profile-page-stats-pp {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
 }
 
 .profile-page-stats-pp:hover {
@@ -107,7 +113,7 @@
 
 .profile-page-grid-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 0px 30px;
 }
@@ -127,8 +133,13 @@
   cursor: pointer;
 }
 
-.profile-page-grid-viewed-button {
+.profile-page-grid-likers-button {
   background: linear-gradient(90deg, var(--accent-other), var(--accent));
+}
+
+.profile-page-grid-viewed-button {
+  color: var(--midtone);
+  background: var(--highlight-light);
 }
 
 .profile-page-grid-edit-button {
@@ -168,9 +179,6 @@
   padding-top: 100%;
   border-radius: 5px;
   box-shadow: 0px 0px 5px 0px silver;
-  /* box-shadow: 0px 0px 5px 0px silver;
-  border-radius: 5px;
-  margin-bottom: 8px; */
 }
 
 .profile-page-picture-aspect-node {
@@ -180,13 +188,12 @@
   bottom: 0;
   right: 0;
   border-radius: 5px;
-  /* border-radius: 5px; */
 }
 
 .profile-page-pictures-picture-container {
   display: inline-block;
-  height: 21%;
-  width: 21%;
+  height: 23%;
+  width: 23%;
   border-radius: 5px;
 }
 
@@ -204,10 +211,8 @@
 .profile-page-modal-image {
   border-radius: 5px;
   padding: 10px;
-  /* height: 280px; */
-  width: 60vw;
+  width: 80vw;
   max-width: 500px;
-  /* object-fit: cover; */
 }
 
 .profile-page-pictures-tags-container {
@@ -230,6 +235,12 @@
   background-color: var(--highlight-light);
 }
 
+.profile-page-pictures-tags-no-tags-text {
+  color: var(--midtone);
+  margin-top: 5px;
+  font-size: 14px;
+}
+
 @media only screen and (min-width: 500px) {
   .profile-page-grid {
     grid-template-areas:
@@ -241,7 +252,7 @@
     "stats stats stats stats butns butns butns butns butns butns";
   }
   .profile-page-grid-buttons {
-    justify-content: flex-end;
+    justify-content: space-between;
   }
   .profile-page-grid-buttons-button {
     margin: 0px;
@@ -285,7 +296,7 @@
     "stats stats stats butns butns butns butns butns butns butns";
   }
   .profile-page-grid-buttons {
-    justify-content: flex-end;
+    justify-content: space-between;
   }
   .profile-page-grid-buttons-button {
     margin: 0px;

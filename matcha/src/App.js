@@ -18,11 +18,12 @@ function App() {
       <Router>
         <Switch>
           <Route path="/oops" component={Oops}/>
-          <ProtectedRoute path={['/profile', '/settings']}>
+          <ProtectedRoute path={['/profile', '/profile/:username', '/settings']}>
             <header>
               <Navbar />
             </header>
-            <Route path="/profile" component={Profile}/>
+            <Route path="/profile" component={Profile} exact/>
+            <Route path="/profile/:username" component={Profile}/>
             <Route path="/settings" component={Settings}/>
           </ProtectedRoute>
           <PublicRoute path="/">

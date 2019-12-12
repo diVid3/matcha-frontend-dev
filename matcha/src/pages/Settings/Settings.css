@@ -151,7 +151,7 @@
 
 .settings-page-form-button-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .settings-page-form-button {
@@ -229,7 +229,6 @@
 .settings-page-pictures-container {
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
   width: 100%;
 }
 
@@ -258,14 +257,14 @@
 
 .settings-page-picture-aspect-container-pp-text {
   position: absolute;
-  right: 0px;
-  bottom: 0px;
+  right: 5px;
+  bottom: 5px;
   font-size: 10px;
   padding: 4px;
   box-shadow: 0px 0px 5px 0px silver;
   color: var(--midtone);
   background-color: white;
-  border-radius: 5px;
+  border-radius: 50%;
 }
 
 .settings-page-picture-aspect-node {
@@ -325,64 +324,35 @@
   margin-bottom: 10px;
 }
 
-/* .settings-page-form-file-input-pp {
-  display: none;
+.settings-page-update-location-button {
+  height: 48px;
+  width: 144px;
+  border-radius: 5px;
+  color: var(--midtone);
+  font-size: 14px;
+  margin: 20px 0px 0px 0px;
+  border: none;
+  box-shadow: 0px 0px 5px 0px silver;
+  background: var(--highlight-light);
+  margin-right: 10px;
 }
 
-.settings-page-form-file-input-1 {
-  display: none;
+.settings-page-update-location-button:hover {
+  cursor: pointer;
 }
 
-.settings-page-form-file-input-2 {
-  display: none;
+.settings-page-update-location-button-saved {
+  color: darkgreen;
+  background: lightgreen;
+  box-shadow: 0px 0px 5px 0px silver;
+  border: 1px solid green;
 }
 
-.settings-page-form-file-input-3 {
-  display: none;
-}
-
-.settings-page-form-file-input-4 {
-  display: none;
-} */
-
-/* .settings-page-picture-container-pp {
-
-}
-
-.settings-page-picture-container-1 {
-  
-}
-
-.settings-page-picture-container-2 {
-  
-}
-
-.settings-page-picture-container-3 {
-  
-}
-
-.settings-page-picture-container-4 {
-  
-} */
-
-.settings-page-picture-pp {
-  
-}
-
-.settings-page-picture-1 {
-  
-}
-
-.settings-page-picture-2 {
-  
-}
-
-.settings-page-picture-3 {
-  
-}
-
-.settings-page-picture-4 {
-  
+.settings-page-update-location-button-updating {
+  color: orange;
+  background: lightyellow;
+  box-shadow: 0px 0px 5px 0px silver;
+  border: 1px solid orange;
 }
 
 @media only screen and (min-width: 525px) {

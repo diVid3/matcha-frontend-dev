@@ -4,6 +4,7 @@ import InputValidation from '../../helpers/InputValidation'
 import PromiseCancel from '../../helpers/PromiseCancel'
 import ParseUserInfo from '../../helpers/ParseUserInfo'
 import UsersProvider from '../../providers/UsersProvider'
+import LocationProvider from '../../providers/LocationProvider'
 import TagsProvider from '../../providers/TagsProvider'
 import PicturesProvider from '../../providers/PicturesProvider'
 import LoadingBlocks from '../../components/shared_components/LoadingBlocks/LoadingBlocks'
@@ -113,6 +114,8 @@ export class Settings extends Component {
       picPath2: '',
       picPath3: '',
       picPath4: '',
+      updatedLocation: false,
+      isBusyUpdatingLocation: false
     }
 
     this.pendingPromises = []
@@ -121,6 +124,10 @@ export class Settings extends Component {
     this.usernameDebounceTimer = undefined
     this.emailDebounceTimer = undefined
     this.canSubmit = true
+    this.canUpdateLocation = true
+
+    this.latitude = ''
+    this.longitude = ''
 
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleChangeDecorator = this.handleChangeDecorator.bind(this)
@@ -136,6 +143,176 @@ export class Settings extends Component {
     this.fileUploadSubmitPP = this.fileUploadSubmitPP.bind(this)
     this.fileUploadSubmitDecorator = this.fileUploadSubmitDecorator.bind(this)
     this.mapTargetStateToPicState = this.mapTargetStateToPicState.bind(this)
+    this.handleUpdateLocation = this.handleUpdateLocation.bind(this)
+  }
+
+  handleUpdateLocation(e) {
+
+    if (!this.canUpdateLocation) {
+
+      return
+    }
+
+    this.canUpdateLocation = false
+
+    this.setState({
+      isBusyUpdatingLocation: true
+    })
+
+    if (navigator && navigator.geolocation) {
+
+      const cancelableLocationPromise = PromiseCancel.makeCancelable(
+        new Promise((res, rej) => {
+
+          navigator.geolocation.getCurrentPosition((position) => {
+            
+            res(() => {
+
+              this.latitude = position.coords.latitude + ''
+              this.longitude = position.coords.longitude + ''
+            })
+          }, (err) => {
+
+            if (err.code === 1) {
+
+              LocationProvider.getLocation()
+              .then((data) => {
+
+                res(() => {
+
+                  this.latitude = data.lat + ''
+                  this.longitude = data.lon + ''
+                })
+              })
+              .catch((err) => {
+                rej(err)
+              })
+            }
+            else if (err.code === 2) {
+
+              LocationProvider.getLocation()
+              .then((data) => {
+
+                this.latitude = data.lat + ''
+                this.longitude = data.lon + ''
+              })
+              .catch((err) => {
+                rej(err)
+              })
+            }
+            else {
+              rej('FRONTEND - Geolocation error, it\'s weird')
+            }
+          })
+        })
+      )
+
+      this.pendingPromises.push(cancelableLocationPromise)
+
+      cancelableLocationPromise.promise
+      .then((func) => {
+        func()
+      })
+      .then(() => {
+
+        const cancelableUpdateLocationPromise = PromiseCancel.makeCancelable(
+          UsersProvider.patchUserBySession({
+            latitude: this.latitude,
+            longitude: this.longitude
+          })
+        )
+
+        this.pendingPromises.push(cancelableUpdateLocationPromise)
+
+        return cancelableUpdateLocationPromise.promise
+      })
+      .then((json) => {
+
+        this.setState({
+          updatedLocation: true,
+          isBusyUpdatingLocation: false
+        })
+
+        const cancelalbleResetUpdatedLocationPromise = PromiseCancel.makeCancelable(
+          new Promise((res, rej) => {
+            setTimeout(() => {
+              this.setState({
+                updatedLocation: false
+              })
+              this.canUpdateLocation = true
+              res()
+            }, 3000)
+          })
+        )
+
+        this.pendingPromises.push(cancelalbleResetUpdatedLocationPromise)
+
+        cancelalbleResetUpdatedLocationPromise.promise
+        .then(() => {})
+        .catch(() => {})
+      })
+      .catch(() => {
+
+        this.canUpdateLocation = true
+      })
+    }
+    else {
+
+      const cancelableLocationPromise = PromiseCancel.makeCancelable(
+        LocationProvider.getLocation()
+      )
+
+      this.pendingPromises.push(cancelableLocationPromise)
+
+      cancelableLocationPromise.promise
+      .then((data) => {
+
+        this.latitude = data.lat + ''
+        this.longitude = data.lon + ''
+      })
+      .then(() => {
+
+        const cancelableUpdateLocationPromise = PromiseCancel.makeCancelable(
+          UsersProvider.patchUserBySession({
+            latitude: this.latitude,
+            longitude: this.longitude
+          })
+        )
+
+        this.pendingPromises.push(cancelableUpdateLocationPromise)
+
+        return cancelableUpdateLocationPromise.promise
+      })
+      .then((json) => {
+
+        this.setState({
+          updatedLocation: true,
+          isBusyUpdatingLocation: false
+        })
+
+        const cancelalbleResetUpdatedLocationPromise = PromiseCancel.makeCancelable(
+          new Promise((res, rej) => {
+            setTimeout(() => {
+              this.setState({
+                updatedLocation: false
+              })
+              this.canUpdateLocation = true
+              res()
+            }, 3000)
+          })
+        )
+
+        this.pendingPromises.push(cancelalbleResetUpdatedLocationPromise)
+
+        cancelalbleResetUpdatedLocationPromise.promise
+        .then(() => {})
+        .catch(() => {})
+      })
+      .catch((err) => {
+
+        this.canUpdateLocation = true
+      })
+    }
   }
 
   mapTargetStateToPicState(targetState) {
@@ -347,11 +524,38 @@ export class Settings extends Component {
     }
   }
 
-  // TODO: This will need to contact its own provider as a patch will need to be done on the backend.
   fileUploadSubmitPP(e) {
     e.preventDefault()
 
-    console.log(this.state.fileSelectedPP)
+    if (!this.state.fileSelectedPP) {
+
+      return
+    }
+
+    const formData = new FormData();
+    if (this.state.profilePicPath) {
+      formData.append('oldPicPath', this.state.profilePicPath)
+    }
+    formData.append('fileSelectedPP', this.state.fileSelectedPP, this.state.fileSelectedPP.name)
+
+    const cancelableProfileFileUploadPromise = PromiseCancel.makeCancelable(
+      PicturesProvider.storeProfilePictureBySession(formData)
+    )
+
+    this.pendingPromises.push(cancelableProfileFileUploadPromise)
+
+    cancelableProfileFileUploadPromise.promise
+    .then((json) => {
+
+      this.setState({
+        fileSelectedPP: null,
+        profilePicPath: `${Config.backend}/${json.picPath}`
+      })
+    })
+    .catch((json) => {
+
+      // Don't change anything.
+    })
   }
 
   fileUploadSubmitDecorator(targetState) {
@@ -634,7 +838,7 @@ export class Settings extends Component {
                               alt="Something"
                             />
                           </div>
-                          <p className="settings-page-picture-aspect-container-pp-text">Profile pic</p>
+                          <p className="settings-page-picture-aspect-container-pp-text">pp</p>
                         </div>
                         <form
                           onSubmit={this.fileUploadSubmitPP}
@@ -916,6 +1120,8 @@ export class Settings extends Component {
                         }
                       }}
                     />
+                    {/* <div className="settings-page-update-location-button-container">
+                    </div> */}
                   </div>
                 </div>
                 <div className="settings-page-part settings-page-part-2">
@@ -934,7 +1140,7 @@ export class Settings extends Component {
                                 }`
                               }
                             >
-                              Username Taken
+                              Username taken
                             </p>
                           </div>
                           <input
@@ -958,7 +1164,7 @@ export class Settings extends Component {
                           />
                         </div>
                         <div className="settings-page-input-container">
-                          <p className="settings-page-input-container-heading">First Name</p>
+                          <p className="settings-page-input-container-heading">First name</p>
                           <input
                             className={
                               `settings-page-form-input ${
@@ -980,7 +1186,7 @@ export class Settings extends Component {
                           />
                         </div>
                         <div className="settings-page-input-container">
-                          <p className="settings-page-input-container-heading">Last Name</p>
+                          <p className="settings-page-input-container-heading">Last name</p>
                           <input
                             className={
                               `settings-page-form-input ${
@@ -1058,7 +1264,7 @@ export class Settings extends Component {
                                 }`
                               }
                             >
-                              Email Taken
+                              Email taken
                             </p>
                           </div>
                           <input
@@ -1102,7 +1308,7 @@ export class Settings extends Component {
                           />
                         </div>
                         <div className="settings-page-input-container">
-                          <p className="settings-page-input-container-heading">Confirm Password</p>
+                          <p className="settings-page-input-container-heading">Confirm password</p>
                           <input
                             className={
                               `settings-page-form-input ${
@@ -1159,7 +1365,7 @@ export class Settings extends Component {
                           </div>
                         </div>
                         <div className="settings-page-form-radio-group settings-page-form-radio-group-sex-pref">
-                          <p className="settings-page-input-container-heading">Sexual Preference</p>
+                          <p className="settings-page-input-container-heading">Sexual preference</p>
                           <div className="settings-page-form-radio-sub-group">
                             <input
                               className="settings-page-form-radio-button"
@@ -1198,6 +1404,29 @@ export class Settings extends Component {
                           </div>
                         </div>
                         <div className="settings-page-form-button-container">
+                          <button
+                            className={
+                              `settings-page-update-location-button ${
+                                this.state.updatedLocation
+                                  ? 'settings-page-update-location-button-saved'
+                                  : ''
+                              } ${
+                                this.state.isBusyUpdatingLocation
+                                  ? 'settings-page-update-location-button-updating'
+                                  : ''
+                              }`
+                            }
+                            type="button"
+                            onClick={this.handleUpdateLocation}
+                          >
+                            {
+                              this.state.updatedLocation
+                                ? 'Updated'
+                                : this.state.isBusyUpdatingLocation
+                                    ? 'Updating...'
+                                    : 'Update my location'
+                            }
+                          </button>
                           <button
                             className={
                               `settings-page-form-button ${

@@ -40,6 +40,44 @@ export class TagsProvider {
     })
   }
 
+  static getTagsByUsername(body) {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/tags/username/${body.username}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        },
+        credentials: 'include'
+      })
+      .then((response) => {
+
+        response.json()
+        .then((data) => {
+
+          if (!response.ok) {
+            return rej(data)
+          }
+
+          res(data)
+        })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, getting tags by username.' }]
+          })
+        })
+      })
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, getting tags by username.' }]
+        })
+      })
+    })
+  }
+
   // body will be like: { tag: 'cooking' }
   static createTagBySession(body) {
 

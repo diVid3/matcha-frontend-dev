@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
+import { Redirect } from "react-router-dom";
 import UsersProvider from '../../providers/UsersProvider'
 import PicturesProvider from '../../providers/PicturesProvider'
 import TagsProvider from '../../providers/TagsProvider'
@@ -13,6 +14,8 @@ import Config from '../../config/Config'
 import './Profile.css';
 import defaultpp from '../../assets/placeholder.png'
 import defaultPic from '../../assets/placeholder.png'
+import InputValidation from '../../helpers/InputValidation'
+import BlockedUsersProvider from '../../providers/BlockedUsersProvider'
 
 Modal.setAppElement('#root');
 
@@ -47,12 +50,24 @@ export class Profile extends Component {
       tags: null,
       viewers: null,
       modalOpen: false,
-      modalImage: ''
+      modalChild: null,
+      redirectTo: '',
+      isOtherUser: false
     }
 
     this.pendingPromises = []
 
     this.handleImageClickDecorator = this.handleImageClickDecorator.bind(this)
+    this.handleViewersClick = this.handleViewersClick.bind(this)
+    this.handleLikersClick = this.handleLikersClick.bind(this)
+  }
+
+  handleViewersClick(e) {
+
+  }
+
+  handleLikersClick(e) {
+
   }
 
   handleImageClickDecorator(path) {
@@ -62,24 +77,186 @@ export class Profile extends Component {
       if (path === 'default') {
         
         this.setState({
-          modalOpen: true,
-          modalImage: 'default'
+          modalChild: <img className="profile-page-modal-image" src={defaultPic} alt="Modal"/>,
+          modalOpen: true
         })
       }
       else {
 
         this.setState({
-          modalOpen: true,
-          modalImage: path
+          modalChild: <img className="profile-page-modal-image" src={path} alt="Modal"/>,
+          modalOpen: true
         })
       }
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
 
-    // TODO: If viewing someone else's profile, you can't get info by session, need to user another function
-    // from these providers, you need to get using their username, since usernames are unique.
+    const cancelableGetOwnUsernamePromise = PromiseCancel.makeCancelable(
+      UsersProvider.getSessionUsername()
+    )
+
+    this.pendingPromises.push(cancelableGetOwnUsernamePromise)
+
+    let json = await cancelableGetOwnUsernamePromise.promise
+
+    if (
+      this.props.match.params &&
+      this.props.match.params.username &&
+      InputValidation.isValidName(this.props.match.params.username) &&
+      typeof json.username === 'string' &&
+      json.username !== this.props.match.params.username // If different username than own.
+    ) {
+
+      // TODO: Make two requests, getUserByUsername, to see if the user exists, and getBlockedUsersBySession, to see
+      // if the current user you're viewing is blocked or not. Use Promise.all to fetch at the same time, upon
+      // completion, check whether the user exists, if the user does exist, make sure the user isn't blocked, then
+      // display, if the user doesn't exist, display: 'Sorry, that user doesn't exist.', if the user is blocked,
+      // display: 'You currently have this user blocked.'
+  
+      const cancelableGetUserByUsernamePromise = PromiseCancel.makeCancelable(
+        UsersProvider.getUserByUsername({
+          username: this.props.match.params.username
+        })
+      )
+
+      const cancelableGetUserPicturesByUsernamePromise = PromiseCancel.makeCancelable(
+        PicturesProvider.getPicturesByUsername({
+          username: this.props.match.params.username
+        })
+      )
+
+      const cancelableGetUserTagsByUsernamePromise = PromiseCancel.makeCancelable(
+        TagsProvider.getTagsByUsername({
+          username: this.props.match.params.username
+        })
+      )
+
+      const cancelableGetBlockedUsersBySessionPromise = PromiseCancel.makeCancelable(
+        BlockedUsersProvider.getBlockedUsersBySession()
+      )
+
+      const cancelableGetCanViewUserPromise = PromiseCancel.makeCancelable(
+        Promise.all([
+          cancelableGetUserByUsernamePromise.promise,
+          cancelableGetBlockedUsersBySessionPromise.promise,
+          cancelableGetUserPicturesByUsernamePromise.promise,
+          cancelableGetUserTagsByUsernamePromise.promise
+        ])
+      )
+
+      this.pendingPromises.push(cancelableGetCanViewUserPromise)
+      this.pendingPromises.push(cancelableGetUserByUsernamePromise)
+      this.pendingPromises.push(cancelableGetUserPicturesByUsernamePromise)
+      this.pendingPromises.push(cancelableGetUserTagsByUsernamePromise)
+      this.pendingPromises.push(cancelableGetBlockedUsersBySessionPromise)
+
+      cancelableGetCanViewUserPromise.promise
+      .then((obj) => {
+
+        console.log(obj)
+
+        // If user exists.
+        if (obj[0].rows.length) {
+
+          // If the user isn't blocked
+          if (!obj[1].rows.some((blockedUser) => obj[0].rows[0].user_id === blockedUser.blocked_id)) {
+
+            // userInfo is obj[0]
+            // pictures is obj[2]
+            // tags is obj[3]
+
+            let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
+            let newPicPath1 = (obj[2].rows[0] && obj[2].rows[0].pic_path) ? (`${Config.backend}/` + obj[2].rows[0].pic_path) : ''
+            let newPicPath2 = (obj[2].rows[1] && obj[2].rows[1].pic_path) ? (`${Config.backend}/` + obj[2].rows[1].pic_path) : ''
+            let newPicPath3 = (obj[2].rows[2] && obj[2].rows[2].pic_path) ? (`${Config.backend}/` + obj[2].rows[2].pic_path) : ''
+            let newPicPath4 = (obj[2].rows[3] && obj[2].rows[3].pic_path) ? (`${Config.backend}/` + obj[2].rows[3].pic_path) : ''
+
+            this.setState({
+              isBusy: false,
+              userInfo: obj[0].rows[0],
+              profilePicPath: newProfilePicPath,
+              picPath1: newPicPath1,
+              picPath2: newPicPath2,
+              picPath3: newPicPath3,
+              picPath4: newPicPath4,
+              tags: obj[3].rows,
+              isOtherUser: true
+            })
+          }
+          else {
+
+            // Redirect if user is blocked.
+            this.setState({
+              redirectTo: '/profile'
+            })
+          }
+        }
+        else {
+
+          // Redirect if user doesn't exist.
+          this.setState({
+            redirectTo: '/profile'
+          })
+        }
+      })
+    }
+    else {
+
+      const cancelableUserInfoPromise = PromiseCancel.makeCancelable(UsersProvider.getUserBySession())
+      const cancelablePicturesPromise = PromiseCancel.makeCancelable(PicturesProvider.getPicturesBySession())
+      const cancelableTagsPromise = PromiseCancel.makeCancelable(TagsProvider.getTagsBySession())
+      const cancelableViewersPromise = PromiseCancel.makeCancelable(ViewersProvider.getViewersBySession())
+
+      const cancelableGetUserDataPromise = PromiseCancel.makeCancelable(
+        Promise.all([
+          cancelableUserInfoPromise.promise,
+          cancelablePicturesPromise.promise,
+          cancelableTagsPromise.promise,
+          cancelableViewersPromise.promise
+        ])
+      )
+  
+      this.pendingPromises.push(cancelableGetUserDataPromise)
+      this.pendingPromises.push(cancelableUserInfoPromise)
+      this.pendingPromises.push(cancelablePicturesPromise)
+      this.pendingPromises.push(cancelableTagsPromise)
+      this.pendingPromises.push(cancelableViewersPromise)
+  
+      cancelableGetUserDataPromise.promise
+      .then((obj) => {
+  
+        console.log(obj)
+  
+        let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
+        let newPicPath1 = (obj[1].rows[0] && obj[1].rows[0].pic_path) ? (`${Config.backend}/` + obj[1].rows[0].pic_path) : ''
+        let newPicPath2 = (obj[1].rows[1] && obj[1].rows[1].pic_path) ? (`${Config.backend}/` + obj[1].rows[1].pic_path) : ''
+        let newPicPath3 = (obj[1].rows[2] && obj[1].rows[2].pic_path) ? (`${Config.backend}/` + obj[1].rows[2].pic_path) : ''
+        let newPicPath4 = (obj[1].rows[3] && obj[1].rows[3].pic_path) ? (`${Config.backend}/` + obj[1].rows[3].pic_path) : ''
+  
+        this.setState({
+          isBusy: false,
+          userInfo: obj[0].rows[0],
+          profilePicPath: newProfilePicPath,
+          picPath1: newPicPath1,
+          picPath2: newPicPath2,
+          picPath3: newPicPath3,
+          picPath4: newPicPath4,
+          tags: obj[2].rows,
+          viewers: obj[3].rows
+        })
+      })
+      .catch((json) => {
+  
+        sessionStorage.setItem('viewError', '1')
+  
+        this.setState({
+          isBusy: false,
+          redirectTo: '/oops'
+        })
+      })
+    }
 
     // TODO: Remember that certain statuses like friends / liked will show if you're viewing anothers profile,
     // the corresponding buttons will need to be enabled, can double up HTML if you want.
@@ -92,59 +269,22 @@ export class Profile extends Component {
     // can be loaded, and after a while, a user can receive a view. The Viewers component will need to be scroll
     // able.
 
-    const cancelableUserInfoPromise = PromiseCancel.makeCancelable(UsersProvider.getUserBySession())
-    const cancelablePicturesPromise = PromiseCancel.makeCancelable(PicturesProvider.getPicturesBySession())
-    const cancelableTagsPromise = PromiseCancel.makeCancelable(TagsProvider.getTagsBySession())
-    const cancelableViewersPromise = PromiseCancel.makeCancelable(ViewersProvider.getViewersBySession())
+    // TODO: To display the Friends status, you'll need to query like below, the same goes for the Liked status,
+    // so if you're not friends, no status, if you didn't like them, no liked. In that case, the only button that
+    // will display will be 'Like', and when you like the other person's profile, a request is made to the backend,
+    // the backend will check if that person is a liker of yours, and if you're a liker of them, if both are true,
+    // that person is added to your friends list, and you're added to their friends list. Should you then dislike
+    // the person, another request will be made, they will be removed from your friends list, and you will be removed
+    // from their friends list, after that, you will be removed as a liker for them.
 
-    this.pendingPromises.push(cancelableUserInfoPromise)
-    this.pendingPromises.push(cancelablePicturesPromise)
-    this.pendingPromises.push(cancelableTagsPromise)
-    this.pendingPromises.push(cancelableViewersPromise)
+    // TODO: Add an if to check for the query params, use getUserByUsername to fetch the other user's data.
+    // TODO: getUserByUsername <---- CHECK
 
-    const cancelableGetUserDataPromise = PromiseCancel.makeCancelable(
-      Promise.all([
-        cancelableUserInfoPromise.promise,
-        cancelablePicturesPromise.promise,
-        cancelableTagsPromise.promise,
-        cancelableViewersPromise.promise
-      ])
-    )
+    // TODO: getPicturesByUsername <---- CHECK
 
-    this.pendingPromises.push(cancelableGetUserDataPromise)
+    // TODO: getTagsByUsername <---- CHECK
 
-    cancelableGetUserDataPromise.promise
-    .then((obj) => {
-
-      console.log(obj)
-
-      let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
-      let newPicPath1 = (obj[1].rows[0] && obj[1].rows[0].pic_path) ? (`${Config.backend}/` + obj[1].rows[0].pic_path) : ''
-      let newPicPath2 = (obj[1].rows[1] && obj[1].rows[1].pic_path) ? (`${Config.backend}/` + obj[1].rows[1].pic_path) : ''
-      let newPicPath3 = (obj[1].rows[2] && obj[1].rows[2].pic_path) ? (`${Config.backend}/` + obj[1].rows[2].pic_path) : ''
-      let newPicPath4 = (obj[1].rows[3] && obj[1].rows[3].pic_path) ? (`${Config.backend}/` + obj[1].rows[3].pic_path) : ''
-
-      this.setState({
-        isBusy: false,
-        userInfo: obj[0].rows[0],
-        profilePicPath: newProfilePicPath,
-        picPath1: newPicPath1,
-        picPath2: newPicPath2,
-        picPath3: newPicPath3,
-        picPath4: newPicPath4,
-        tags: obj[2].rows,
-        viewers: obj[3].rows
-      })
-    })
-    .catch((json) => {
-
-      sessionStorage.setItem('viewError', '1')
-
-      this.setState({
-        isBusy: false,
-        redirectTo: '/oops'
-      })
-    })
+    // TODO: This will not need to be called if viewing another's profile.
   }
 
   componentWillUnmount() {
@@ -155,39 +295,47 @@ export class Profile extends Component {
   render() {
     return (
       <div className="profile-page">
+        {
+          this.state.redirectTo
+            ? <Redirect to={this.state.redirectTo} />
+            : null
+        }
         <Modal
           isOpen={this.state.modalOpen}
           style={modalStyle}
           shouldCloseOnOverlayClick={true}
           onRequestClose={() => this.setState({ modalOpen: false })}
         >
-          <img className="profile-page-modal-image"
-            src={
-              this.state.modalImage === 'default'
-                ? defaultPic
-                : this.state.modalImage
-            }
-            alt="Modal"
-          />
+          {
+            this.state.modalChild
+          }
         </Modal>
         {
           !this.state.isBusy
             ? <div className="profile-page-grid">
                 <div className="profile-page-grid-component profile-page-grid-stats">
                   <div className="profile-page-stats-pp-container">
-                    <img className="profile-page-stats-pp"
-                      src={
-                        this.state.userInfo.profile_pic_path
-                          ? null
-                          : defaultpp
-                      }
-                      alt="Profile"
-                      onClick={this.handleImageClickDecorator(`${
-                        this.state.profilePicPath
-                          ? this.state.profilePicPath
-                          : 'default'
-                      }`)}
-                    />
+
+                    <div className="profile-page-stats-pp-pic-container">
+                      <div className="profile-page-picture-aspect-container">
+                        <div className="profile-page-picture-aspect-node">
+                          <img className="profile-page-stats-pp"
+                            src={
+                              this.state.profilePicPath
+                                ? this.state.profilePicPath
+                                : defaultpp
+                            }
+                            alt="Profile"
+                            onClick={this.handleImageClickDecorator(`${
+                              this.state.profilePicPath
+                                ? this.state.profilePicPath
+                                : 'default'
+                            }`)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                   <div className="profile-page-stats-title">
                     <p className="profile-page-stats-name">
@@ -233,12 +381,26 @@ export class Profile extends Component {
                   </div>
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-buttons">
-                  <button
-                    className="profile-page-grid-buttons-button profile-page-grid-viewed-button"
-                    type="button"
-                  >
-                    Viewed
-                  </button>
+                  {
+                    !this.state.isOtherUser // TODO: These 2 buttons will need to set the modalChild, modalImage to '' + open it
+                      ? <Fragment>
+                          <button
+                            className="profile-page-grid-buttons-button profile-page-grid-viewed-button"
+                            type="button"
+                            onClick={this.handleViewersClick}
+                          >
+                            Viewers
+                          </button>
+                          <button
+                            className="profile-page-grid-buttons-button profile-page-grid-likers-button"
+                            type="button"
+                            onClick={this.handleLikersClick}
+                          >
+                            Likers
+                          </button>
+                        </Fragment>
+                      : null // TODO: Display last seen if offline, friends / like / liked, block, report fake
+                  }
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-pictures">
                   <div className="profile-page-pictures-pictures-container">
@@ -327,11 +489,13 @@ export class Profile extends Component {
                   <div className="profile-page-pictures-tags-container">
                     <p className="profile-page-pictures-tags-heading">Tags</p>
                     {
-                      this.state.tags.map(
-                        tag => <div className="profile-page-pictures-tags-tag" key={tag.id}>
-                          {tag.tag}
-                        </div>
-                      )
+                      this.state.tags.length
+                        ? this.state.tags.map(
+                            tag => <div className="profile-page-pictures-tags-tag" key={tag.id}>
+                              {tag.tag}
+                            </div>
+                          )
+                        : <p className="profile-page-pictures-tags-no-tags-text">No tags</p>
                     }
                   </div>
                   <div className="profile-page-pictures-bio-container">
