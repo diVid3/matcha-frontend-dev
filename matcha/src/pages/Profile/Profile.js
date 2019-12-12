@@ -10,12 +10,13 @@ import ParseUserInfo from '../../helpers/ParseUserInfo'
 import SimpleMap from '../../components/shared_components/SimpleMap/SimpleMap'
 import Modal from 'react-modal'
 import Config from '../../config/Config'
+import InputValidation from '../../helpers/InputValidation'
+import BlockedUsersProvider from '../../providers/BlockedUsersProvider'
+import ViewersLikersContainer from '../../components/targeted_components/Profile/ViewersLikersContainer/ViewersLikersContainer'
 
 import './Profile.css';
 import defaultpp from '../../assets/placeholder.png'
 import defaultPic from '../../assets/placeholder.png'
-import InputValidation from '../../helpers/InputValidation'
-import BlockedUsersProvider from '../../providers/BlockedUsersProvider'
 
 Modal.setAppElement('#root');
 
@@ -64,10 +65,16 @@ export class Profile extends Component {
 
   handleViewersClick(e) {
 
+    // TODO: Make call to get content for ViewersLikersContainer, if you have it, setState...
+    // remember to change modalChild, you can pass the props through straigt, not let the component
+    // take it from the state.
   }
 
   handleLikersClick(e) {
 
+    // TODO: Make call to get content for ViewersLikersContainer, if you have it, setState...
+    // remember to change modalChild, you can pass the props through straigt, not let the component
+    // take it from the state.
   }
 
   handleImageClickDecorator(path) {
@@ -148,9 +155,9 @@ export class Profile extends Component {
 
       this.pendingPromises.push(cancelableGetCanViewUserPromise)
       this.pendingPromises.push(cancelableGetUserByUsernamePromise)
+      this.pendingPromises.push(cancelableGetBlockedUsersBySessionPromise)
       this.pendingPromises.push(cancelableGetUserPicturesByUsernamePromise)
       this.pendingPromises.push(cancelableGetUserTagsByUsernamePromise)
-      this.pendingPromises.push(cancelableGetBlockedUsersBySessionPromise)
 
       cancelableGetCanViewUserPromise.promise
       .then((obj) => {
@@ -184,6 +191,18 @@ export class Profile extends Component {
               tags: obj[3].rows,
               isOtherUser: true
             })
+
+            const cancelableCreateViewerPromise = PromiseCancel.makeCancelable(
+              ViewersProvider.createViewerBySession({
+                targetUserID: this.state.userInfo.user_id
+              })
+            )
+
+            this.pendingPromises.push(cancelableCreateViewerPromise)
+
+            cancelableCreateViewerPromise.promise
+            .then((json) => {})
+            .catch((json) => {})
           }
           else {
 
@@ -382,7 +401,7 @@ export class Profile extends Component {
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-buttons">
                   {
-                    !this.state.isOtherUser // TODO: These 2 buttons will need to set the modalChild, modalImage to '' + open it
+                    !this.state.isOtherUser // TODO: These 2 buttons will need to set the modalChild + open it
                       ? <Fragment>
                           <button
                             className="profile-page-grid-buttons-button profile-page-grid-viewed-button"

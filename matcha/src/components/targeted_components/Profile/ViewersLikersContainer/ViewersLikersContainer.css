@@ -1,0 +1,36 @@
+.viewers-likers-container {
+  width: 100%;
+  background-color: white;
+}
+
+.viewers-likers-viewer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 20px;
+  border-top: 2px solid var(--midtone);
+}
+
+.viewers-likers-viewer:first-child {
+  border-top: none;
+}
+
+.viewers-likers-viewer-text {
+  color: var(--midtone);
+}
+
+.viewers-likers-liker {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 20px;
+  border-top: 2px solid var(--midtone);
+}
+
+.viewers-likers-liker:first-child {
+  border-top: none;
+}
+
+.viewers-likers-liker-text {
+  color: var(--midtone);
+}
