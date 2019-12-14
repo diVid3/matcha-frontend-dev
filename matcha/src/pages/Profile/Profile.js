@@ -4,6 +4,7 @@ import UsersProvider from '../../providers/UsersProvider'
 import PicturesProvider from '../../providers/PicturesProvider'
 import TagsProvider from '../../providers/TagsProvider'
 import ViewersProvider from '../../providers/ViewersProvider'
+import LikersProvider from '../../providers/LikersProvider'
 import PromiseCancel from '../../helpers/PromiseCancel'
 import LoadingBlocks from '../../components/shared_components/LoadingBlocks/LoadingBlocks'
 import ParseUserInfo from '../../helpers/ParseUserInfo'
@@ -65,16 +66,60 @@ export class Profile extends Component {
 
   handleViewersClick(e) {
 
-    // TODO: Make call to get content for ViewersLikersContainer, if you have it, setState...
-    // remember to change modalChild, you can pass the props through straigt, not let the component
-    // take it from the state.
+    this.setState({
+      modalChild: <ViewersLikersContainer displayViewers={true} content={[]} isLoading={true}/>,
+      modalOpen: true,
+    })
+
+    const cancelableGetViewersPromise = PromiseCancel.makeCancelable(
+      ViewersProvider.getViewersBySession()
+    )
+
+    this.pendingPromises.push(cancelableGetViewersPromise)
+
+    cancelableGetViewersPromise.promise
+    .then((json) => {
+      
+      this.setState({
+        modalChild: <ViewersLikersContainer displayViewers={true} content={json.rows} isLoading={false} />
+      })
+    })
+    .catch((json) => {
+      
+      this.setState({
+        modalChild: <div />,
+        modalOpen: false
+      })
+    })
   }
 
   handleLikersClick(e) {
 
-    // TODO: Make call to get content for ViewersLikersContainer, if you have it, setState...
-    // remember to change modalChild, you can pass the props through straigt, not let the component
-    // take it from the state.
+    this.setState({
+      modalChild: <ViewersLikersContainer displayViewers={false} content={[]} isLoading={true}/>,
+      modalOpen: true,
+    })
+
+    const cancelableGetLikersPromise = PromiseCancel.makeCancelable(
+      LikersProvider.getLikersBySession()
+    )
+
+    this.pendingPromises.push(cancelableGetLikersPromise)
+
+    cancelableGetLikersPromise.promise
+    .then((json) => {
+
+      this.setState({
+        modalChild: <ViewersLikersContainer displayViewers={false} content={json.rows} isLoading={false} />
+      })
+    })
+    .catch((json) => {
+
+      this.setState({
+        modalChild: <div />,
+        modalOpen: false
+      })
+    })
   }
 
   handleImageClickDecorator(path) {
@@ -128,6 +173,10 @@ export class Profile extends Component {
         })
       )
 
+      const cancelableGetBlockedUsersBySessionPromise = PromiseCancel.makeCancelable(
+        BlockedUsersProvider.getBlockedUsersBySession()
+      )
+
       const cancelableGetUserPicturesByUsernamePromise = PromiseCancel.makeCancelable(
         PicturesProvider.getPicturesByUsername({
           username: this.props.match.params.username
@@ -140,8 +189,16 @@ export class Profile extends Component {
         })
       )
 
-      const cancelableGetBlockedUsersBySessionPromise = PromiseCancel.makeCancelable(
-        BlockedUsersProvider.getBlockedUsersBySession()
+      const cancelableGetLikersByUsernamePromise = PromiseCancel.makeCancelable(
+        LikersProvider.getLikersByUsername({
+          username: this.props.match.params.username
+        })
+      )
+
+      // This is for comparisons against the usernames in the users friends collection, if not friends, against
+      // the users likers.
+      const cancelAbleGetOwnUsername = PromiseCancel.makeCancelable(
+        UsersProvider.getSessionUsername()
       )
 
       const cancelableGetCanViewUserPromise = PromiseCancel.makeCancelable(
@@ -149,7 +206,10 @@ export class Profile extends Component {
           cancelableGetUserByUsernamePromise.promise,
           cancelableGetBlockedUsersBySessionPromise.promise,
           cancelableGetUserPicturesByUsernamePromise.promise,
-          cancelableGetUserTagsByUsernamePromise.promise
+          cancelableGetUserTagsByUsernamePromise.promise,
+          // TODO: Add getFriendsByUsername here
+          cancelableGetLikersByUsernamePromise.promise,
+          cancelAbleGetOwnUsername.promise
         ])
       )
 
@@ -158,6 +218,9 @@ export class Profile extends Component {
       this.pendingPromises.push(cancelableGetBlockedUsersBySessionPromise)
       this.pendingPromises.push(cancelableGetUserPicturesByUsernamePromise)
       this.pendingPromises.push(cancelableGetUserTagsByUsernamePromise)
+      // TODO: push getFriendsByUsername here
+      this.pendingPromises.push(cancelableGetLikersByUsernamePromise)
+      this.pendingPromises.push(cancelAbleGetOwnUsername)
 
       cancelableGetCanViewUserPromise.promise
       .then((obj) => {
@@ -173,12 +236,17 @@ export class Profile extends Component {
             // userInfo is obj[0]
             // pictures is obj[2]
             // tags is obj[3]
+            // friends is obj[4]
+            // likers is obj[5]
+            // loggedInUsername is obj[6]
 
             let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
             let newPicPath1 = (obj[2].rows[0] && obj[2].rows[0].pic_path) ? (`${Config.backend}/` + obj[2].rows[0].pic_path) : ''
             let newPicPath2 = (obj[2].rows[1] && obj[2].rows[1].pic_path) ? (`${Config.backend}/` + obj[2].rows[1].pic_path) : ''
             let newPicPath3 = (obj[2].rows[2] && obj[2].rows[2].pic_path) ? (`${Config.backend}/` + obj[2].rows[2].pic_path) : ''
             let newPicPath4 = (obj[2].rows[3] && obj[2].rows[3].pic_path) ? (`${Config.backend}/` + obj[2].rows[3].pic_path) : ''
+
+            // TODO: Check if 
 
             this.setState({
               isBusy: false,
@@ -191,6 +259,8 @@ export class Profile extends Component {
               tags: obj[3].rows,
               isOtherUser: true
             })
+
+            // TODO: Need to open special backend route to increase the user's rating.
 
             const cancelableCreateViewerPromise = PromiseCancel.makeCancelable(
               ViewersProvider.createViewerBySession({
@@ -418,7 +488,17 @@ export class Profile extends Component {
                             Likers
                           </button>
                         </Fragment>
-                      : null // TODO: Display last seen if offline, friends / like / liked, block, report fake
+                      : <Fragment>
+                          {
+                            // Display last seen 1st if offline.
+                            // Display block 2nd.
+                            // Display report fake 3rd.
+                            // Display friends / unlike / like TODO: need to get the people that liked this username + friends
+                          }
+                          {
+
+                          }
+                        </Fragment>
                   }
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-pictures">

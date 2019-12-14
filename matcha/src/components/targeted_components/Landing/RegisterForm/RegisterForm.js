@@ -303,6 +303,8 @@ export class RegisterForm extends Component {
       return
     }
 
+    this.calcPasswordStrength()
+
     if (
       this.passwordStrength === 0 ||
       this.passwordStrength === 1 ||

@@ -649,6 +649,8 @@ export class Settings extends Component {
 
   handlePasswordSubmit() {
 
+    this.calcPasswordStrength()
+
     if (
       this.passwordStrength === 0 ||
       this.passwordStrength === 1 ||
