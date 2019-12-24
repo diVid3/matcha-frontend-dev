@@ -11,7 +11,7 @@ export class ProtectedRoute extends Component {
     super(props)
 
     this.state = {
-      isLoggedIn: true,
+      isLoggedIn: false,
       redirectTo: ''
     }
 
@@ -20,7 +20,7 @@ export class ProtectedRoute extends Component {
   
   componentDidMount() {
 
-    // Checking if sid is valid, pass by default, redirect if found to be invalid.
+    // Only displays children if cookie is valid and logged in.
     if (
       document.cookie &&
       document.cookie.includes('=') &&
@@ -38,11 +38,10 @@ export class ProtectedRoute extends Component {
       cancelableIsLoggedInPromise.promise
       .then((data) => {
   
-        if (!data.isLoggedIn) {
+        if (data.isLoggedIn) {
   
           this.setState({
-            isLoggedIn: false,
-            redirectTo: '/'
+            isLoggedIn: true
           })
         }
       })

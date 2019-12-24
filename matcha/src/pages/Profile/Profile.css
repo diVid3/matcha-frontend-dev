@@ -112,25 +112,25 @@
 }
 
 .profile-page-grid-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0px 30px;
+  padding: 30px;
 }
 
 .profile-page-grid-buttons-button {
+  display: block;
   height: 48px;
-  width: 100px;
+  width: 100%;
   border-radius: 5px;
   color: white;
   font-size: 14px;
-  margin: 20px 0px;
   border: none;
   box-shadow: 0px 0px 5px 0px silver;
+  margin-top: 30px;
+  background-color: white;
+  padding: 5px;
 }
 
-.profile-page-grid-buttons-button:hover {
-  cursor: pointer;
+.profile-page-grid-buttons-button:first-child {
+  margin-top: 0px;
 }
 
 .profile-page-grid-likers-button {
@@ -142,9 +142,43 @@
   background: var(--highlight-light);
 }
 
-.profile-page-grid-edit-button {
-  color: gray;
-  background-color: var(--highlight-light)
+.profile-page-grid-friends-status {
+  color: var(--midtone);
+  background: var(--highlight-light);
+}
+
+.profile-page-grid-like-button {
+  background: linear-gradient(90deg, var(--accent-other), var(--accent));
+}
+
+.profile-page-grid-unlike-button {
+  background: linear-gradient(90deg, var(--accent-other), var(--accent));
+}
+
+.profile-page-grid-block-button {
+  color: var(--midtone);
+  background: var(--highlight-light);
+}
+
+.profile-page-grid-unblock-button {
+  color: var(--midtone);
+  background: var(--highlight-light);
+}
+
+.profile-page-grid-report-fake-button {
+  color: var(--midtone);
+  background: var(--highlight-light);
+}
+
+.profile-page-grid-report-fake-button-success {
+  color: darkgreen;
+  background: lightgreen;
+  box-shadow: 0px 0px 5px 0px silver;
+  border: 1px solid green;
+}
+
+.profile-page-grid-buttons-button:hover {
+  cursor: pointer;
 }
 
 .profile-page-grid-pictures {
@@ -188,6 +222,38 @@
   bottom: 0;
   right: 0;
   border-radius: 5px;
+}
+
+.profile-page-picture-aspect-container-statuses {
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile-page-picture-aspect-container-statuses-friend {
+  position: absolute;
+  border-radius: 5px;
+  color: var(--midtone);
+  background: var(--highlight-light);
+  font-size: 10px;
+  padding: 5px;
+  bottom: 0px;
+  left: 0px;
+  margin: 0px 0px 5px 5px;
+  box-shadow: 0px 0px 2px 0px silver;
+}
+
+.profile-page-picture-aspect-container-statuses-online {
+  position: absolute;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  background-color: limegreen;
+  bottom: 0px;
+  right: 0px;
+  margin: 0px 5px 5px 0px;
 }
 
 .profile-page-pictures-picture-container {
@@ -253,11 +319,22 @@
     "stats stats stats stats butns butns butns butns butns butns";
   }
   .profile-page-grid-buttons {
-    justify-content: space-between;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0px 30px;
   }
   .profile-page-grid-buttons-button {
-    margin: 0px;
-    width: 100px;
+    display: inline-block;
+    width: 100%;
+    max-width: 70px;
+    margin-top: 0px;
+    margin-right: 10px;
+    height: 38px;
+    font-size: 10px;
+  }
+  .profile-page-grid-buttons-button:last-child {
+    margin-right: 0px;
   }
   .profile-page-pictures-tags-tag {
     margin: 0px 8px 8px 0px;
@@ -296,12 +373,10 @@
     "stats stats stats butns butns butns butns butns butns butns"
     "stats stats stats butns butns butns butns butns butns butns";
   }
-  .profile-page-grid-buttons {
-    justify-content: space-between;
-  }
   .profile-page-grid-buttons-button {
-    margin: 0px;
-    width: 120px;
+    max-width: 120px;
+    height: 48px;
+    font-size: 14px;
   }
   .profile-page-pictures-tags-tag {
     margin: 0px 11px 11px 0px;

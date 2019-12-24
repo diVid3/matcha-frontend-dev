@@ -1,4 +1,5 @@
 import Config from '../config/Config'
+import SocketWrapper from '../helpers/SocketWrapper'
 
 export class SessionProvider {
 
@@ -23,6 +24,16 @@ export class SessionProvider {
           if (!response.ok) {
             return rej(data)
           }
+
+          // This is done because a socket is already open and logging in will create an entry in the socketStore
+          // on the backend and this will not keep an open socket around.
+          SocketWrapper.closeSocket()
+          SocketWrapper.connectSocket()
+
+          // At this point, the socket connection should be open.
+          SocketWrapper.getSocket().emit('fromClientUserLoggedIn', {
+            username: data.username
+          })
 
           res(data)
         })
@@ -63,6 +74,11 @@ export class SessionProvider {
           if (!response.ok) {
             return rej(data)
           }
+
+          SocketWrapper.getSocket().emit('fromClientUserLoggedOff', {
+            username: data.username
+          })
+          SocketWrapper.closeSocket()
 
           res(data)
         })

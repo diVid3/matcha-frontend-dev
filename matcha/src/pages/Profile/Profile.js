@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom"
 import UsersProvider from '../../providers/UsersProvider'
 import PicturesProvider from '../../providers/PicturesProvider'
 import TagsProvider from '../../providers/TagsProvider'
@@ -14,6 +14,9 @@ import Config from '../../config/Config'
 import InputValidation from '../../helpers/InputValidation'
 import BlockedUsersProvider from '../../providers/BlockedUsersProvider'
 import ViewersLikersContainer from '../../components/targeted_components/Profile/ViewersLikersContainer/ViewersLikersContainer'
+import FriendsProvider from '../../providers/FriendsProvider'
+import FakeUsersProvider from '../../providers/FakeUsersProvider'
+import SocketWrapper from '../../helpers/SocketWrapper'
 
 import './Profile.css';
 import defaultpp from '../../assets/placeholder.png'
@@ -50,18 +53,237 @@ export class Profile extends Component {
       picPath3: '',
       picPath4: '',
       tags: null,
-      viewers: null,
       modalOpen: false,
       modalChild: null,
       redirectTo: '',
-      isOtherUser: false
+      isOtherUser: false,
+      hasMeAsFriend: false,
+      hasMeAsLiker: false,
+      hasReportedFake: false,
+      hasBlockedUser: false, // TODO: This should be set on componentDidMount()
+      isUserLoggedIn: false
     }
 
     this.pendingPromises = []
+    this.canPressLikeUnlike = true
+    this.canPressReportFake = true
+    this.canPressBlockUnblockUser = true
 
     this.handleImageClickDecorator = this.handleImageClickDecorator.bind(this)
     this.handleViewersClick = this.handleViewersClick.bind(this)
     this.handleLikersClick = this.handleLikersClick.bind(this)
+    this.handleLike = this.handleLike.bind(this)
+    this.handleUnlike = this.handleUnlike.bind(this)
+    this.handleReportFake = this.handleReportFake.bind(this)
+    this.handleBlockUser = this.handleBlockUser.bind(this)
+    this.handleUnblockUser = this.handleUnblockUser.bind(this)
+  }
+
+  // TODO: Build handleUnblockUser(e) { ... }
+  handleUnblockUser(e) {
+
+    if (!this.canPressBlockUnblockUser) {
+
+      return
+    }
+
+    this.canPressBlockUnblockUser = false
+
+    this.setState({
+      hasBlockedUser: false
+    })
+
+    const cancelableUnblockUserPromise = PromiseCancel.makeCancelable(
+      BlockedUsersProvider.deleteBlockedUserBySession({
+        targetUserID: this.state.userInfo.user_id + ''
+      })
+    )
+
+    this.pendingPromises.push(cancelableUnblockUserPromise)
+
+    cancelableUnblockUserPromise.promise
+    .then((json) => {
+
+      this.setState({
+        hasBlockedUser: false
+      })
+
+      this.canPressBlockUnblockUser = true
+    })
+    .catch((json) => {
+
+      this.setState({
+        hasBlockedUser: true
+      })
+
+      this.canPressBlockUnblockUser = true
+    })
+  }
+
+  handleBlockUser(e) {
+
+    if (!this.canPressBlockUnblockUser) {
+
+      return
+    }
+
+    this.canPressBlockUnblockUser = false
+
+    this.setState({
+      hasBlockedUser: true
+    })
+
+    const cancelableBlockUserPromise = PromiseCancel.makeCancelable(
+      BlockedUsersProvider.createBlockedUserBySession({
+        targetUserID: this.state.userInfo.user_id + ''
+      })
+    )
+
+    this.pendingPromises.push(cancelableBlockUserPromise)
+
+    cancelableBlockUserPromise.promise
+    .then((json) => {
+
+      this.setState({
+        hasBlockedUser: true
+      })
+
+      this.canPressBlockUnblockUser = true
+    })
+    .catch((json) => {
+
+      this.setState({
+        hasBlockedUser: false
+      })
+
+      this.canPressBlockUnblockUser = true
+    })
+  }
+
+  handleReportFake(e) {
+
+    if (!this.canPressReportFake) {
+
+      return
+    }
+
+    this.canPressReportFake = false
+
+    const cancelableReportFakePromise = PromiseCancel.makeCancelable(
+      FakeUsersProvider.createFakeUserBySession({
+        targetUserID: this.state.userInfo.user_id + ''
+      })
+    )
+
+    this.pendingPromises.push(cancelableReportFakePromise)
+
+    cancelableReportFakePromise.promise
+    .then((json) => {
+
+      this.setState({
+        hasReportedFake: true
+      })
+
+      setTimeout(() => {
+
+        this.setState({
+          hasReportedFake: false
+        })
+        this.canPressReportFake = true
+      }, 3000)
+    })
+    .catch((json) => {
+
+      this.canPressReportFake = true
+    })
+  }
+
+  handleLike(e) {
+
+    if (!this.canPressLikeUnlike) {
+
+      return
+    }
+
+    this.canPressLikeUnlike = false
+
+    this.setState({
+      hasMeAsLiker: true
+    })
+
+    const cancelableLikeUserPromise = PromiseCancel.makeCancelable(
+      LikersProvider.createLikerBySession({
+        targetUserID: this.state.userInfo.user_id + '',
+        targetUsername: this.state.userInfo.username
+      })
+    )
+
+    this.pendingPromises.push(cancelableLikeUserPromise)
+
+    cancelableLikeUserPromise.promise
+    .then((json) => {
+
+      if (json.madeFriends) {
+
+        this.setState({
+          hasMeAsFriend: true
+        })
+      }
+
+      this.canPressLikeUnlike = true
+    })
+    .catch((json) => {
+
+      this.setState({
+        hasMeAsLiker: false
+      })
+
+      this.canPressLikeUnlike = true
+    })
+  }
+
+  handleUnlike(e) {
+
+    if (!this.canPressLikeUnlike) {
+
+      return
+    }
+
+    this.canPressLikeUnlike = false
+
+    this.setState({
+      hasMeAsLiker: false
+    })
+
+    const cancelableUnlikeUserPromise = PromiseCancel.makeCancelable(
+      LikersProvider.deleteLikerBySession({
+        targetUserID: this.state.userInfo.user_id + '',
+        targetUsername: this.state.userInfo.username
+      })
+    )
+
+    this.pendingPromises.push(cancelableUnlikeUserPromise)
+
+    cancelableUnlikeUserPromise.promise
+    .then((json) => {
+
+      if (json.unfriended) {
+
+        this.setState({
+          hasMeAsFriend: false
+        })
+      }
+
+      this.canPressLikeUnlike = true
+    })
+    .catch((json) => {
+
+      this.setState({
+        hasMeAsLiker: true
+      })
+
+      this.canPressLikeUnlike = true
+    })
   }
 
   handleViewersClick(e) {
@@ -127,7 +349,7 @@ export class Profile extends Component {
     return (e) => {
 
       if (path === 'default') {
-        
+
         this.setState({
           modalChild: <img className="profile-page-modal-image" src={defaultPic} alt="Modal"/>,
           modalOpen: true
@@ -189,6 +411,12 @@ export class Profile extends Component {
         })
       )
 
+      const cancelableGetUserFriendsByUsername = PromiseCancel.makeCancelable(
+        FriendsProvider.getFriendsByUsername({
+          username: this.props.match.params.username
+        })
+      )
+
       const cancelableGetLikersByUsernamePromise = PromiseCancel.makeCancelable(
         LikersProvider.getLikersByUsername({
           username: this.props.match.params.username
@@ -197,8 +425,14 @@ export class Profile extends Component {
 
       // This is for comparisons against the usernames in the users friends collection, if not friends, against
       // the users likers.
-      const cancelAbleGetOwnUsername = PromiseCancel.makeCancelable(
+      const cancelableGetOwnUsername = PromiseCancel.makeCancelable(
         UsersProvider.getSessionUsername()
+      )
+
+      const cancelableGetUserOnlinePromise = PromiseCancel.makeCancelable(
+        UsersProvider.isUserLoggedIn({
+          username: this.props.match.params.username
+        })
       )
 
       const cancelableGetCanViewUserPromise = PromiseCancel.makeCancelable(
@@ -207,9 +441,10 @@ export class Profile extends Component {
           cancelableGetBlockedUsersBySessionPromise.promise,
           cancelableGetUserPicturesByUsernamePromise.promise,
           cancelableGetUserTagsByUsernamePromise.promise,
-          // TODO: Add getFriendsByUsername here
+          cancelableGetUserFriendsByUsername.promise,
           cancelableGetLikersByUsernamePromise.promise,
-          cancelAbleGetOwnUsername.promise
+          cancelableGetOwnUsername.promise,
+          cancelableGetUserOnlinePromise.promise
         ])
       )
 
@@ -218,9 +453,10 @@ export class Profile extends Component {
       this.pendingPromises.push(cancelableGetBlockedUsersBySessionPromise)
       this.pendingPromises.push(cancelableGetUserPicturesByUsernamePromise)
       this.pendingPromises.push(cancelableGetUserTagsByUsernamePromise)
-      // TODO: push getFriendsByUsername here
+      this.pendingPromises.push(cancelableGetUserFriendsByUsername)
       this.pendingPromises.push(cancelableGetLikersByUsernamePromise)
-      this.pendingPromises.push(cancelAbleGetOwnUsername)
+      this.pendingPromises.push(cancelableGetOwnUsername)
+      this.pendingPromises.push(cancelableGetUserOnlinePromise)
 
       cancelableGetCanViewUserPromise.promise
       .then((obj) => {
@@ -231,56 +467,84 @@ export class Profile extends Component {
         if (obj[0].rows.length) {
 
           // If the user isn't blocked
-          if (!obj[1].rows.some((blockedUser) => obj[0].rows[0].user_id === blockedUser.blocked_id)) {
+          // if (!obj[1].rows.some((blockedUser) => obj[0].rows[0].user_id === blockedUser.blocked_id))
 
-            // userInfo is obj[0]
-            // pictures is obj[2]
-            // tags is obj[3]
-            // friends is obj[4]
-            // likers is obj[5]
-            // loggedInUsername is obj[6]
+          // userInfo is obj[0]
+          // blockedUsers is obj[1]
+          // pictures is obj[2]
+          // tags is obj[3]
+          // friends is obj[4]
+          // likers is obj[5]
+          // loggedInUsername is obj[6]
+          // isUserOnline is obj[7]
 
-            let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
-            let newPicPath1 = (obj[2].rows[0] && obj[2].rows[0].pic_path) ? (`${Config.backend}/` + obj[2].rows[0].pic_path) : ''
-            let newPicPath2 = (obj[2].rows[1] && obj[2].rows[1].pic_path) ? (`${Config.backend}/` + obj[2].rows[1].pic_path) : ''
-            let newPicPath3 = (obj[2].rows[2] && obj[2].rows[2].pic_path) ? (`${Config.backend}/` + obj[2].rows[2].pic_path) : ''
-            let newPicPath4 = (obj[2].rows[3] && obj[2].rows[3].pic_path) ? (`${Config.backend}/` + obj[2].rows[3].pic_path) : ''
+          let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
+          let newPicPath1 = (obj[2].rows[0] && obj[2].rows[0].pic_path) ? (`${Config.backend}/` + obj[2].rows[0].pic_path) : ''
+          let newPicPath2 = (obj[2].rows[1] && obj[2].rows[1].pic_path) ? (`${Config.backend}/` + obj[2].rows[1].pic_path) : ''
+          let newPicPath3 = (obj[2].rows[2] && obj[2].rows[2].pic_path) ? (`${Config.backend}/` + obj[2].rows[2].pic_path) : ''
+          let newPicPath4 = (obj[2].rows[3] && obj[2].rows[3].pic_path) ? (`${Config.backend}/` + obj[2].rows[3].pic_path) : ''
 
-            // TODO: Check if 
+          // TODO: Check if my username is in his friends set, if so, display friends and not like / dislike. Check
+          // friends first, then likers.
+          const hasMeAsFriendResult = obj[4].rows.some(friend => friend.friend_username === obj[6].username)
+          const hasMeAsLikerResult = obj[5].rows.some(liker => liker.liker_username === obj[6].username)
 
-            this.setState({
-              isBusy: false,
-              userInfo: obj[0].rows[0],
-              profilePicPath: newProfilePicPath,
-              picPath1: newPicPath1,
-              picPath2: newPicPath2,
-              picPath3: newPicPath3,
-              picPath4: newPicPath4,
-              tags: obj[3].rows,
-              isOtherUser: true
+          // Calculating the user's fame_rating
+          // obj[0].rows[0].fame_rating = obj[5].rows.length
+
+          // Checking if the user has been blocked before
+          let hasBlockedUserResult = false
+          if (obj[1].rows.some((blockedUser) => obj[0].rows[0].user_id === blockedUser.blocked_id)) {
+            hasBlockedUserResult = true
+          }
+
+          // console.log(obj[7])
+
+          this.setState({
+            isBusy: false,
+            userInfo: obj[0].rows[0],
+            profilePicPath: newProfilePicPath,
+            picPath1: newPicPath1,
+            picPath2: newPicPath2,
+            picPath3: newPicPath3,
+            picPath4: newPicPath4,
+            tags: obj[3].rows,
+            isOtherUser: true,
+            hasMeAsFriend: hasMeAsFriendResult,
+            hasMeAsLiker: hasMeAsLikerResult,
+            hasBlockedUser: hasBlockedUserResult,
+            isUserLoggedIn: obj[7].status
+          })
+
+          const cancelableCreateViewerPromise = PromiseCancel.makeCancelable(
+            ViewersProvider.createViewerBySession({
+              targetUserID: this.state.userInfo.user_id
             })
+          )
 
-            // TODO: Need to open special backend route to increase the user's rating.
+          this.pendingPromises.push(cancelableCreateViewerPromise)
 
-            const cancelableCreateViewerPromise = PromiseCancel.makeCancelable(
-              ViewersProvider.createViewerBySession({
-                targetUserID: this.state.userInfo.user_id
+          cancelableCreateViewerPromise.promise
+          .then((json) => {})
+          .catch((json) => {})
+
+          const socket = SocketWrapper.getSocket()
+
+          socket.on('fromServerUserLoggedIn', (data) => {
+            if (data.username === this.props.match.params.username) {
+              this.setState({
+                isUserLoggedIn: true
               })
-            )
+            }
+          })
 
-            this.pendingPromises.push(cancelableCreateViewerPromise)
-
-            cancelableCreateViewerPromise.promise
-            .then((json) => {})
-            .catch((json) => {})
-          }
-          else {
-
-            // Redirect if user is blocked.
-            this.setState({
-              redirectTo: '/profile'
-            })
-          }
+          socket.on('fromServerUserLoggedOff', (data) => {
+            if (data.username === this.props.match.params.username) {
+              this.setState({
+                isUserLoggedIn: false
+              })
+            }
+          })
         }
         else {
 
@@ -289,6 +553,10 @@ export class Profile extends Component {
             redirectTo: '/profile'
           })
         }
+      })
+      .catch((err) => {
+
+        console.log(err)
       })
     }
     else {
@@ -332,8 +600,7 @@ export class Profile extends Component {
           picPath2: newPicPath2,
           picPath3: newPicPath3,
           picPath4: newPicPath4,
-          tags: obj[2].rows,
-          viewers: obj[3].rows
+          tags: obj[2].rows
         })
       })
       .catch((json) => {
@@ -422,6 +689,16 @@ export class Profile extends Component {
                             }`)}
                           />
                         </div>
+                          {
+                            this.state.hasMeAsFriend
+                              ? <p className="profile-page-picture-aspect-container-statuses-friend">Friend</p>
+                              : null
+                          }
+                          {
+                            this.state.isUserLoggedIn
+                              ? <div className="profile-page-picture-aspect-container-statuses-online"/>
+                              : null // TODO: Could possibly have a red circle here
+                          }
                       </div>
                     </div>
 
@@ -471,7 +748,7 @@ export class Profile extends Component {
                 </div>
                 <div className="profile-page-grid-component profile-page-grid-buttons">
                   {
-                    !this.state.isOtherUser // TODO: These 2 buttons will need to set the modalChild + open it
+                    !this.state.isOtherUser
                       ? <Fragment>
                           <button
                             className="profile-page-grid-buttons-button profile-page-grid-viewed-button"
@@ -491,12 +768,55 @@ export class Profile extends Component {
                       : <Fragment>
                           {
                             // Display last seen 1st if offline.
-                            // Display block 2nd.
-                            // Display report fake 3rd.
-                            // Display friends / unlike / like TODO: need to get the people that liked this username + friends
+                          }
+                          <button
+                            className={`profile-page-grid-buttons-button profile-page-grid-report-fake-button ${
+                              this.state.hasReportedFake
+                                ? 'profile-page-grid-report-fake-button-success'
+                                : ''
+                            }`}
+                            type="button"
+                            onClick={this.handleReportFake}
+                          >
+                            {
+                              this.state.hasReportedFake
+                                ? 'Reported'
+                                : 'Report fake'
+                            }
+                          </button>
+                          {
+                            this.state.hasBlockedUser
+                              ? <button
+                                  className="profile-page-grid-buttons-button profile-page-grid-unblock-button"
+                                  type="button"
+                                  onClick={this.handleUnblockUser}
+                                >
+                                  Unblock
+                                </button>
+                              : <button
+                                  className="profile-page-grid-buttons-button profile-page-grid-block-button"
+                                  type="button"
+                                  onClick={this.handleBlockUser}
+                                >
+                                  Block
+                                </button>
                           }
                           {
-
+                            this.state.hasMeAsLiker
+                              ? <button
+                                  className="profile-page-grid-buttons-button profile-page-grid-unlike-button"
+                                  type="button"
+                                  onClick={this.handleUnlike}
+                                >
+                                  Unlike
+                                </button>
+                              : <button
+                                  className="profile-page-grid-buttons-button profile-page-grid-like-button"
+                                  type="button"
+                                  onClick={this.handleLike}
+                                >
+                                  Like
+                                </button>
                           }
                         </Fragment>
                   }

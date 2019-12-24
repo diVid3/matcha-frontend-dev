@@ -3,9 +3,9 @@
   background-color: white;
   border-radius: 5px;
   max-height: 500px;
-  max-width: 260px;
-  min-height: 300px;
-  min-width: 260px;
+  max-width: 300px;
+  width: 80vw;
+  min-height: 50vh;
   /* border: 1px solid var(--highlight-light) */
 }
 
@@ -76,5 +76,11 @@
 @media only screen and (min-width: 400px) {
   .viewers-likers-container {
     max-width: 340px;
+  }
+}
+
+@media only screen and (min-width: 700px) {
+  .viewers-likers-container {
+    width: 500px;
   }
 }
