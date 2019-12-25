@@ -11,6 +11,9 @@ import Settings from './pages/Settings/Settings'
 import Oops from './pages/Oops/Oops'
 import Navbar from './components/shared_components/Navbar/Navbar'
 import SocketWrapper from './helpers/SocketWrapper'
+import Chat from './pages/Chat/Chat'
+
+// TODO: Remember to include notifications in mobile Navbar!
 
 class App extends Component {
 
@@ -32,13 +35,21 @@ class App extends Component {
         <Router>
           <Switch>
             <Route path="/oops" component={Oops}/>
-            <ProtectedRoute path={['/profile', '/profile/:username', '/settings']}>
+            <ProtectedRoute
+              path={[
+                '/profile',
+                '/profile/:username',
+                '/settings',
+                '/chat'
+              ]}
+            >
               <header>
                 <Navbar />
               </header>
               <Route path="/profile" component={Profile} exact/>
               <Route path="/profile/:username" component={Profile}/>
               <Route path="/settings" component={Settings}/>
+              <Route path="/chat" component={Chat}/>
             </ProtectedRoute>
             <PublicRoute path="/">
               <Landing />

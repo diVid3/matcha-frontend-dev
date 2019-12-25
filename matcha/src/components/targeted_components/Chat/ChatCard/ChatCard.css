@@ -1,0 +1,137 @@
+.chat-card {
+  width: 100%;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0px 4px 3px 1px lightgray;
+  border-radius: 5px;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.chat-card:last-child {
+  margin-bottom: 0px;
+}
+
+.chat-card:hover {
+  cursor: pointer;
+}
+
+.chat-card-pp-container {
+  display: inline-block;
+  position: relative;
+}
+
+.chat-card-pp {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* .chat-card-pp-aspect-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  box-shadow: 0px 0px 5px 0px silver;
+  border-radius: 5px;
+} */
+
+/* .chat-card-pp-aspect-node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  border-radius: 5px;
+} */
+
+.chat-card-pp-user-online {
+  position: absolute;
+  border-radius: 50%;
+  width: 13px;
+  height: 13px;
+  background-color: limegreen;
+  bottom: 0px;
+  right: 0px;
+  margin: 0px 5px 9px 0px;
+}
+
+.chat-card-info-container {
+  display: inline-block;
+  position: relative;
+  height: 80px;
+  width: calc(100% - 80px);
+}
+
+.chat-card-text {
+  font-size: 12px;
+  color: var(--midtone)
+}
+
+.chat-card-info-names-container {
+  position: absolute;
+  top: 0px;
+  margin-left: 20px;
+}
+
+.chat-card-full-name {
+  margin-bottom: 8px;
+}
+
+.chat-card-username {
+  font-size: 10px;
+  color: silver;
+}
+
+.chat-card-last-message-date {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+.chat-card-last-message {
+  position: absolute;
+  bottom: 0px;
+  margin-left: 20px;
+  padding-right: 20px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--placeholder)
+}
+
+@media only screen and (min-width: 400px) {
+  .chat-card-pp {
+    width: 100px;
+    height: 100px;
+  }
+  .chat-card-info-container {
+    height: 100px;
+    width: calc(100% - 100px);
+  }
+  .chat-card-text {
+    font-size: 14px;
+  }
+  .chat-card-username {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .chat-card-pp {
+    width: 120px;
+    height: 120px;
+  }
+  .chat-card-info-container {
+    height: 120px;
+    width: calc(100% - 120px);
+  }
+  .chat-card-text {
+    font-size: 16px;
+  }
+  .chat-card-username {
+    font-size: 14px;
+  }
+}

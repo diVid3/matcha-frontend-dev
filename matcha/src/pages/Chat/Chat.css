@@ -1,0 +1,25 @@
+.chat-page {
+  max-width: 900px;
+  margin: 0px auto;
+  padding: 20px;
+}
+
+.chat-page-loading-container {
+  margin: 15vh auto 0px auto;
+  width: 140px;
+  height: 140px;
+}
+
+.chat-page-container {
+
+}
+
+.chat-page-chat-cards-container {
+
+}
+
+.chat-page-chat-session-container {
+  height: calc(100vh - 91px);
+  width: 100%;
+  background-color: red;
+}

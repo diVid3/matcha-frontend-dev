@@ -556,7 +556,12 @@ export class Profile extends Component {
       })
       .catch((err) => {
 
-        console.log(err)
+        sessionStorage.setItem('viewError', '1')
+  
+        this.setState({
+          isBusy: false,
+          redirectTo: '/oops'
+        })
       })
     }
     else {
@@ -689,16 +694,16 @@ export class Profile extends Component {
                             }`)}
                           />
                         </div>
-                          {
-                            this.state.hasMeAsFriend
-                              ? <p className="profile-page-picture-aspect-container-statuses-friend">Friend</p>
-                              : null
-                          }
-                          {
-                            this.state.isUserLoggedIn
-                              ? <div className="profile-page-picture-aspect-container-statuses-online"/>
-                              : null // TODO: Could possibly have a red circle here
-                          }
+                        {
+                          this.state.hasMeAsFriend
+                            ? <p className="profile-page-picture-aspect-container-statuses-friend">Friend</p>
+                            : null
+                        }
+                        {
+                          this.state.isUserLoggedIn
+                            ? <div className="profile-page-picture-aspect-container-statuses-online"/>
+                            : null // TODO: Could possibly have a red circle here
+                        }
                       </div>
                     </div>
 

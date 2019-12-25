@@ -78,7 +78,7 @@ export class Navbar extends Component {
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="/profile">Profile</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Browse</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Search</NavLink></li>
-            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to=""></NavLink></li>
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to="/chat"></NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-notification" to=""></NavLink></li>
           </ul>
           <div className="nav-spacer"></div>
@@ -113,7 +113,7 @@ export class Navbar extends Component {
           <ul className="nav-items">
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/profile">Profile</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Browse</NavLink></li>
-            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/lol">Chat</NavLink></li>
+            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/chat">Chat</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Notifications</NavLink></li>
           </ul>
           <ul className="nav-items">
