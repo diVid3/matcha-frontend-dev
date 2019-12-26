@@ -26,7 +26,8 @@ export class Chat extends Component {
       lastMessages: null,
       isSelectedUserLoggedIn: false,
       enteredMessage: '',
-      selectedFriendFeed: null
+      selectedFriendFeed: null,
+      ownUserData: null
     }
 
     this.pendingPromises = []
@@ -44,11 +45,37 @@ export class Chat extends Component {
   }
 
   handleSendMessage(e) {
+    e.preventDefault()
+
+    if (!this.state.enteredMessage) {
+
+      return
+    }
+
+    const messageTimeIssued = +new Date()
+
+    const ownMessage = {
+      user_id: this.state.ownUserData.id - 0,
+      other_user_id: this.state.friendsInfo[this.selectedFriendIndex].user_id - 0,
+      time_issued: messageTimeIssued,
+      message: this.state.enteredMessage,
+      read: 0,
+      username: this.state.ownUserData.username
+    }
+
+    const newSelectedFriendFeed = this.state.selectedFriendFeed.slice()
+    newSelectedFriendFeed.push(ownMessage)
+
+    console.log(newSelectedFriendFeed)
+
+    this.setState({
+      selectedFriendFeed: newSelectedFriendFeed
+    })
 
     const chatMessage = {
       targetUsername: this.state.friendsInfo[this.selectedFriendIndex].username,
       targetUserID: this.state.friendsInfo[this.selectedFriendIndex].user_id + '',
-      timeIssued: +new Date(),
+      timeIssued: messageTimeIssued,
       message: this.state.enteredMessage,
       read: 0
     }
@@ -138,13 +165,27 @@ export class Chat extends Component {
     // TODO: Fetch chatSessions
     // TODO: After fetching chatSessions, use their id's to get respective messageFeeds
 
-    const cancelableGetChatSessionsPromise = PromiseCancel.makeCancelable(
-      ChatSessionsProvider.getChatSessionsBySession()
+    const cancelableGetOwnUsernamePromise = PromiseCancel.makeCancelable(
+      UsersProvider.getSessionUsername()
     )
 
-    this.pendingPromises.push(cancelableGetChatSessionsPromise)
+    this.pendingPromises.push(cancelableGetOwnUsernamePromise)
 
-    cancelableGetChatSessionsPromise.promise
+    cancelableGetOwnUsernamePromise.promise
+    .then((json) => {
+
+      this.setState({
+        ownUserData: json
+      })
+
+      const cancelableGetChatSessionsPromise = PromiseCancel.makeCancelable(
+        ChatSessionsProvider.getChatSessionsBySession()
+      )
+  
+      this.pendingPromises.push(cancelableGetChatSessionsPromise)
+  
+      return cancelableGetChatSessionsPromise.promise
+    })
     .then((json) => {
 
       // console.log(json)
@@ -182,13 +223,20 @@ export class Chat extends Component {
 
       // TODO: Slice new message into selectedFriendFeed
       // TODO: To do a username comparison, might need to get my own username.
-      // socket.on('fromServerChatMessage', (data) => {
-      //   if (this._isMounted && data.targetUsername === this.props.match.params.username) {
-      //     this.setState({
-      //       isUserLoggedIn: true
-      //     })
-      //   }
-      // })
+      // TODO: Before you can slice the new message in, it needs to mimic the message format in selectedFriendFeed
+      socket.on('fromServerChatMessage', (data) => {
+        if (this._isMounted && !this.state.displayChatCards) {
+
+          const newSelectedFriendFeed = this.state.selectedFriendFeed.slice()
+          newSelectedFriendFeed.push(data)
+
+          console.log(newSelectedFriendFeed)
+
+          this.setState({
+            selectedFriendFeed: newSelectedFriendFeed
+          })
+        }
+      })
 
       socket.on('fromServerUserLoggedIn', (data) => {
         if (this._isMounted && data.username === this.state.friendsInfo[this.selectedFriendIndex].username) {
@@ -311,9 +359,9 @@ export class Chat extends Component {
                           {
                             // TODO: If a new message is received / sent, a slice of these rows + the new message
                             // will need to set to state.
-                            this.state.selectedFriendFeed.map((message) =>
+                            this.state.selectedFriendFeed.map((message, i) =>
                               <ChatBubble
-                                key={message.id}
+                                key={i}
                                 left={message.username === this.state.friendsInfo[this.selectedFriendIndex].username}
                                 text={message.message}
                                 messageDateTime={message.time_issued}
@@ -322,17 +370,23 @@ export class Chat extends Component {
                           }
                         </div>
                         <div className="chat-page-chat-session-bar chat-page-chat-session-bottom-bar">
-                          <input
-                            className="chat-page-chat-session-bottom-bar-text-input"
-                            type="text"
-                            name="enteredMessage"
-                            value={this.state.enteredMessage}
-                            placeholder="Type a message"
-                            onChange={this.handleEnterMessage}
-                          />
-                          <div className="chat-page-chat-session-bottom-bar-right-arrow"
-                            onClick={this.handleSendMessage}
-                          />
+                          <form
+                            className="chat-page-chat-session-bottom-bar-form"
+                            onSubmit={this.handleSendMessage}
+                          >
+                            <input
+                              className="chat-page-chat-session-bottom-bar-text-input"
+                              type="text"
+                              name="enteredMessage"
+                              value={this.state.enteredMessage}
+                              placeholder="Type a message"
+                              onChange={this.handleEnterMessage}
+                            />
+                            <button
+                              className="chat-page-chat-session-bottom-bar-right-arrow"
+                              type="submit"
+                            />
+                          </form>
                         </div>
                       </div>
                 }

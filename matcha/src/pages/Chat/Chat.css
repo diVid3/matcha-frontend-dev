@@ -34,16 +34,17 @@
   height: 50px;
   display: flex;
   justify-content: space-between;
-  padding: 0px 20px 0px 20px;
+  padding: 0px 10px 0px 10px;
 }
 
 .chat-page-chat-session-middle-bar {
   height: calc(100% - 50px - 50px);
   border-top: 1px solid var(--highlight-light);
   border-bottom: 1px solid var(--highlight-light);
-  padding: 20px;
+  padding: 10px;
   position: relative;
   background-color: rgb(240, 240, 240);
+  overflow: auto;
 }
 
 .chat-page-chat-session-bottom-bar {
@@ -51,7 +52,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 0px 20px 0px 20px;
+  padding: 0px 10px 0px 10px;
 }
 
 .chat-page-chat-session-bottom-bar-right-arrow {
@@ -60,7 +61,17 @@
   width: 18px;
   background-image: url('../../assets/arrow-right.png');
   background-size: cover;
+  border: none;
   margin-left: 10px;
+  background-color: transparent;
+}
+
+.chat-page-chat-session-bottom-bar-form {
+  height: 100%;
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .chat-page-chat-session-bottom-bar-text-input {
@@ -68,7 +79,11 @@
   flex-grow: 1;
   border: none;
   font-size: 12px;
-  color: var(--midtone)
+  color: var(--midtone);
+}
+
+.chat-page-chat-session-bottom-bar-text-input::placeholder {
+  color: silver;
 }
 
 .chat-page-chat-session-bottom-bar-right-arrow:hover {
@@ -166,13 +181,16 @@
   }
   .chat-page-chat-session-top-bar {
     height: 60px;
+    padding: 0px 20px 0px 20px;
     /* padding: 0px 15px 0px 15px; */
   }
   .chat-page-chat-session-middle-bar {
     height: calc(100% - 60px - 60px);
+    padding: 20px;
   }
   .chat-page-chat-session-bottom-bar {
     height: 60px;
+    padding: 0px 20px 0px 20px;
     /* padding: 0px 15px 0px 15px; */
   }
   .chat-page-chat-session-top-bar-left-arrow {
@@ -209,13 +227,16 @@
   }
   .chat-page-chat-session-top-bar {
     height: 70px;
+    padding: 0px 20px 0px 20px;
     /* padding: 0px 20px 0px 20px; */
   }
   .chat-page-chat-session-middle-bar {
     height: calc(100% - 70px - 70px);
+    padding: 20px;
   }
   .chat-page-chat-session-bottom-bar {
     height: 70px;
+    padding: 0px 20px 0px 20px;
     /* padding: 0px 20px 0px 20px; */
   }
   .chat-page-chat-session-top-bar-left-arrow {

@@ -1,8 +1,8 @@
 .chat-bubble {
   display: flex;
   position: relative;
-  padding-bottom: 20px;
-  margin-top: 10px;
+  padding-bottom: 18px;
+  margin-top: 16px;
 }
 
 .chat-bubble:first-child {
@@ -54,6 +54,7 @@
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0px 1px 1px 0px silver;
+  max-width: 200px;
   /* border: 1px solid var(--highlight); */
   /* width: 200px; */
 }
@@ -74,7 +75,7 @@
   position: absolute;
   bottom: 0px;
   font-size: 10px;
-  color: var(--midtone)
+  color: silver;
 }
 
 .chat-bubble-date-time-left {
@@ -87,24 +88,26 @@
 
 @media only screen and (min-width: 400px) {
   .chat-bubble {
-    padding-bottom: 24px;
+    padding-bottom: 20px;
   }
   .chat-bubble-text {
     font-size: 14px;
+    max-width: 300px;
   }
   .chat-bubble-date-time {
-    font-size: 12px;
+    font-size: 10px;
   }
 }
 
 @media only screen and (min-width: 600px) {
   .chat-bubble {
-    padding-bottom: 28px;
+    padding-bottom: 22px;
   }
   .chat-bubble-text {
     font-size: 16px;
+    max-width: 500px;
   }
   .chat-bubble-date-time {
-    font-size: 14px;
+    font-size: 12px;
   }
 }
