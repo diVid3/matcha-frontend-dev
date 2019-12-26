@@ -201,6 +201,21 @@
   font-size: 14px;
 }
 
+.profile-page-pictures-last-seen-container {
+  margin-top: 20px;
+}
+
+.profile-page-pictures-last-seen-heading {
+  color: silver;
+  font-size: 12px;
+}
+
+.profile-page-pictures-last-seen-text {
+  color: var(--midtone);
+  margin-top: 5px;
+  font-size: 14px;
+}
+
 .profile-page-pictures-pictures-container {
   display: flex;
   justify-content: space-between;
@@ -308,6 +323,11 @@
   font-size: 14px;
 }
 
+.profile-page-grid-last-seen {
+  color: var(--midtone);
+  font-size: 12px;
+}
+
 @media only screen and (min-width: 500px) {
   .profile-page-grid {
     grid-template-areas:
@@ -349,6 +369,9 @@
   .profile-page-pictures-bio-text {
     font-size: 12px;
   }
+  .profile-page-pictures-last-seen-text {
+    font-size: 12px;
+  }
 }
 
 @media only screen and (min-width: 600px) {
@@ -359,6 +382,9 @@
     font-size: 14px;
   }
   .profile-page-pictures-bio-text {
+    font-size: 14px;
+  }
+  .profile-page-pictures-last-seen-text {
     font-size: 14px;
   }
 }

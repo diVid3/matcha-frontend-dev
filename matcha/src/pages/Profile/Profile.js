@@ -68,6 +68,7 @@ export class Profile extends Component {
     this.canPressLikeUnlike = true
     this.canPressReportFake = true
     this.canPressBlockUnblockUser = true
+    this._isMounted = false
 
     this.handleImageClickDecorator = this.handleImageClickDecorator.bind(this)
     this.handleViewersClick = this.handleViewersClick.bind(this)
@@ -367,6 +368,8 @@ export class Profile extends Component {
 
   async componentDidMount() {
 
+    this._isMounted = true
+
     const cancelableGetOwnUsernamePromise = PromiseCancel.makeCancelable(
       UsersProvider.getSessionUsername()
     )
@@ -531,7 +534,7 @@ export class Profile extends Component {
           const socket = SocketWrapper.getSocket()
 
           socket.on('fromServerUserLoggedIn', (data) => {
-            if (data.username === this.props.match.params.username) {
+            if (this._isMounted && data.username === this.props.match.params.username) {
               this.setState({
                 isUserLoggedIn: true
               })
@@ -539,7 +542,7 @@ export class Profile extends Component {
           })
 
           socket.on('fromServerUserLoggedOff', (data) => {
-            if (data.username === this.props.match.params.username) {
+            if (this._isMounted && data.username === this.props.match.params.username) {
               this.setState({
                 isUserLoggedIn: false
               })
@@ -649,6 +652,8 @@ export class Profile extends Component {
   }
 
   componentWillUnmount() {
+  
+    this._isMounted = false
 
     this.pendingPromises.forEach(p => p.cancel())
   }
@@ -771,9 +776,6 @@ export class Profile extends Component {
                           </button>
                         </Fragment>
                       : <Fragment>
-                          {
-                            // Display last seen 1st if offline.
-                          }
                           <button
                             className={`profile-page-grid-buttons-button profile-page-grid-report-fake-button ${
                               this.state.hasReportedFake
@@ -928,6 +930,16 @@ export class Profile extends Component {
                       { this.state.userInfo.biography }
                     </p>
                   </div>
+                  {
+                    this.state.isOtherUser && !this.state.isUserLoggedIn
+                      ? <div className="profile-page-pictures-last-seen-container">
+                          <p className="profile-page-pictures-last-seen-heading">Last seen</p>
+                          <p className="profile-page-pictures-last-seen-text">
+                            { new Date(this.state.userInfo.last_seen).toLocaleString().replace(/\//g, '.') }
+                          </p>
+                        </div>
+                      : null
+                  }
                 </div>
               </div>
             : <div className="profile-page-loading-container">

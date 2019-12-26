@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Config from '../../../../config/Config'
 import PromiseCancel from '../../../../helpers/PromiseCancel'
 import UsersProvider from '../../../../providers/UsersProvider'
+import SocketWrapper from '../../../../helpers/SocketWrapper'
 
 import './ChatCard.css'
 import defaultpp from '../../../../assets/placeholder.png'
@@ -16,6 +17,7 @@ export class ChatCard extends Component {
     }
 
     this.pendingPromises = []
+    this._isMounted = false
 
     this.getProfilePicPath = this.getProfilePicPath.bind(this)
   }
@@ -26,6 +28,8 @@ export class ChatCard extends Component {
   }
 
   componentDidMount() {
+
+    this._isMounted = true
 
     const cancelableIsUserLoggedInPromise = PromiseCancel.makeCancelable(
       UsersProvider.isUserLoggedIn({
@@ -46,9 +50,29 @@ export class ChatCard extends Component {
       }
     })
     .catch((json) => {})
+
+    const socket = SocketWrapper.getSocket()
+  
+    socket.on('fromServerUserLoggedIn', (data) => {
+      if (this._isMounted && data.username === this.props.username) {
+        this.setState({
+          isUserLoggedIn: true
+        })
+      }
+    })
+
+    socket.on('fromServerUserLoggedOff', (data) => {
+      if (this._isMounted && data.username === this.props.username) {
+        this.setState({
+          isUserLoggedIn: false
+        })
+      }
+    })
   }
 
   componentWillUnmount() {
+
+    this._isMounted = false
 
     this.pendingPromises.forEach(p => p.cancel())
   }

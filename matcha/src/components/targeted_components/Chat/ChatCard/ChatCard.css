@@ -1,11 +1,12 @@
 .chat-card {
   width: 100%;
-  padding: 20px;
+  padding: 10px;
   background-color: white;
   box-shadow: 0px 4px 3px 1px lightgray;
   border-radius: 5px;
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  height: 100px;
 }
 
 .chat-card:last-child {
@@ -26,25 +27,8 @@
   height: 80px;
   object-fit: cover;
   border-radius: 5px;
-}
-
-/* .chat-card-pp-aspect-container {
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  padding-top: 100%;
   box-shadow: 0px 0px 5px 0px silver;
-  border-radius: 5px;
-} */
-
-/* .chat-card-pp-aspect-node {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  border-radius: 5px;
-} */
+}
 
 .chat-card-pp-user-online {
   position: absolute;
@@ -62,6 +46,7 @@
   position: relative;
   height: 80px;
   width: calc(100% - 80px);
+  padding-left: 12px;
 }
 
 .chat-card-text {
@@ -72,7 +57,6 @@
 .chat-card-info-names-container {
   position: absolute;
   top: 0px;
-  margin-left: 20px;
 }
 
 .chat-card-full-name {
@@ -81,28 +65,33 @@
 
 .chat-card-username {
   font-size: 10px;
-  color: silver;
+  color: var(--placeholder);
 }
 
 .chat-card-last-message-date {
   position: absolute;
   top: 0px;
   right: 0px;
+  color: var(--placeholder);
 }
 
 .chat-card-last-message {
   position: absolute;
   bottom: 0px;
-  margin-left: 20px;
   padding-right: 20px;
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--placeholder)
+  color: var(--placeholder);
 }
 
 @media only screen and (min-width: 400px) {
+  .chat-card {
+    height: 126px;
+    padding: 13px;
+    margin-bottom: 16px;
+  }
   .chat-card-pp {
     width: 100px;
     height: 100px;
@@ -120,6 +109,11 @@
 }
 
 @media only screen and (min-width: 600px) {
+  .chat-card {
+    height: 152px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
   .chat-card-pp {
     width: 120px;
     height: 120px;
