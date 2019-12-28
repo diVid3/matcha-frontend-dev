@@ -24,8 +24,7 @@ export class Navbar extends Component {
 
   handleMobileNotificationClick(e) {
     e.preventDefault()
-    this.toggleMobileMenu()
-    this.props.toggleModal()
+    this.props.openModal()
   }
 
   toggleMobileMenu() {
@@ -87,7 +86,7 @@ export class Navbar extends Component {
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Search</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to="/chat"></NavLink></li>
             {/* <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-notification" to=""></NavLink></li> */}
-            <li className="nav-desk-item nav-desk-item-left"><span className="nav-desk-item-icon-notification" onClick={this.props.toggleModal}></span></li>
+            <li className="nav-desk-item nav-desk-item-left"><span className="nav-desk-item-icon-notification" onClick={this.props.openModal}></span></li>
           </ul>
           <div className="nav-spacer"></div>
           <ul className="nav-desk-items nav-desk-items-right">

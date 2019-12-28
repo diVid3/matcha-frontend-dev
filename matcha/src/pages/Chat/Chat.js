@@ -77,6 +77,9 @@ export class Chat extends Component {
       selectedFriendFeed: newSelectedFriendFeed,
       friendFeeds: newFriendFeeds,
       lastMessages: newLastMessages
+    }, () => {
+      const chatDiv = document.getElementById('chatToScroll')
+      chatDiv.scrollTop = chatDiv.scrollHeight
     })
 
     const chatMessage = {
@@ -92,11 +95,6 @@ export class Chat extends Component {
     this.setState({
       enteredMessage: ''
     })
-
-    setTimeout(() => {
-      const chatDiv = document.getElementById('chatToScroll')
-      chatDiv.scrollTop = chatDiv.scrollHeight
-    }, 0)
   }
 
   handleEnterMessage(e) {
@@ -167,12 +165,10 @@ export class Chat extends Component {
       this.setState({
         selectedFriendFeed: this.state.friendFeeds[this.selectedFriendIndex].rows,
         displayChatCards: false
-      })
-
-      setTimeout(() => {
+      }, () => {
         const chatDiv = document.getElementById('chatToScroll')
         chatDiv.scrollTop = chatDiv.scrollHeight
-      }, 0)
+      })
     }
   }
 
@@ -249,13 +245,11 @@ export class Chat extends Component {
             selectedFriendFeed: newSelectedFriendFeed,
             friendFeeds: newFriendFeeds,
             lastMessages: newLastMessages
-          })
-
-          // Scrolling the div in case new messages
-          setTimeout(() => {
+          }, () => {
+            // Scrolling the div in case new messages
             const chatDiv = document.getElementById('chatToScroll')
             chatDiv.scrollTop = chatDiv.scrollHeight
-          }, 0)
+          })
         }
       })
 
@@ -371,14 +365,16 @@ export class Chat extends Component {
                         </div>
                         <div id="chatToScroll" className="chat-page-chat-session-bar chat-page-chat-session-middle-bar">
                           {
-                            this.state.selectedFriendFeed.map((message, i) =>
-                              <ChatBubble
-                                key={i}
-                                left={message.username === this.state.friendsInfo[this.selectedFriendIndex].username}
-                                text={message.message}
-                                messageDateTime={message.time_issued}
-                              />
-                            )
+                            this.state.selectedFriendFeed.length
+                              ? this.state.selectedFriendFeed.map((message, i) =>
+                                  <ChatBubble
+                                    key={i}
+                                    left={message.username === this.state.friendsInfo[this.selectedFriendIndex].username}
+                                    text={message.message}
+                                    messageDateTime={message.time_issued}
+                                  />
+                                )
+                              : <p className="chat-page-chat-session-no-friends-msg">Say hi to your friend</p>
                           }
                         </div>
                         <div className="chat-page-chat-session-bar chat-page-chat-session-bottom-bar">

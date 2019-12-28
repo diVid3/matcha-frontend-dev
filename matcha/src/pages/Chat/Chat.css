@@ -172,6 +172,20 @@
   margin-right: 10px;
 }
 
+.chat-page-chat-session-no-friends-msg {
+  display: inline-block;
+  color: var(--placeholder);
+  padding: 8px 10px 8px 10px;
+  border-radius: 500px;
+  font-size: 12px;
+  background-color: white;
+  box-shadow: 0px 1px 1px 0px silver;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 @media only screen and (min-width: 400px) {
   .chat-page-chat-session-top-bar-left-name {
     font-size: 14px;
@@ -215,6 +229,9 @@
   .chat-page-chat-session-top-bar-right-presence {
     width: 22px;
     height: 22px;
+  }
+  .chat-page-chat-session-no-friends-msg {
+    font-size: 14px;
   }
 }
 
@@ -261,5 +278,8 @@
   .chat-page-chat-session-top-bar-right-presence {
     width: 24px;
     height: 24px;
+  }
+  .chat-page-chat-session-no-friends-msg {
+    font-size: 16px;
   }
 }
