@@ -55,8 +55,7 @@
   border-radius: 5px;
   box-shadow: 0px 1px 1px 0px silver;
   max-width: 200px;
-  /* border: 1px solid var(--highlight); */
-  /* width: 200px; */
+  overflow-wrap: break-word;
 }
 
 .chat-bubble-text-left {

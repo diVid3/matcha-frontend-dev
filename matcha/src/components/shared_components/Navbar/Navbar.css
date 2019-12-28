@@ -146,6 +146,10 @@ nav {
   background-size: cover;
 }
 
+.nav-desk-item-icon-notification:hover {
+  cursor: pointer;
+}
+
 .nav-desk-item-icon-setting {
   height: 18px;
   width: 18px;

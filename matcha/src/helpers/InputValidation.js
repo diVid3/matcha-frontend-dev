@@ -9,6 +9,7 @@ export class InputValidation {
   static isValidPassword = (password) => /^(?:\w|[a-z0-9!#$@%&'*+/=?^_`{|}~-]){6,200}$/.test(password)
   static isValidUuid = (uuid) => uuidv4Checker.is(uuid)
   static isValidBio = (bio) => /^[^\t]{1,250}$/.test(bio)
+  static isValidMessage = (message) => /^.{0,10000}$/.test(message)
 
   static passwordHasUpperCase = (password) => /[A-Z]/.test(password)
   static passwordHasLowerCase = (password) => /[a-z]/.test(password)

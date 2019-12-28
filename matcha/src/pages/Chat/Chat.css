@@ -2,6 +2,7 @@
   max-width: 900px;
   margin: 0px auto;
   padding: 20px;
+  /* height: calc(100vh - 51px); */
 }
 
 .chat-page-loading-container {
@@ -75,7 +76,7 @@
 }
 
 .chat-page-chat-session-bottom-bar-text-input {
-  height: 100%;
+  height: 30px;
   flex-grow: 1;
   border: none;
   font-size: 12px;

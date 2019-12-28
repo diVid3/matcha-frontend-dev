@@ -9,6 +9,7 @@ import Config from '../../config/Config'
 import UsersProvider from '../../providers/UsersProvider'
 import ChatBubble from '../../components/targeted_components/Chat/ChatBubble/ChatBubble'
 import SocketWrapper from '../../helpers/SocketWrapper'
+import InputValidation from '../../helpers/InputValidation'
 
 import './Chat.css'
 import defaultpp from '../../assets/placeholder.png'
@@ -27,7 +28,8 @@ export class Chat extends Component {
       isSelectedUserLoggedIn: false,
       enteredMessage: '',
       selectedFriendFeed: null,
-      ownUserData: null
+      ownUserData: null,
+      enteredMessageValid: true,
     }
 
     this.pendingPromises = []
@@ -47,7 +49,7 @@ export class Chat extends Component {
   handleSendMessage(e) {
     e.preventDefault()
 
-    if (!this.state.enteredMessage) {
+    if (!this.state.enteredMessageValid || !this.state.enteredMessage) {
 
       return
     }
@@ -66,10 +68,15 @@ export class Chat extends Component {
     const newSelectedFriendFeed = this.state.selectedFriendFeed.slice()
     newSelectedFriendFeed.push(ownMessage)
 
-    console.log(newSelectedFriendFeed)
+    const newFriendFeeds = this.state.friendFeeds.slice()
+    newFriendFeeds[this.selectedFriendIndex].rows = newSelectedFriendFeed
+
+    const newLastMessages = newFriendFeeds.map((feed) => feed.rows.slice(-1))
 
     this.setState({
-      selectedFriendFeed: newSelectedFriendFeed
+      selectedFriendFeed: newSelectedFriendFeed,
+      friendFeeds: newFriendFeeds,
+      lastMessages: newLastMessages
     })
 
     const chatMessage = {
@@ -85,13 +92,19 @@ export class Chat extends Component {
     this.setState({
       enteredMessage: ''
     })
+
+    setTimeout(() => {
+      const chatDiv = document.getElementById('chatToScroll')
+      chatDiv.scrollTop = chatDiv.scrollHeight
+    }, 0)
   }
 
   handleEnterMessage(e) {
-    const { name, value } = e.target
+    const { value } = e.target
 
     this.setState({
-      [name]: value
+      enteredMessage: value,
+      enteredMessageValid: InputValidation.isValidMessage(value)
     })
   }
 
@@ -155,15 +168,17 @@ export class Chat extends Component {
         selectedFriendFeed: this.state.friendFeeds[this.selectedFriendIndex].rows,
         displayChatCards: false
       })
+
+      setTimeout(() => {
+        const chatDiv = document.getElementById('chatToScroll')
+        chatDiv.scrollTop = chatDiv.scrollHeight
+      }, 0)
     }
   }
 
   componentDidMount() {
 
     this._isMounted = true
-
-    // TODO: Fetch chatSessions
-    // TODO: After fetching chatSessions, use their id's to get respective messageFeeds
 
     const cancelableGetOwnUsernamePromise = PromiseCancel.makeCancelable(
       UsersProvider.getSessionUsername()
@@ -188,8 +203,6 @@ export class Chat extends Component {
     })
     .then((json) => {
 
-      // console.log(json)
-
       this.setState({
         friendsInfo: json.rows
       })
@@ -209,8 +222,8 @@ export class Chat extends Component {
     })
     .then((json) => {
 
-      // console.log(json)
-
+      // Skimming off last messages from the friendFeeds array, every index will be another array containing
+      // the last message as its first index, so i.e. lastMessages[i][0].
       const lastMessages = json.map((feed) => feed.rows.slice(-1))
 
       this.setState({
@@ -221,20 +234,28 @@ export class Chat extends Component {
 
       const socket = SocketWrapper.getSocket()
 
-      // TODO: Slice new message into selectedFriendFeed
-      // TODO: To do a username comparison, might need to get my own username.
-      // TODO: Before you can slice the new message in, it needs to mimic the message format in selectedFriendFeed
       socket.on('fromServerChatMessage', (data) => {
         if (this._isMounted && !this.state.displayChatCards) {
 
           const newSelectedFriendFeed = this.state.selectedFriendFeed.slice()
           newSelectedFriendFeed.push(data)
 
-          console.log(newSelectedFriendFeed)
+          const newFriendFeeds = this.state.friendFeeds.slice()
+          newFriendFeeds[this.selectedFriendIndex].rows = newSelectedFriendFeed
+
+          const newLastMessages = newFriendFeeds.map((feed) => feed.rows.slice(-1))
 
           this.setState({
-            selectedFriendFeed: newSelectedFriendFeed
+            selectedFriendFeed: newSelectedFriendFeed,
+            friendFeeds: newFriendFeeds,
+            lastMessages: newLastMessages
           })
+
+          // Scrolling the div in case new messages
+          setTimeout(() => {
+            const chatDiv = document.getElementById('chatToScroll')
+            chatDiv.scrollTop = chatDiv.scrollHeight
+          }, 0)
         }
       })
 
@@ -285,10 +306,6 @@ export class Chat extends Component {
             : null
         }
         {
-          // TODO: Need to first make component to display friends / chats.
-          // TODO: Then double up the HTML to select a friend and enter a chat, hide the chats when a chat is selected.
-        }
-        {
           this.state.isBusy
             ? <div className="chat-page-loading-container">
                 <LoadingBlocks/>
@@ -299,9 +316,6 @@ export class Chat extends Component {
                     ? <div className="chat-page-chat-cards-container">
                         {
                           this.state.friendsInfo.map((info, i) => 
-                            // TODO: Add socket listener to overwrite lastMessages[i][0],
-                            // a setState will be needed to change props so the cards can re-render on message
-                            // received.
                             <ChatCard
                               key={info.user_id}
                               profilePicPath={info.profile_pic_path}
@@ -355,10 +369,8 @@ export class Chat extends Component {
                             />
                           </div>
                         </div>
-                        <div className="chat-page-chat-session-bar chat-page-chat-session-middle-bar">
+                        <div id="chatToScroll" className="chat-page-chat-session-bar chat-page-chat-session-middle-bar">
                           {
-                            // TODO: If a new message is received / sent, a slice of these rows + the new message
-                            // will need to set to state.
                             this.state.selectedFriendFeed.map((message, i) =>
                               <ChatBubble
                                 key={i}
@@ -375,7 +387,11 @@ export class Chat extends Component {
                             onSubmit={this.handleSendMessage}
                           >
                             <input
-                              className="chat-page-chat-session-bottom-bar-text-input"
+                              className={`chat-page-chat-session-bottom-bar-text-input ${
+                                !this.state.enteredMessageValid
+                                  ? 'input-bad'
+                                  : ''
+                              }`}
                               type="text"
                               name="enteredMessage"
                               value={this.state.enteredMessage}

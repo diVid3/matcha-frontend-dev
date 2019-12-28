@@ -49,8 +49,6 @@ export class ChatBubble extends Component {
               this.props.messageDateTime
                 ? new Date(this.props.messageDateTime).toLocaleString().split(', ')[1]
                 : new Date().toLocaleString().split(', ')[1]
-                // ? new Date(this.props.messageDateTime).toLocaleString().replace(/\//g, '.')
-                // : new Date().toLocaleString().replace(/\//g, '.')
             }
           </p>
         </div>

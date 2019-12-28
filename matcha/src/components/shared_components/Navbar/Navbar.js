@@ -8,7 +8,7 @@ import './Navbar.css'
 export class Navbar extends Component {
 
   constructor(props) {
-    super(props)
+    super()
 
     this.state = {
       mobileMenuOpen: false,
@@ -19,6 +19,13 @@ export class Navbar extends Component {
 
     this.toggleMobileMenu = this.toggleMobileMenu.bind(this)
     this.logOut = this.logOut.bind(this)
+    this.handleMobileNotificationClick = this.handleMobileNotificationClick.bind(this)
+  }
+
+  handleMobileNotificationClick(e) {
+    e.preventDefault()
+    this.toggleMobileMenu()
+    this.props.toggleModal()
   }
 
   toggleMobileMenu() {
@@ -79,7 +86,8 @@ export class Navbar extends Component {
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Browse</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Search</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to="/chat"></NavLink></li>
-            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-notification" to=""></NavLink></li>
+            {/* <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-notification" to=""></NavLink></li> */}
+            <li className="nav-desk-item nav-desk-item-left"><span className="nav-desk-item-icon-notification" onClick={this.props.toggleModal}></span></li>
           </ul>
           <div className="nav-spacer"></div>
           <ul className="nav-desk-items nav-desk-items-right">
@@ -114,7 +122,8 @@ export class Navbar extends Component {
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/profile">Profile</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Browse</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/chat">Chat</NavLink></li>
-            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Notifications</NavLink></li>
+            {/* <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Notifications</NavLink></li> */}
+            <li><a className="nav-link" onClick={this.handleMobileNotificationClick} href="/#">Notifications</a></li>
           </ul>
           <ul className="nav-items">
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Search</NavLink></li>

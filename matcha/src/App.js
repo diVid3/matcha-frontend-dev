@@ -12,10 +12,46 @@ import Oops from './pages/Oops/Oops'
 import Navbar from './components/shared_components/Navbar/Navbar'
 import SocketWrapper from './helpers/SocketWrapper'
 import Chat from './pages/Chat/Chat'
+import Modal from 'react-modal'
+
+Modal.setAppElement('#root');
+
+const modalStyle = {
+  overlay: {
+    backgroundColor: 'rgba(0,0,0,0.5)'
+  },
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '10px'
+  }
+}
 
 // TODO: Remember to include notifications in mobile Navbar!
 
 class App extends Component {
+  constructor(props) {
+    super()
+
+    this.state = {
+      modalOpen: false
+    }
+
+    this.pendingPromises = []
+
+    this.toggleModal = this.toggleModal.bind(this)
+  }
+
+  toggleModal() {
+
+    this.setState({
+      modalOpen: true
+    })
+  }
 
   componentDidMount() {
 
@@ -32,6 +68,17 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+      <Modal
+        isOpen={this.state.modalOpen}
+        style={modalStyle}
+        shouldCloseOnOverlayClick={true}
+        onRequestClose={() => this.setState({ modalOpen: false })}
+      >
+        {/* {
+          this.state.modalChild
+        } */}
+        <p>hi</p>
+      </Modal>
         <Router>
           <Switch>
             <Route path="/oops" component={Oops}/>
@@ -44,7 +91,7 @@ class App extends Component {
               ]}
             >
               <header>
-                <Navbar />
+                <Navbar toggleModal={this.toggleModal}/>
               </header>
               <Route path="/profile" component={Profile} exact/>
               <Route path="/profile/:username" component={Profile}/>
