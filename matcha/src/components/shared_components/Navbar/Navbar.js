@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { NavLink, Redirect } from "react-router-dom";
 import PromiseCancel from '../../../helpers/PromiseCancel'
 import SessionProvider from '../../../providers/SessionProvider'
+import NotificationBubble from '../NotificationBubble/NotificationBubble'
 
 import './Navbar.css'
 
@@ -85,8 +86,19 @@ export class Navbar extends Component {
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Browse</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Search</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to="/chat"></NavLink></li>
-            {/* <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-notification" to=""></NavLink></li> */}
-            <li className="nav-desk-item nav-desk-item-left"><span className="nav-desk-item-icon-notification" onClick={this.props.openModal}></span></li>
+            <li
+              className="nav-desk-item nav-desk-item-left nav-desk-item-icon-container"
+            >
+              {
+                this.props.notifications.filter((n) => n.read - 0 === 0).length
+                  ? <NotificationBubble
+                      notifications={this.props.notifications}
+                      desktop={true}
+                    />
+                  : null
+              }
+              <span className="nav-desk-item-icon-notification" onClick={this.props.openModal}/>
+            </li>
           </ul>
           <div className="nav-spacer"></div>
           <ul className="nav-desk-items nav-desk-items-right">
@@ -121,8 +133,25 @@ export class Navbar extends Component {
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/profile">Profile</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Browse</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/chat">Chat</NavLink></li>
-            {/* <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Notifications</NavLink></li> */}
-            <li><a className="nav-link" onClick={this.handleMobileNotificationClick} href="/#">Notifications</a></li>
+            <li
+              className="nav-link-notifications-fill"
+              onClick={this.handleMobileNotificationClick}
+            >
+              <a
+                className="nav-link nav-link-notifications"
+                href="/#"
+              >
+                Notifications
+              </a>
+              {
+                this.props.notifications.filter((n) => n.read - 0 === 0).length
+                  ? <NotificationBubble
+                      notifications={this.props.notifications}
+                      desktop={false}
+                    />
+                  : null
+              }
+            </li>
           </ul>
           <ul className="nav-items">
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Search</NavLink></li>

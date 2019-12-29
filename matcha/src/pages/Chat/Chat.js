@@ -92,6 +92,15 @@ export class Chat extends Component {
 
     SocketWrapper.getSocket().emit('fromClientChatMessage', chatMessage)
 
+    const clientNotification = {
+      targetUsername: this.state.friendsInfo[this.selectedFriendIndex].username,
+      notification: 'You have a new message',
+      read: '0',
+      origUsername: this.state.ownUserData.username
+    }
+
+    SocketWrapper.getSocket().emit('fromClientNotification', clientNotification)
+
     this.setState({
       enteredMessage: ''
     })

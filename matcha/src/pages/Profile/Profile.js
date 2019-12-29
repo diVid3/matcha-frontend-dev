@@ -35,8 +35,7 @@ const modalStyle = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
-    padding: '10px',
-    maxHeight: '60vh'
+    padding: '10px'
   }
 }
 
@@ -62,7 +61,8 @@ export class Profile extends Component {
       hasMeAsLiker: false,
       hasReportedFake: false,
       hasBlockedUser: false, // TODO: This should be set on componentDidMount()
-      isUserLoggedIn: false
+      isUserLoggedIn: false,
+      ownInfo: null
     }
 
     this.pendingPromises = []
@@ -81,7 +81,6 @@ export class Profile extends Component {
     this.handleUnblockUser = this.handleUnblockUser.bind(this)
   }
 
-  // TODO: Build handleUnblockUser(e) { ... }
   handleUnblockUser(e) {
 
     if (!this.canPressBlockUnblockUser) {
@@ -137,7 +136,8 @@ export class Profile extends Component {
 
     const cancelableBlockUserPromise = PromiseCancel.makeCancelable(
       BlockedUsersProvider.createBlockedUserBySession({
-        targetUserID: this.state.userInfo.user_id + ''
+        targetUserID: this.state.userInfo.user_id + '',
+        targetUsername: this.state.userInfo.username
       })
     )
 
@@ -209,6 +209,17 @@ export class Profile extends Component {
 
     this.canPressLikeUnlike = false
 
+    const socket = SocketWrapper.getSocket()
+
+    const clientNotification = {
+      targetUsername: this.state.userInfo.username,
+      notification: 'Somebody liked you',
+      read: '0',
+      origUsername: this.state.ownInfo.username
+    }
+
+    socket.emit('fromClientNotification', clientNotification)
+
     this.setState({
       hasMeAsLiker: true
     })
@@ -270,6 +281,17 @@ export class Profile extends Component {
     .then((json) => {
 
       if (json.unfriended) {
+
+        const socket = SocketWrapper.getSocket()
+
+        const clientNotification = {
+          targetUsername: this.state.userInfo.username,
+          notification: 'A friend unliked you',
+          read: '0',
+          origUsername: this.state.ownInfo.username
+        }
+    
+        socket.emit('fromClientNotification', clientNotification)
 
         this.setState({
           hasMeAsFriend: false
@@ -386,12 +408,6 @@ export class Profile extends Component {
       typeof json.username === 'string' &&
       json.username !== this.props.match.params.username // If different username than own.
     ) {
-
-      // TODO: Make two requests, getUserByUsername, to see if the user exists, and getBlockedUsersBySession, to see
-      // if the current user you're viewing is blocked or not. Use Promise.all to fetch at the same time, upon
-      // completion, check whether the user exists, if the user does exist, make sure the user isn't blocked, then
-      // display, if the user doesn't exist, display: 'Sorry, that user doesn't exist.', if the user is blocked,
-      // display: 'You currently have this user blocked.'
   
       const cancelableGetUserByUsernamePromise = PromiseCancel.makeCancelable(
         UsersProvider.getUserByUsername({
@@ -488,8 +504,6 @@ export class Profile extends Component {
           let newPicPath3 = (obj[2].rows[2] && obj[2].rows[2].pic_path) ? (`${Config.backend}/` + obj[2].rows[2].pic_path) : ''
           let newPicPath4 = (obj[2].rows[3] && obj[2].rows[3].pic_path) ? (`${Config.backend}/` + obj[2].rows[3].pic_path) : ''
 
-          // TODO: Check if my username is in his friends set, if so, display friends and not like / dislike. Check
-          // friends first, then likers.
           const hasMeAsFriendResult = obj[4].rows.some(friend => friend.friend_username === obj[6].username)
           const hasMeAsLikerResult = obj[5].rows.some(liker => liker.liker_username === obj[6].username)
 
@@ -517,7 +531,8 @@ export class Profile extends Component {
             hasMeAsFriend: hasMeAsFriendResult,
             hasMeAsLiker: hasMeAsLikerResult,
             hasBlockedUser: hasBlockedUserResult,
-            isUserLoggedIn: obj[7].status
+            isUserLoggedIn: obj[7].status,
+            ownInfo: obj[6]
           })
 
           const cancelableCreateViewerPromise = PromiseCancel.makeCancelable(
@@ -533,6 +548,15 @@ export class Profile extends Component {
           .catch((json) => {})
 
           const socket = SocketWrapper.getSocket()
+
+          const clientNotification = {
+            targetUsername: this.state.userInfo.username,
+            notification: 'Somebody viewed your profile',
+            read: '0',
+            origUsername: obj[6].username
+          }
+
+          socket.emit('fromClientNotification', clientNotification)
 
           socket.on('fromServerUserLoggedIn', (data) => {
             if (this._isMounted && data.username === this.props.match.params.username) {
@@ -622,34 +646,6 @@ export class Profile extends Component {
         })
       })
     }
-
-    // TODO: Remember that certain statuses like friends / liked will show if you're viewing anothers profile,
-    // the corresponding buttons will need to be enabled, can double up HTML if you want.
-
-    // TODO: When viewing anothers profile, react should pull the username from query params, and on mount will
-    // fetch the related data.
-
-    // TODO: The Viewed button can enable the popup again, with the related viewers, i.e. their usernames. The
-    // Viewed component would be better off making a request rather than working on old data, since a profile
-    // can be loaded, and after a while, a user can receive a view. The Viewers component will need to be scroll
-    // able.
-
-    // TODO: To display the Friends status, you'll need to query like below, the same goes for the Liked status,
-    // so if you're not friends, no status, if you didn't like them, no liked. In that case, the only button that
-    // will display will be 'Like', and when you like the other person's profile, a request is made to the backend,
-    // the backend will check if that person is a liker of yours, and if you're a liker of them, if both are true,
-    // that person is added to your friends list, and you're added to their friends list. Should you then dislike
-    // the person, another request will be made, they will be removed from your friends list, and you will be removed
-    // from their friends list, after that, you will be removed as a liker for them.
-
-    // TODO: Add an if to check for the query params, use getUserByUsername to fetch the other user's data.
-    // TODO: getUserByUsername <---- CHECK
-
-    // TODO: getPicturesByUsername <---- CHECK
-
-    // TODO: getTagsByUsername <---- CHECK
-
-    // TODO: This will not need to be called if viewing another's profile.
   }
 
   componentWillUnmount() {
@@ -708,7 +704,7 @@ export class Profile extends Component {
                         {
                           this.state.isUserLoggedIn
                             ? <div className="profile-page-picture-aspect-container-statuses-online"/>
-                            : null // TODO: Could possibly have a red circle here
+                            : null
                         }
                       </div>
                     </div>

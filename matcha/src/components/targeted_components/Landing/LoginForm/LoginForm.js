@@ -171,6 +171,8 @@ export class LoginForm extends Component {
 
         if (json.status) {
 
+          this.props.getNotificationData()
+
           this.setState({
             isBusy: false,
             redirectTo: '/profile'

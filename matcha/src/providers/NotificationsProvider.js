@@ -80,6 +80,46 @@ export class MessagesProvider {
       })
     })
   }
+
+  static patchNotificationByUsername(body, username) {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/notifications/username/${username}`, {
+        method: 'PATCH',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(body)
+      })
+      .then((response) => {
+
+        response.json()
+        .then((data) => {
+
+          if (!response.ok) {
+            return rej(data)
+          }
+
+          res(data)
+        })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, patching notification by username.' }]
+          })
+        })
+      })
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, patching notification by username.' }]
+        })
+      })
+    })
+  }
 }
 
 export default MessagesProvider

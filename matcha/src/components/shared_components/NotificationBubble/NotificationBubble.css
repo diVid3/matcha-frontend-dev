@@ -1,0 +1,32 @@
+.notification-bubble {
+  position: absolute;
+  top: 4px;
+  right: -10px;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  background-color: #c80000;
+  height: 18px;
+  width: 18px;
+  text-align: center;
+  z-index: 1;
+  padding-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-bubble-mobile {
+  display: inline-block;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  background-color: #c80000;
+  height: 18px;
+  width: 18px;
+  text-align: center;
+  padding-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

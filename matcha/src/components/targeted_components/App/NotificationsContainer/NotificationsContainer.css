@@ -1,0 +1,38 @@
+.notifications-container {
+  position: relative;
+  background-color: white;
+  border-radius: 5px;
+  max-height: 500px;
+  max-width: 300px;
+  width: 80vw;
+  min-height: 50vh;
+}
+
+.notifications-container-notification {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0px 20px 20px 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--highlight);
+}
+
+.notifications-container-notification:first-child {
+  border-top: none;
+}
+
+.notifications-container-notification:last-child {
+  margin-bottom: 0px;
+  padding-bottom: 20px;
+}
+
+.notifications-container-notification-text {
+  color: var(--highlight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notifications-container-notification-text-unread {
+  color: var(--midtone);
+}

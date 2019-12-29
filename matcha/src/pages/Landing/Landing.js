@@ -108,7 +108,7 @@ export class Landing extends Component {
 
     switch (this.state.formToShow) {
       case "login":
-        formToReturn = <LoginForm switchForm={this.switchForm} />
+        formToReturn = <LoginForm switchForm={this.switchForm} getNotificationData={this.props.getNotificationData}/>
         break
       case "register":
         formToReturn = <RegisterForm switchForm={this.switchForm} />

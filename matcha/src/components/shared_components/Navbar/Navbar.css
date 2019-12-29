@@ -171,6 +171,25 @@ nav {
   transform: rotateZ(25deg);
 }
 
+.nav-desk-item-icon-container {
+  position: relative;
+}
+
+.nav-link-item-container {
+  position: relative;
+}
+
+.nav-link-notifications {
+  display: inline-block;
+  padding: 10px 10px 10px 20px;
+}
+
+.nav-link-notifications-fill {
+  background-color: var(--highlight-light);
+  display: flex;
+  align-items: center;
+}
+
 @media only screen and (min-width: 600px) {
   .nav-items-wrapper {
     display: none;
