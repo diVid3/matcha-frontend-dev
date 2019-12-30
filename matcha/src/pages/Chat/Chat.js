@@ -240,25 +240,55 @@ export class Chat extends Component {
       const socket = SocketWrapper.getSocket()
 
       socket.on('fromServerChatMessage', (data) => {
-        if (this._isMounted && !this.state.displayChatCards) {
+        if (this._isMounted) {
 
-          const newSelectedFriendFeed = this.state.selectedFriendFeed.slice()
-          newSelectedFriendFeed.push(data)
+          if (!this.state.displayChatCards) {
 
-          const newFriendFeeds = this.state.friendFeeds.slice()
-          newFriendFeeds[this.selectedFriendIndex].rows = newSelectedFriendFeed
+            const newSelectedFriendFeed = this.state.selectedFriendFeed.slice()
+            newSelectedFriendFeed.push(data)
+  
+            const newFriendFeeds = this.state.friendFeeds.slice()
+            newFriendFeeds[this.selectedFriendIndex].rows = newSelectedFriendFeed
+  
+            const newLastMessages = newFriendFeeds.map((feed) => feed.rows.slice(-1))
+  
+            this.setState({
+              selectedFriendFeed: newSelectedFriendFeed,
+              friendFeeds: newFriendFeeds,
+              lastMessages: newLastMessages
+            }, () => {
+              // Scrolling the div in case new messages
+              const chatDiv = document.getElementById('chatToScroll')
+              chatDiv.scrollTop = chatDiv.scrollHeight
+            })
+          }
+          else {
 
-          const newLastMessages = newFriendFeeds.map((feed) => feed.rows.slice(-1))
+            const targetedFriendUsername = data.username
+            let targetedFriendIndex = undefined
 
-          this.setState({
-            selectedFriendFeed: newSelectedFriendFeed,
-            friendFeeds: newFriendFeeds,
-            lastMessages: newLastMessages
-          }, () => {
-            // Scrolling the div in case new messages
-            const chatDiv = document.getElementById('chatToScroll')
-            chatDiv.scrollTop = chatDiv.scrollHeight
-          })
+            this.state.friendsInfo.some((friend, i) => {
+              if (friend.username === targetedFriendUsername) {
+                targetedFriendIndex = i
+              }
+              return friend.username === targetedFriendUsername
+            })
+
+            if (targetedFriendIndex === undefined) {
+
+              return
+            }
+
+            const newFriendFeeds = this.state.friendFeeds.slice()
+            newFriendFeeds[targetedFriendIndex].rows.push(data)
+
+            const newLastMessages = newFriendFeeds.map((feed) => feed.rows.slice(-1))
+
+            this.setState({
+              friendFeeds: newFriendFeeds,
+              lastMessages: newLastMessages
+            })
+          }
         }
       })
 
@@ -278,9 +308,9 @@ export class Chat extends Component {
         }
       })
 
-      console.log(this.state.friendsInfo)
-      console.log(this.state.friendFeeds)
-      console.log(this.state.lastMessages)
+      console.log('friendsInfo: ', this.state.friendsInfo)
+      console.log('friendFeeds: ', this.state.friendFeeds)
+      console.log('lastMessages: ', this.state.lastMessages)
     })
     .catch((json) => {
 
