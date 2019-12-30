@@ -780,7 +780,6 @@ export class Settings extends Component {
       let newPicPath3 = (obj[1].rows[2] && obj[1].rows[2].pic_path) ? (`${Config.backend}/` + obj[1].rows[2].pic_path) : ''
       let newPicPath4 = (obj[1].rows[3] && obj[1].rows[3].pic_path) ? (`${Config.backend}/` + obj[1].rows[3].pic_path) : ''
 
-      // TODO: The pictures will simply link to a path hosted publicly on the backend.
       this.setState({
         isBusy: false,
         userInfo: obj[0].rows[0],
@@ -1122,8 +1121,6 @@ export class Settings extends Component {
                         }
                       }}
                     />
-                    {/* <div className="settings-page-update-location-button-container">
-                    </div> */}
                   </div>
                 </div>
                 <div className="settings-page-part settings-page-part-2">
