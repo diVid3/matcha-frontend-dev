@@ -78,6 +78,82 @@ export class UsersProvider {
     })
   }
 
+  static getAllUsers() {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/users`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        },
+        credentials: 'include'
+      })
+      .then((response) => {
+
+        response.json()
+        .then((data) => {
+
+          if (!response.ok) {
+            return rej(data)
+          }
+
+          res(data)
+        })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, getting all users.' }]
+          })
+        })
+      })
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, getting all users.' }]
+        })
+      })
+    })
+  }
+
+  static getAllUsersAndTags() {
+
+    return new Promise((res, rej) => {
+
+      fetch(`${Config.backend}/api/v1.0/users/tags`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        },
+        credentials: 'include'
+      })
+      .then((response) => {
+
+        response.json()
+        .then((data) => {
+
+          if (!response.ok) {
+            return rej(data)
+          }
+
+          res(data)
+        })
+        .catch((err) => {
+  
+          rej({
+            errors: [{ code: 'PROVIDER', message: 'Fetch (converting json) failed, getting all users and tags.' }]
+          })
+        })
+      })
+      .catch((err) => {
+
+        rej({
+          errors: [{ code: 'PROVIDER', message: 'Fetch failed, getting all users and tags.' }]
+        })
+      })
+    })
+  }
+
   static getUserByUsername(body) {
 
     return new Promise((res, rej) => {

@@ -19,6 +19,7 @@ import PromiseCancel from './helpers/PromiseCancel'
 import UsersProvider from './providers/UsersProvider'
 import NotificationsProvider from './providers/NotificationsProvider'
 import SessionProvider from './providers/SessionProvider'
+import Search from './pages/Search/Search'
 
 Modal.setAppElement('#root');
 
@@ -37,15 +38,6 @@ const modalStyle = {
   }
 }
 
-// Data:
-//
-// {
-//   targetUsername: 'diVid3'
-//   notification: 'You received a message',
-//   read: '0',
-//   origUsername: 'tomGun1911'
-// }
-
 class App extends Component {
   constructor(props) {
     super()
@@ -54,7 +46,8 @@ class App extends Component {
       modalOpen: false,
       ownInfo: null,
       notifications: [],
-      redirectTo: ''
+      redirectTo: '',
+      prevBrowseSearchQuery: ''
     }
 
     this.pendingPromises = []
@@ -229,17 +222,6 @@ class App extends Component {
         })
       })
     }
-
-    // TODO: When the app mounts, the notification store should fetch the previous notifications stored in the db
-    // as well setting up the listeners for new notifications using the SocketWrapper, the notificationContainer
-    // simply projects the contents of the notification store. The notification icons will simply display a bubble
-    // if any of the notifications in the notification store is unread, i.e. it'll simply be a count of the unread
-    // notifications. When a new notification is received and the notification container is unmounted (modal closed)
-    // the notification will be unread. If you receive any notification whilst the notificationContainer is mounted,
-    // that notification will be read. The determining of a notification being read or unread should be done before
-    // that notification is commited to the DB. When the notificationContainer mounts, it should pull all the
-    // notifications from the notification store and check which one's is not read, they should be collected and
-    // a promise.all patch request should fire to change their status from unread to read in the DB.
   }
 
   componentWillUnmount() {
@@ -274,7 +256,8 @@ class App extends Component {
                 '/profile',
                 '/profile/:username',
                 '/settings',
-                '/chat'
+                '/chat',
+                '/search'
               ]}
             >
               <header>
@@ -284,6 +267,7 @@ class App extends Component {
               <Route path="/profile/:username" component={Profile}/>
               <Route path="/settings" component={Settings}/>
               <Route path="/chat" component={Chat}/>
+              <Route path="/search" component={Search}/>
             </ProtectedRoute>
             <PublicRoute path="/">
               <Landing getNotificationData={this.getNotificationData}/>

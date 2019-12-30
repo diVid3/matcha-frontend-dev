@@ -1,0 +1,15 @@
+.search-page {
+  max-width: 900px;
+  margin: 0px auto;
+  padding-bottom: 20px;
+}
+
+.search-page-loading-container {
+  margin: 15vh auto 0px auto;
+  width: 140px;
+  height: 140px;
+}
+
+.search-page-container {
+
+}
