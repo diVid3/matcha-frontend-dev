@@ -1,8 +1,8 @@
 .chat-bubble {
   display: flex;
   position: relative;
-  padding-bottom: 18px;
-  margin-top: 16px;
+  padding-bottom: 16px;
+  margin-top: 12px;
 }
 
 .chat-bubble:first-child {
@@ -74,7 +74,7 @@
   position: absolute;
   bottom: 0px;
   font-size: 10px;
-  color: silver;
+  color: var(--placeholder)
 }
 
 .chat-bubble-date-time-left {
@@ -87,7 +87,8 @@
 
 @media only screen and (min-width: 400px) {
   .chat-bubble {
-    padding-bottom: 20px;
+    margin-top: 14px;
+    padding-bottom: 18px;
   }
   .chat-bubble-text {
     font-size: 14px;
@@ -100,7 +101,8 @@
 
 @media only screen and (min-width: 600px) {
   .chat-bubble {
-    padding-bottom: 22px;
+    margin-top: 16px;
+    padding-bottom: 20px;
   }
   .chat-bubble-text {
     font-size: 16px;

@@ -73,6 +73,7 @@
   top: 0px;
   right: 0px;
   color: var(--placeholder);
+  font-size: 10px;
 }
 
 .chat-card-last-message {
@@ -106,6 +107,9 @@
   .chat-card-username {
     font-size: 12px;
   }
+  .chat-card-last-message-date {
+    font-size: 12px;
+  }
 }
 
 @media only screen and (min-width: 600px) {
@@ -123,9 +127,12 @@
     width: calc(100% - 120px);
   }
   .chat-card-text {
-    font-size: 16px;
+    font-size: 15px;
   }
   .chat-card-username {
+    font-size: 14px;
+  }
+  .chat-card-last-message-date {
     font-size: 14px;
   }
 }

@@ -44,7 +44,8 @@
   border-bottom: 1px solid var(--highlight-light);
   padding: 10px;
   position: relative;
-  background-color: rgb(245, 245, 245);
+  /* background-color: rgb(245, 245, 245); */
+  background-color: rgba(143, 48, 188, 0.04);
   overflow: auto;
 }
 
@@ -237,10 +238,10 @@
 
 @media only screen and (min-width: 600px) {
   .chat-page-chat-session-top-bar-left-name {
-    font-size: 16px;
+    font-size: 15px;
   }
   .chat-page-chat-session-top-bar-right-presence-word {
-    font-size: 16px;
+    font-size: 15px;
     margin-right: 14px;
   }
   .chat-page-chat-session-top-bar {
@@ -268,7 +269,7 @@
     margin-left: 14px;
   }
   .chat-page-chat-session-bottom-bar-text-input {
-    font-size: 16px;
+    font-size: 15px;
   }
   .chat-page-chat-session-top-bar-left-pp-img {
     height: 52px;
@@ -280,6 +281,6 @@
     height: 24px;
   }
   .chat-page-chat-session-no-friends-msg {
-    font-size: 16px;
+    font-size: 15px;
   }
 }

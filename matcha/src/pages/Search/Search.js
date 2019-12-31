@@ -3,8 +3,8 @@ import { Redirect } from 'react-router-dom'
 import UsersProvider from '../../providers/UsersProvider'
 import PromiseCancel from '../../helpers/PromiseCancel'
 import LoadingBlocks from '../../components/shared_components/LoadingBlocks/LoadingBlocks'
-import UserFilter from '../../helpers/UserFilter'
-import ParseFilterSortParam from '../../helpers/ParseFilterSortParam'
+import UserSortAndFilter from '../../helpers/UserSortAndFilter'
+import UserFilter from '../../components/shared_components/UserFilter/UserFilter'
 
 import './Search.css'
 
@@ -13,60 +13,92 @@ export class Search extends Component {
     super()
 
     this.state = {
-      isBusy: true,
+      isBusy: false,
       redirectTo: ''
     }
 
     this.pendingPromises = []
     this.ownInfo = null
     this.allUsersAndTags = null
+
+    this.filterThis = this.filterThis.bind(this)
+  }
+
+  filterThis(queryParam) {
+
+    // TODO: This does not cause the component to remount as was initially thought, but it still causes
+    // a store to the history api, which is good, so if this method is called, the query param can be stored
+    // in the App component to enable detection of custom user input into the URL bar and not act on it.
+    //
+    // So a setState is required to affect the history api, but a manual search should be kicked off here...
+    //
+    // You need to also manually run the code that is currently in componentDidMount().
+    this.setState({
+      redirectTo: '/search' + queryParam
+    })
   }
 
   componentDidMount() {
 
-    const cancelableGetOwnInfoPromise = PromiseCancel.makeCancelable(
-      UsersProvider.getSessionUsername()
-    )
+    // TODO: Only pre-load / fetch data + filter + sort if (this.props.location.search) is true
+    // otherwise, fetch + filter data as 'Search' + present another filter + sort when the user
+    // clicks on search.
 
-    const cancelableGetAllUsersAndTagsPromise = PromiseCancel.makeCancelable(
-      UsersProvider.getAllUsersAndTags()
-    )
-
-    this.pendingPromises.push(cancelableGetOwnInfoPromise)
-    this.pendingPromises.push(cancelableGetAllUsersAndTagsPromise)
-
-    Promise.all([
-      cancelableGetOwnInfoPromise.promise,
-      cancelableGetAllUsersAndTagsPromise.promise
-    ])
-    .then((json) => {
-
-      this.ownInfo = json[0]
-      this.allUsersAndTags = json[1].rows.filter((user) => user.username !== this.ownInfo.username)
-
-      console.log(UserFilter.flattenUsersAndTags(this.allUsersAndTags))
-
-      // TODO: Need to add the 'matcha' default tag to the system otherwise the DB left joing is going to
-      // complicate things...
-
-      if (this.props.location.search) {
-
-        ParseFilterSortParam.getFilterConfig(this.props.location.search)
-      }
+    if (this.props.location.search) {
 
       this.setState({
-        isBusy: false
+        isBusy: true
       })
-    })
-    .catch((json) => {
 
-      sessionStorage.setItem('viewError', '1')
+      const cancelableGetOwnInfoPromise = PromiseCancel.makeCancelable(
+        UsersProvider.getSessionUsername()
+      )
   
-      this.setState({
-        isBusy: false,
-        redirectTo: '/oops'
+      const cancelableGetAllUsersAndTagsPromise = PromiseCancel.makeCancelable(
+        UsersProvider.getAllUsersAndTags()
+      )
+  
+      this.pendingPromises.push(cancelableGetOwnInfoPromise)
+      this.pendingPromises.push(cancelableGetAllUsersAndTagsPromise)
+  
+      Promise.all([
+        cancelableGetOwnInfoPromise.promise,
+        cancelableGetAllUsersAndTagsPromise.promise
+      ])
+      .then((json) => {
+  
+        json[1].rows.some((user) => {
+          if (user.username === json[0].username) {
+            this.ownInfo = user
+          }
+          return user.username === json[0].username
+        })
+  
+        if (!this.ownInfo) {
+          throw new Error('couldn\'t find own user data for the search filter!')
+        }
+  
+        this.allUsersAndTags = UserSortAndFilter.flattenUsersAndTags(json[1].rows.filter((user) => user.username !== this.ownInfo.username))
+  
+        console.log(this.allUsersAndTags)
+        this.allUsersAndTags = UserSortAndFilter.filterData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
+        UserSortAndFilter.sortData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
+        console.log(this.allUsersAndTags)
+  
+        this.setState({
+          isBusy: false
+        })
       })
-    })
+      .catch((json) => {
+  
+        sessionStorage.setItem('viewError', '1')
+    
+        this.setState({
+          isBusy: false,
+          redirectTo: '/oops'
+        })
+      })
+    }
   }
 
   componentWillUnmount() {
@@ -88,7 +120,10 @@ export class Search extends Component {
               <LoadingBlocks/>
             </div>
           : <div className="search-page-container">
-
+              <UserFilter
+                search={true}
+                filterThis={this.filterThis}
+              />
             </div>
         }
       </div>

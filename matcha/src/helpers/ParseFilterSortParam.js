@@ -6,8 +6,6 @@ export class ParseFilterSortParam {
 
     const filterOptions = queryParam.slice(1).split('&')
 
-    console.log(filterOptions)
-
     filterOptions.forEach(option => {
 
       const keyValArr = option.split('=')
@@ -33,7 +31,24 @@ export class ParseFilterSortParam {
       }
     })
 
-    console.log(obj)
+    return obj
+  }
+
+  static getSortConfig(queryParam) {
+
+    const obj = {}
+
+    const filterOptions = queryParam.slice(1).split('&')
+
+    filterOptions.forEach(option => {
+
+      const keyValArr = option.split('=')
+
+      if (keyValArr[0] === 'sort') {
+
+        obj.sort = keyValArr[1]
+      }
+    })
 
     return obj
   }
