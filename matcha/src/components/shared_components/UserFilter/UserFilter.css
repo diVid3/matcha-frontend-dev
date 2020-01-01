@@ -19,7 +19,8 @@
 .user-filter-tag-picker {
   /* width: calc(50% - 10px); */
   /* width: 50%; */
-  width: 100%;
+  /* width: 100%; */
+  flex-grow: 1;
   position: relative;
   /* border: 1px solid var(--highlight);
   border-radius: 5px; */
@@ -34,7 +35,7 @@
 .user-filter-tag-picker-heading {
   color: var(--midtone);
   font-size: 13px;
-  margin: 0px 0px 10px 0px;
+  margin: 0px 0px 6px 0px;
 }
 
 .user-filter-tag-picker-tags-container {
@@ -67,7 +68,8 @@
 .user-filter-sliders-container {
   /* width: calc(50% - 10px); */
   /* width: 50%; */
-  width: 100%;
+  /* width: 100%; */
+  flex-grow: 1;
   /* padding: 0px 0px 0px 10px; */
 }
 
@@ -127,6 +129,12 @@
   border: none;
   box-shadow: 0px 0px 5px 0px silver;
   background: linear-gradient(90deg, var(--accent-other), var(--accent));
+}
+
+.user-filter-button-disabled {
+  /* color: var(--midtone);
+  background: var(--highlight-light); */
+  opacity: 0.5;
 }
 
 .user-filter-button:hover {

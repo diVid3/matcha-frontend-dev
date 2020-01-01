@@ -51,10 +51,19 @@ class App extends Component {
     }
 
     this.pendingPromises = []
+    this.prevSearch = ''
 
     this.openModal = this.openModal.bind(this)
     this.getNotificationData = this.getNotificationData.bind(this)
     this.readAllNotifications = this.readAllNotifications.bind(this)
+    this.savePrevSearch = this.savePrevSearch.bind(this)
+  }
+
+  savePrevSearch(queryParam) {
+
+    console.log('savePrevSearch called!')
+
+    this.prevSearch = queryParam
   }
 
   readAllNotifications() {
@@ -267,7 +276,15 @@ class App extends Component {
               <Route path="/profile/:username" component={Profile}/>
               <Route path="/settings" component={Settings}/>
               <Route path="/chat" component={Chat}/>
-              <Route path="/search" component={Search}/>
+              <Route path="/search"
+                render={(props) =>
+                  <Search
+                    {...props}
+                    savePrevSearch={this.savePrevSearch}
+                    prevSearch={this.prevSearch}
+                  />
+                }
+              />
             </ProtectedRoute>
             <PublicRoute path="/">
               <Landing getNotificationData={this.getNotificationData}/>

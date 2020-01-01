@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import ParseFilterSortParam from '../../../helpers/ParseFilterSortParam'
+import PropTypes from 'prop-types';
 
 import './UserFilter.css'
 
@@ -46,7 +48,67 @@ export class UserFilter extends Component {
     this.handleButtonClick = this.handleButtonClick.bind(this)
   }
 
+  componentDidMount() {
+
+    if (
+      this.props.locationSearch &&
+      this.props.appSavedPrevSearch &&
+      this.props.locationSearch === this.props.appSavedPrevSearch
+    ) {
+
+      const config = ParseFilterSortParam.getFilterConfig(this.props.locationSearch)
+
+      const obj = {}
+
+      if (config.distance || config.distance === 0) {
+
+        obj.furthestDistance = config.distance
+      }
+
+      if (config.age) {
+
+        obj.highestAge = config.age
+      }
+
+      if (config.rating || config.rating === 0) {
+
+        obj.lowestRating = config.rating
+      }
+
+      if (config.tags) {
+
+        const newTagClickStates = [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+
+        config.tags.forEach((tag) => {
+          const targetIndex = userFilterAcceptedTags.indexOf(tag)
+          newTagClickStates[targetIndex] = true
+        })
+
+        obj.tagClickStates = newTagClickStates
+      }
+
+      this.setState(obj)
+    }
+  }
+
   handleButtonClick(e) {
+
+    if (!this.props.canClick) {
+
+      return
+    }
 
     if (
       this.state.furthestDistance <= -1 &&
@@ -77,7 +139,7 @@ export class UserFilter extends Component {
 
     if (!(this.state.tagClickStates.every((tag) => !tag))) {
 
-      let tagStr = 'tags='
+      let tagStr = '&tags='
 
       this.state.tagClickStates.forEach((val, i) => {
 
@@ -91,7 +153,9 @@ export class UserFilter extends Component {
       queryParam += tagStr
     }
 
-    this.props.filterThis(queryParam)
+    queryParam = queryParam.replace(/\?&/g, '?')
+
+    this.props.giveConfig(queryParam)
   }
 
   handleDistanceChange(e) {
@@ -143,7 +207,7 @@ export class UserFilter extends Component {
             }`}>
             <div className="user-filter-slider-container-heading-container">
               <p className="user-filter-slider-container-heading">
-                Furthest distance
+                Within distance
               </p>
               {
                 this.state.furthestDistance <= -1
@@ -221,7 +285,7 @@ export class UserFilter extends Component {
               : 'user-filter-tag-picker-disabled'
           }`}>
             <p className="user-filter-tag-picker-heading">
-              Should have these tags
+              Should at least have these tags
             </p>
             <div className="user-filter-tag-picker-tags-container">
               {
@@ -244,7 +308,11 @@ export class UserFilter extends Component {
         </div>
         <div className="user-filter-button-container">
           <button
-            className="user-filter-button"
+            className={`user-filter-button ${
+              !this.props.canClick
+                ? 'user-filter-button-disabled'
+                : ''
+            }`}
             type="button"
             onClick={this.handleButtonClick}
           >
@@ -258,6 +326,20 @@ export class UserFilter extends Component {
       </div>
     )
   }
+}
+
+// search={true}
+// giveConfig={this.getSearchConfig}
+// canClick={true}
+// locationSearch={this.props.location.search}
+// appSavedPrevSearch={this.props.prevSearch}
+
+UserFilter.propTypes = {
+  search: PropTypes.bool,
+  giveConfig: PropTypes.func.isRequired,
+  canClick: PropTypes.bool,
+  locationSearch: PropTypes.string.isRequired,
+  appSavedPrevSearch: PropTypes.string.isRequired
 }
 
 export default UserFilter

@@ -44,7 +44,7 @@ export class UserSortAndFilter {
       filteredData = filteredData.filter((user) => user.age <= config.age)
     }
 
-    if (config.distance) {
+    if (config.distance || config.distance === 0) {
 
       filteredData = filteredData.filter((user) => {
         const myCoords = { latitude: ownInfo.latitude, longitude: ownInfo.longitude }
@@ -56,7 +56,7 @@ export class UserSortAndFilter {
       })
     }
 
-    if (config.rating) {
+    if (config.rating || config.rating === 0) {
 
       filteredData = filteredData.filter((user) => user.fame_rating >= config.rating)
     }
