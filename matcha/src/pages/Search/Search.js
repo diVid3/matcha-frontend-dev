@@ -37,17 +37,15 @@ export class Search extends Component {
   // then setState({ data: this.allUsersAndTags }).
   getSortConfig(queryParam) {
 
-    console.log(this.state.data)
+    const cleanQueryParam = this.props.location.search.replace(/&sort=[\w]+/g, '')
 
-    this.props.history.push('/search' + this.props.location.search + queryParam)
-    this.props.savePrevSearch(this.props.location.search + queryParam)
+    this.props.history.push('/search' + cleanQueryParam + queryParam)
+    this.props.savePrevSearch(cleanQueryParam + queryParam)
 
-    UserSortAndFilter.sortData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
+    UserSortAndFilter.sortData(cleanQueryParam + queryParam, this.ownInfo, this.allUsersAndTags)
 
     this.setState({
       data: this.allUsersAndTags
-    }, () => {
-      console.log(this.state.data)
     })
   }
 
@@ -66,9 +64,6 @@ export class Search extends Component {
 
     this.setState({
       data: newData
-    }, () => {
-
-      console.log(this.state.data)
     })
   }
 
@@ -114,15 +109,10 @@ export class Search extends Component {
       this.allUsersAndTags = UserSortAndFilter.flattenUsersAndTags(json[1].rows.filter((user) => user.username !== this.ownInfo.username))
       this.allUsersAndTags = UserSortAndFilter.filterData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
 
-      // TODO: Use this here after getting sort config
-      // UserSortAndFilter.sortData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
-
       this.setState({
         isBusy: false,
         data: this.allUsersAndTags
       })
-
-      console.log(this.state.data)
     })
     .catch((json) => {
 
@@ -136,12 +126,6 @@ export class Search extends Component {
   }
 
   componentDidMount() {
-
-    console.log('Search mounted!')
-
-    // TODO: Only pre-load / fetch data + filter + sort if (this.props.location.search) is true
-    // otherwise, fetch + filter data as 'Search' + present another filter + sort when the user
-    // clicks on search.
 
     if (
       this.props.location.search &&
@@ -184,15 +168,15 @@ export class Search extends Component {
         this.allUsersAndTags = UserSortAndFilter.flattenUsersAndTags(json[1].rows.filter((user) => user.username !== this.ownInfo.username))
         this.allUsersAndTags = UserSortAndFilter.filterData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
 
-        // TODO: Use this here after getting sort config, might need to test with .includes('sort')
-        // UserSortAndFilter.sortData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
+        if (this.props.location.search.includes('sort')) {
+          // console.log(this.props.location.search)
+          UserSortAndFilter.sortData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
+        }
 
         this.setState({
           isBusy: false,
           data: this.allUsersAndTags
         })
-
-        console.log(this.state.data)
       })
       .catch((json) => {
   

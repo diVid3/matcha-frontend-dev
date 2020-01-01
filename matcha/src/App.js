@@ -61,8 +61,6 @@ class App extends Component {
 
   savePrevSearch(queryParam) {
 
-    console.log('savePrevSearch called!')
-
     this.prevSearch = queryParam
   }
 
@@ -154,8 +152,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-
-    console.log('App component has mounted!')
 
     // This is done so that if the user did already log in, and the browser is refreshed, the sockedID will migrate
     // on the backend.
