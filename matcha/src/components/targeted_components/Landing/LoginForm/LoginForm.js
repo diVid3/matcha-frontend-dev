@@ -178,6 +178,14 @@ export class LoginForm extends Component {
             redirectTo: '/profile'
           })
         }
+        else if (json.message === 'Account not verified.') {
+
+          this.setState({
+            isBusy: false,
+            errorToShow: 'Account not verified'
+          })
+          this.showCorrectErrors()
+        }
         else {
 
           this.setState({
