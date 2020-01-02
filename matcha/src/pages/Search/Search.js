@@ -32,9 +32,6 @@ export class Search extends Component {
     this.getSortConfig = this.getSortConfig.bind(this)
   }
 
-  // TODO: Sorting can't be done without data, by the time you have data, the URL already contains a '?',
-  // so you can simply push the current search param + the sort string to the history api, then sort,
-  // then setState({ data: this.allUsersAndTags }).
   getSortConfig(queryParam) {
 
     const cleanQueryParam = this.props.location.search.replace(/&sort=[\w]+/g, '')
@@ -55,11 +52,7 @@ export class Search extends Component {
   // then the sort.
   getNormalFilterConfig(queryParam) {
 
-    // console.log(queryParam)
-
-    // TODO: This should simply filter the data again, stupid I know, and then just do a setState
-    // of the new data.
-
+    // This is to ensure that the filter is idempotent.
     const newData = UserSortAndFilter.filterData(queryParam, this.ownInfo, this.allUsersAndTags)
 
     this.setState({
@@ -68,8 +61,6 @@ export class Search extends Component {
   }
 
   getSearchConfig(queryParam) {
-
-    // A search is done to actually get the data for the 2nd filter and sort components.
 
     this.props.history.push('/search' + queryParam)
     this.props.savePrevSearch(queryParam)
@@ -169,7 +160,6 @@ export class Search extends Component {
         this.allUsersAndTags = UserSortAndFilter.filterData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
 
         if (this.props.location.search.includes('sort')) {
-          // console.log(this.props.location.search)
           UserSortAndFilter.sortData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
         }
 

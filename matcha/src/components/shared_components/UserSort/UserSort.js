@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
+import ParseFilterSortParam from '../../../helpers/ParseFilterSortParam'
 
 import './UserSort.css'
 
@@ -51,14 +52,19 @@ export class UserSort extends Component {
 
   componentDidMount() {
 
-    // TODO: Adjust internal state accordingly if bottom is true
-    //
+    if (
+      this.props.locationSearch &&
+      this.props.appSavedPrevSearch &&
+      this.props.locationSearch === this.props.appSavedPrevSearch &&
+      this.props.locationSearch.includes('sort')
+    ) {
 
-    // if (
-    //   this.props.locationSearch &&
-    //   this.props.appSavedPrevSearch &&
-    //   this.props.locationSearch === this.props.appSavedPrevSearch
-    // ) {
+      const config = ParseFilterSortParam.getSortConfig(this.props.locationSearch)
+
+      this.setState({
+        currentActiveButtonString: config.sort
+      })
+    }
   }
 
 
@@ -71,7 +77,7 @@ export class UserSort extends Component {
               ? 'user-sort-button-container-heading-disabled'
               : ''
           }`}>
-            Sort
+            Sort by
           </p>
           <button
             className={`user-sort-button ${
@@ -86,7 +92,7 @@ export class UserSort extends Component {
             type="button"
             onClick={this.handleButtonClickDecorator('age')}
           >
-            age
+            Age
           </button>
           <button
             className={`user-sort-button ${
@@ -101,7 +107,7 @@ export class UserSort extends Component {
             type="button"
             onClick={this.handleButtonClickDecorator('distance')}
           >
-            distance
+            Distance
           </button>
           <button
             className={`user-sort-button ${
@@ -116,7 +122,7 @@ export class UserSort extends Component {
             type="button"
             onClick={this.handleButtonClickDecorator('rating')}
           >
-            rating
+            Rating
           </button>
           <button
             className={`user-sort-button ${
@@ -131,7 +137,7 @@ export class UserSort extends Component {
             type="button"
             onClick={this.handleButtonClickDecorator('tags')}
           >
-            tags
+            Tags
           </button>
         </div>
       </div>

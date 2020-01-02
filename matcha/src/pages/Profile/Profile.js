@@ -62,7 +62,9 @@ export class Profile extends Component {
       hasReportedFake: false,
       hasBlockedUser: false, // TODO: This should be set on componentDidMount()
       isUserLoggedIn: false,
-      ownInfo: null
+      ownInfo: null,
+      personalInfo: null,
+      personalPics: null
     }
 
     this.pendingPromises = []
@@ -455,6 +457,14 @@ export class Profile extends Component {
         })
       )
 
+      const cancelableGetOwnUserInfoForLikeCheckPromise = PromiseCancel.makeCancelable(
+        UsersProvider.getUserBySession()
+      )
+
+      const cancelableGetOwnPicturesForLikeCheckPromise = PromiseCancel.makeCancelable(
+        PicturesProvider.getPicturesBySession()
+      )
+
       const cancelableGetCanViewUserPromise = PromiseCancel.makeCancelable(
         Promise.all([
           cancelableGetUserByUsernamePromise.promise,
@@ -464,7 +474,9 @@ export class Profile extends Component {
           cancelableGetUserFriendsByUsername.promise,
           cancelableGetLikersByUsernamePromise.promise,
           cancelableGetOwnUsername.promise,
-          cancelableGetUserOnlinePromise.promise
+          cancelableGetUserOnlinePromise.promise,
+          cancelableGetOwnUserInfoForLikeCheckPromise.promise,
+          cancelableGetOwnPicturesForLikeCheckPromise.promise
         ])
       )
 
@@ -477,6 +489,8 @@ export class Profile extends Component {
       this.pendingPromises.push(cancelableGetLikersByUsernamePromise)
       this.pendingPromises.push(cancelableGetOwnUsername)
       this.pendingPromises.push(cancelableGetUserOnlinePromise)
+      this.pendingPromises.push(cancelableGetOwnUserInfoForLikeCheckPromise)
+      this.pendingPromises.push(cancelableGetOwnPicturesForLikeCheckPromise)
 
       cancelableGetCanViewUserPromise.promise
       .then((obj) => {
@@ -497,6 +511,8 @@ export class Profile extends Component {
           // likers is obj[5]
           // loggedInUsername is obj[6]
           // isUserOnline is obj[7]
+          // personalInfo is obj[8]
+          // personalPics is obj[9]
 
           let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
           let newPicPath1 = (obj[2].rows[0] && obj[2].rows[0].pic_path) ? (`${Config.backend}/` + obj[2].rows[0].pic_path) : ''
@@ -532,7 +548,9 @@ export class Profile extends Component {
             hasMeAsLiker: hasMeAsLikerResult,
             hasBlockedUser: hasBlockedUserResult,
             isUserLoggedIn: obj[7].status,
-            ownInfo: obj[6]
+            ownInfo: obj[6],
+            personalInfo: obj[8].rows[0],
+            personalPics: obj[9].rows
           })
 
           const cancelableCreateViewerPromise = PromiseCancel.makeCancelable(
@@ -806,21 +824,32 @@ export class Profile extends Component {
                                 </button>
                           }
                           {
-                            this.state.hasMeAsLiker
-                              ? <button
-                                  className="profile-page-grid-buttons-button profile-page-grid-unlike-button"
-                                  type="button"
-                                  onClick={this.handleUnlike}
-                                >
-                                  Unlike
-                                </button>
-                              : <button
-                                  className="profile-page-grid-buttons-button profile-page-grid-like-button"
-                                  type="button"
-                                  onClick={this.handleLike}
-                                >
-                                  Like
-                                </button>
+                            (
+                              (
+                                this.state.personalInfo &&
+                                this.state.personalInfo.profile_pic_path !== null
+                              ) ||
+                              (
+                                this.state.personalPics &&
+                                this.state.personalPics.length
+                              )
+                            )
+                              ? this.state.hasMeAsLiker
+                                  ? <button
+                                      className="profile-page-grid-buttons-button profile-page-grid-unlike-button"
+                                      type="button"
+                                      onClick={this.handleUnlike}
+                                    >
+                                      Unlike
+                                    </button>
+                                  : <button
+                                      className="profile-page-grid-buttons-button profile-page-grid-like-button"
+                                      type="button"
+                                      onClick={this.handleLike}
+                                    >
+                                      Like
+                                    </button>
+                              : null
                           }
                         </Fragment>
                   }

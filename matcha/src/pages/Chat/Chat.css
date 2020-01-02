@@ -44,8 +44,7 @@
   border-bottom: 1px solid var(--highlight-light);
   padding: 10px;
   position: relative;
-  /* background-color: rgb(245, 245, 245); */
-  background-color: rgba(143, 48, 188, 0.04);
+  background-color: rgb(236, 236, 236);
   overflow: auto;
 }
 
