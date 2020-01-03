@@ -36,3 +36,8 @@
 .notifications-container-notification-text-unread {
   color: var(--midtone);
 }
+
+.notifications-container-empty-text {
+  color: var(--midtone);
+  padding: 20px;
+}

@@ -83,7 +83,7 @@ export class Navbar extends Component {
           </div>
           <ul className="nav-desk-items nav-desk-items-left">
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="/profile">Profile</NavLink></li>
-            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="">Browse</NavLink></li>
+            <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="/browse">Browse</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-link" to="/search">Search</NavLink></li>
             <li className="nav-desk-item nav-desk-item-left"><NavLink className="nav-desk-item-icon-chat" to="/chat"></NavLink></li>
             <li
@@ -131,7 +131,7 @@ export class Navbar extends Component {
         >
           <ul className="nav-items">
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/profile">Profile</NavLink></li>
-            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="">Browse</NavLink></li>
+            <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/browse">Browse</NavLink></li>
             <li><NavLink className="nav-link" onClick={this.toggleMobileMenu} to="/chat">Chat</NavLink></li>
             <li
               className="nav-link-notifications-fill"

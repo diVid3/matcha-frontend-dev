@@ -1,0 +1,152 @@
+.user-card {
+  width: 100%;
+  padding: 10px;
+  background-color: white;
+  box-shadow: 0px 4px 3px 1px lightgray;
+  border-radius: 5px;
+  margin-bottom: 12px;
+  height: 100px;
+  display: block;
+  position: relative;
+}
+
+.user-card:last-child {
+  margin-bottom: 0px;
+}
+
+.user-card:hover {
+  cursor: pointer;
+}
+
+.user-card-flex-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.user-card-pp {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px 0px silver;
+}
+
+.user-card-info-container {
+  display: flex;
+  margin-left: 12px;
+  flex-grow: 1;
+}
+
+.user-card-stats-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 60px;
+  margin-right: 10px;
+}
+
+.user-card-stat-block {
+}
+
+.user-card-stat-block-heading {
+  color: var(--placeholder);
+  font-size: 10px;
+  margin-bottom: 1px;
+}
+
+.user-card-stat-block-stat {
+  display: inline-block;
+  color: var(--midtone);
+  font-size: 10px;
+  padding: 3px;
+  border-radius: 5px;
+  background-color: var(--highlight-light);
+  text-align: center;
+}
+
+.user-card-stuff-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-card-stuff-username {
+  color: var(--midtone);
+  font-size: 10px;
+  margin-bottom: 6px;
+}
+
+.user-card-bio-container {
+  flex-grow: 1;
+  color: var(--midtone);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* padding: 4px;
+  border: 1px solid var(--highlight-light);
+  border-radius: 2px; */
+}
+
+@media only screen and (min-width: 400px) {
+  .user-card {
+    margin: 0px 0px 16px 0px;
+    padding: 13px;
+    margin-bottom: 16px;
+    height: 126px;
+  }
+  .user-card-pp {
+    width: 100px;
+    height: 100px;
+  }
+  .user-card-stats-container {
+    width: 70px;
+  }
+  .user-card-stat-block-stat {
+    font-size: 12px;
+    padding: 5px;
+  }
+  .user-card-bio-container {
+    font-size: 12px;
+  }
+  .user-card-stuff-username {
+    color: var(--midtone);
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  .user-card-bio-container {
+    /* padding: 6px; */
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .user-card {
+    margin: 0px 0px 20px 0px;
+    padding: 16px;
+    margin-bottom: 20px;
+    height: 152px;
+  }
+  .user-card-pp {
+    width: 120px;
+    height: 120px;
+  }
+  .user-card-stats-container {
+    width: 80px;
+    margin-right: 20px;
+  }
+  .user-card-stat-block-stat {
+    font-size: 13px;
+  }
+  .user-card-bio-container {
+    font-size: 13px;
+  }
+  .user-card-stuff-username {
+    color: var(--midtone);
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .user-card-bio-container {
+    /* padding: 10px; */
+  }
+}

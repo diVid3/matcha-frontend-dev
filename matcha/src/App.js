@@ -20,6 +20,7 @@ import UsersProvider from './providers/UsersProvider'
 import NotificationsProvider from './providers/NotificationsProvider'
 import SessionProvider from './providers/SessionProvider'
 import Search from './pages/Search/Search'
+import Browse from './pages/Browse/Browse'
 
 Modal.setAppElement('#root');
 
@@ -52,16 +53,23 @@ class App extends Component {
 
     this.pendingPromises = []
     this.prevSearch = ''
+    this.prevBrowse = ''
 
     this.openModal = this.openModal.bind(this)
     this.getNotificationData = this.getNotificationData.bind(this)
     this.readAllNotifications = this.readAllNotifications.bind(this)
     this.savePrevSearch = this.savePrevSearch.bind(this)
+    this.savePrevBrowse = this.savePrevBrowse.bind(this)
   }
 
   savePrevSearch(queryParam) {
 
     this.prevSearch = queryParam
+  }
+
+  savePrevBrowse(queryParam) {
+
+    this.prevBrowse = queryParam
   }
 
   readAllNotifications() {
@@ -262,7 +270,8 @@ class App extends Component {
                 '/profile/:username',
                 '/settings',
                 '/chat',
-                '/search'
+                '/search',
+                '/browse'
               ]}
             >
               <header>
@@ -278,6 +287,15 @@ class App extends Component {
                     {...props}
                     savePrevSearch={this.savePrevSearch}
                     prevSearch={this.prevSearch}
+                  />
+                }
+              />
+              <Route path="/browse"
+                render={(props) =>
+                  <Browse
+                    {...props}
+                    savePrevBrowse={this.savePrevBrowse}
+                    prevBrowse={this.prevBrowse}
                   />
                 }
               />

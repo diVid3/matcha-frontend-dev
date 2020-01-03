@@ -34,7 +34,7 @@
 
 .user-filter-tag-picker-heading {
   color: var(--midtone);
-  font-size: 13px;
+  font-size: 10px;
   margin: 0px 0px 6px 0px;
 }
 
@@ -48,7 +48,7 @@
   display: inline-block;
   margin: 0px 8px 8px 0px;
   padding: 3px 10px 3px 10px;
-  font-size: 14px;
+  font-size: 10px;
   border-radius: 500px;
   color: gray;
   background-color: white;
@@ -95,13 +95,13 @@
 .user-filter-slider-container-heading {
   display: inline-block;
   color: var(--midtone);
-  font-size: 13px;
+  font-size: 10px;
 }
 
 .user-filter-slider-container-value {
   display: inline-block;
   color: var(--midtone);
-  font-size: 13px;
+  font-size: 10px;
 }
 
 .user-filter-slider {
@@ -120,11 +120,11 @@
 }
 
 .user-filter-button {
-  height: 48px;
-  width: 100px;
+  height: 38px;
+  width: 80px;
   border-radius: 5px;
   color: white;
-  font-size: 14px;
+  font-size: 10px;
   /* margin: 20px 0px 0px 0px; */
   border: none;
   box-shadow: 0px 0px 5px 0px silver;
@@ -139,4 +139,60 @@
 
 .user-filter-button:hover {
   cursor: pointer;
+}
+
+@media only screen and (min-width: 400px) {
+  /* .user-sort-button-container-heading {
+    font-size: 12px;
+  }
+  .user-sort-button {
+    font-size: 12px;
+  } */
+  .user-filter-slider-container-heading {
+    font-size: 12px;
+  }
+  .user-filter-slider-container-value {
+    font-size: 12px;
+  }
+  .user-filter-tag-picker-heading {
+    font-size: 12px;
+  }
+  .user-filter-tag-picker-tag {
+    font-size: 12px;
+  }
+  .user-filter-button {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  /* .user-sort-button-container-heading {
+    color: var(--midtone);
+    font-size: 13px;
+    margin: 0px 0px 10px 0px;
+  }
+  .user-sort-button {
+    height: 48px;
+    width: 100px;
+    font-size: 13px;
+  } */
+  .user-filter-slider-container-heading {
+    font-size: 13px;
+  }
+  .user-filter-slider-container-value {
+    display: inline-block;
+    color: var(--midtone);
+    font-size: 13px;
+  }
+  .user-filter-tag-picker-heading {
+    font-size: 13px;
+  }
+  .user-filter-tag-picker-tag {
+    font-size: 13px;
+  }
+  .user-filter-button {
+    height: 48px;
+    width: 100px;
+    font-size: 13px;
+  }
 }

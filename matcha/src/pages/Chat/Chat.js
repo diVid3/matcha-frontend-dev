@@ -307,10 +307,6 @@ export class Chat extends Component {
           })
         }
       })
-
-      console.log('friendsInfo: ', this.state.friendsInfo)
-      console.log('friendFeeds: ', this.state.friendFeeds)
-      console.log('lastMessages: ', this.state.lastMessages)
     })
     .catch((json) => {
 
@@ -346,22 +342,26 @@ export class Chat extends Component {
             : <div className="chat-page-container">
                 {
                   this.state.displayChatCards
-                    ? <div className="chat-page-chat-cards-container">
-                        {
-                          this.state.friendsInfo.map((info, i) => 
-                            <ChatCard
-                              key={info.user_id}
-                              profilePicPath={info.profile_pic_path}
-                              username={info.username}
-                              firstName={info.first_name}
-                              lastName={info.last_name}
-                              lastMessageDate={this.getLastMessageTimeIssued(this.state.lastMessages[i])}
-                              lastMessage={this.getLastMessageMessage(this.state.lastMessages[i])}
-                              selectHandler={this.handleSelectFriendDecorator(i)}
-                            />
-                          )
-                        }
-                      </div>
+                    ? this.state.friendsInfo.length
+                      ? <div className="chat-page-chat-cards-container">
+                          {
+                            this.state.friendsInfo.map((info, i) => 
+                              <ChatCard
+                                key={info.user_id}
+                                profilePicPath={info.profile_pic_path}
+                                username={info.username}
+                                firstName={info.first_name}
+                                lastName={info.last_name}
+                                lastMessageDate={this.getLastMessageTimeIssued(this.state.lastMessages[i])}
+                                lastMessage={this.getLastMessageMessage(this.state.lastMessages[i])}
+                                selectHandler={this.handleSelectFriendDecorator(i)}
+                              />
+                            )
+                          }
+                        </div>
+                      : <p className="chat-page-container-no-friends">
+                          To chat, first make a few friends
+                        </p>
                     : <div className="chat-page-chat-session-container">
                         <div className="chat-page-chat-session-bar chat-page-chat-session-top-bar">
                           <div className="chat-page-chat-session-top-bar-left">

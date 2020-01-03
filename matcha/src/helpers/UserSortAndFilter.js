@@ -101,12 +101,16 @@ export class UserSortAndFilter {
           const prevUserFirstLettersOfTagsArr = []
           const nextUserFirstLettersOfTagsArr = []
 
-          prevUser.tags.forEach((tag) => {
+          // removing nulls as they're not valid tags
+          const cleanedPrevUserTags = prevUser.tags.filter((tag) => tag !== null)
+          const cleanedNextUserTags = nextUser.tags.filter((tag) => tag !== null)
+
+          cleanedPrevUserTags.forEach((tag) => {
             const firstLetterOfTag = tag.split('')[0]
             prevUserFirstLettersOfTagsArr.push(firstLetterOfTag)
           })
 
-          nextUser.tags.forEach((tag) => {
+          cleanedNextUserTags.forEach((tag) => {
             const firstLetterOfTag = tag.split('')[0]
             nextUserFirstLettersOfTagsArr.push(firstLetterOfTag)
           })

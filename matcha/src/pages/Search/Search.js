@@ -6,6 +6,8 @@ import LoadingBlocks from '../../components/shared_components/LoadingBlocks/Load
 import UserSortAndFilter from '../../helpers/UserSortAndFilter'
 import UserFilter from '../../components/shared_components/UserFilter/UserFilter'
 import UserSort from '../../components/shared_components/UserSort/UserSort'
+import UserCards from '../../components/shared_components/UserCards/UserCards'
+import BlockedUsersProvider from '../../providers/BlockedUsersProvider'
 
 // It's important to setState({ data }) so that the components required to project the data will
 // detect the state change. This must be done after this.allUsersAndTags is mutated and ready for
@@ -46,10 +48,6 @@ export class Search extends Component {
     })
   }
 
-  // TODO: Since /Search has essentially 2 filters, this won't affect the query params, however,
-  // /Search has only 1 sort, so sort should take the current query params, if any, and attach
-  // the sort config to it, then remember that componentDidMount did mount should do the search first
-  // then the sort.
   getNormalFilterConfig(queryParam) {
 
     // This is to ensure that the filter is idempotent.
@@ -77,12 +75,18 @@ export class Search extends Component {
       UsersProvider.getAllUsersAndTags()
     )
 
+    const cancelableGetBlockedUsersPromise = PromiseCancel.makeCancelable(
+      BlockedUsersProvider.getBlockedUsersBySession()
+    )
+
     this.pendingPromises.push(cancelableGetOwnInfoPromise)
     this.pendingPromises.push(cancelableGetAllUsersAndTagsPromise)
+    this.pendingPromises.push(cancelableGetBlockedUsersPromise)
 
     Promise.all([
       cancelableGetOwnInfoPromise.promise,
-      cancelableGetAllUsersAndTagsPromise.promise
+      cancelableGetAllUsersAndTagsPromise.promise,
+      cancelableGetBlockedUsersPromise.promise
     ])
     .then((json) => {
 
@@ -99,6 +103,10 @@ export class Search extends Component {
 
       this.allUsersAndTags = UserSortAndFilter.flattenUsersAndTags(json[1].rows.filter((user) => user.username !== this.ownInfo.username))
       this.allUsersAndTags = UserSortAndFilter.filterData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
+
+      // Filtering out blocked users
+      const blockedUsers = json[2].rows
+      this.allUsersAndTags = this.allUsersAndTags.filter((user) => !blockedUsers.some((blocked) => user.username === blocked.blocked_username))
 
       this.setState({
         isBusy: false,
@@ -135,13 +143,19 @@ export class Search extends Component {
       const cancelableGetAllUsersAndTagsPromise = PromiseCancel.makeCancelable(
         UsersProvider.getAllUsersAndTags()
       )
-  
+
+      const cancelableGetBlockedUsersPromise = PromiseCancel.makeCancelable(
+        BlockedUsersProvider.getBlockedUsersBySession()
+      )
+
       this.pendingPromises.push(cancelableGetOwnInfoPromise)
       this.pendingPromises.push(cancelableGetAllUsersAndTagsPromise)
+      this.pendingPromises.push(cancelableGetBlockedUsersPromise)
   
       Promise.all([
         cancelableGetOwnInfoPromise.promise,
-        cancelableGetAllUsersAndTagsPromise.promise
+        cancelableGetAllUsersAndTagsPromise.promise,
+        cancelableGetBlockedUsersPromise.promise
       ])
       .then((json) => {
   
@@ -155,9 +169,13 @@ export class Search extends Component {
         if (!this.ownInfo) {
           throw new Error('couldn\'t find own user data for the search filter!')
         }
-  
+
         this.allUsersAndTags = UserSortAndFilter.flattenUsersAndTags(json[1].rows.filter((user) => user.username !== this.ownInfo.username))
         this.allUsersAndTags = UserSortAndFilter.filterData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
+
+        // Filtering out blocked users
+        const blockedUsers = json[2].rows
+        this.allUsersAndTags = this.allUsersAndTags.filter((user) => !blockedUsers.some((blocked) => user.username === blocked.blocked_username))
 
         if (this.props.location.search.includes('sort')) {
           UserSortAndFilter.sortData(this.props.location.search, this.ownInfo, this.allUsersAndTags)
@@ -219,6 +237,13 @@ export class Search extends Component {
                 locationSearch={this.props.location.search}
                 appSavedPrevSearch={this.props.prevSearch}
               />
+              {
+                this.state.data && this.state.data.length
+                  ? <UserCards
+                      data={this.state.data}
+                    />
+                  : null
+              }
             </div>
         }
       </div>

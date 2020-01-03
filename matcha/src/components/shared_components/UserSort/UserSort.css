@@ -1,6 +1,6 @@
 .user-sort {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin: 20px 0px 0px 0px;
 }
 
@@ -11,7 +11,7 @@
 /* 33px padding top for the absolute float heading */
 .user-sort-button-container {
   position: relative;
-  padding: 20px 20px 20px 20px;
+  padding: 20px 0px 0px 20px;
   border-radius: 5px;
   background-color: white;
   box-shadow: 0px 0px 5px 0px silver;
@@ -23,8 +23,8 @@
 
 .user-sort-button-container-heading {
   color: var(--midtone);
-  font-size: 13px;
-  margin: 0px 0px 6px 0px;
+  font-size: 10px;
+  margin: 0px 0px 10px 0px;
 }
 
 .user-sort-button-container-heading-disabled {
@@ -32,15 +32,15 @@
 }
 
 .user-sort-button {
-  height: 48px;
-  width: 100px;
+  height: 38px;
+  width: 80px;
   border-radius: 5px;
   color: white;
-  font-size: 14px;
+  font-size: 10px;
   border: none;
   box-shadow: 0px 0px 5px 0px silver;
   background: linear-gradient(90deg, var(--accent-other), var(--accent));
-  margin: 0px 20px 0px 0px;
+  margin: 0px 20px 20px 0px;
 }
 
 .user-sort-button-disabled {
@@ -51,10 +51,45 @@
   cursor: pointer;
 }
 
-.user-sort-button:last-child {
+/* .user-sort-button:last-child {
   margin: 0px;
-}
+} */
 
 .user-sort-button-selected {
-  filter: brightness(50%);
+  filter: brightness(70%);
 }
+
+@media only screen and (min-width: 400px) {
+  .user-sort-button-container-heading {
+    font-size: 12px;
+  }
+  .user-sort-button {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (min-width: 555px) {
+  .user-sort-button-container {
+    padding: 20px;
+  }
+  .user-sort-button {
+    margin: 0px 20px 0px 0px;
+  }
+  .user-sort-button:last-child {
+    margin: 0px;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .user-sort-button-container-heading {
+    color: var(--midtone);
+    font-size: 13px;
+    margin: 0px 0px 10px 0px;
+  }
+  .user-sort-button {
+    height: 48px;
+    width: 100px;
+    font-size: 13px;
+  }
+}
+

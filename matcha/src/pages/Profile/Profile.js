@@ -495,8 +495,6 @@ export class Profile extends Component {
       cancelableGetCanViewUserPromise.promise
       .then((obj) => {
 
-        console.log(obj)
-
         // If user exists.
         if (obj[0].rows.length) {
 
@@ -531,8 +529,6 @@ export class Profile extends Component {
           if (obj[1].rows.some((blockedUser) => obj[0].rows[0].user_id === blockedUser.blocked_id)) {
             hasBlockedUserResult = true
           }
-
-          // console.log(obj[7])
 
           this.setState({
             isBusy: false,
@@ -634,8 +630,6 @@ export class Profile extends Component {
   
       cancelableGetUserDataPromise.promise
       .then((obj) => {
-  
-        console.log(obj)
   
         let newProfilePicPath = obj[0].rows[0].profile_pic_path ? (`${Config.backend}/` + obj[0].rows[0].profile_pic_path) : ''
         let newPicPath1 = (obj[1].rows[0] && obj[1].rows[0].pic_path) ? (`${Config.backend}/` + obj[1].rows[0].pic_path) : ''
