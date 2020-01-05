@@ -115,7 +115,12 @@ export class Settings extends Component {
       picPath3: '',
       picPath4: '',
       updatedLocation: false,
-      isBusyUpdatingLocation: false
+      isBusyUpdatingLocation: false,
+      fileSelectedPPErrorText: '',
+      fileSelected1ErrorText: '',
+      fileSelected2ErrorText: '',
+      fileSelected3ErrorText: '',
+      fileSelected4ErrorText: ''
     }
 
     this.pendingPromises = []
@@ -554,7 +559,25 @@ export class Settings extends Component {
     })
     .catch((json) => {
 
-      // Don't change anything.
+      // TODO: The backend is sending 400 back, this might or might not be correct.
+
+      if (
+        json &&
+        json.errors &&
+        json.errors[0] &&
+        json.errors[0].code === '400-PIC-4'
+      ) {
+
+        this.setState({
+          fileSelectedPPErrorText: 'Broken file'
+        })
+
+        setTimeout(() => {
+          this.setState({
+            fileSelectedPPErrorText: ''
+          })
+        }, 3000)
+      }
     })
   }
 
@@ -596,7 +619,23 @@ export class Settings extends Component {
       })
       .catch((json) => {
 
-        // Don't change anything.
+        if (
+          json &&
+          json.errors &&
+          json.errors[0] &&
+          json.errors[0].code === '400-PIC-4'
+        ) {
+
+          this.setState({
+            [targetState + 'ErrorText']: 'Broken file'
+          })
+  
+          setTimeout(() => {
+            this.setState({
+              [targetState + 'ErrorText']: ''
+            })
+          }, 3000)
+        }
       })
     }
   }
@@ -863,7 +902,11 @@ export class Settings extends Component {
                           {
                             this.state.fileSelectedPP
                               ? <p className="settings-page-file-select-input-text">
-                                  { this.state.fileSelectedPP.name }
+                                  {
+                                    this.state.fileSelectedPPErrorText
+                                      ? this.state.fileSelectedPPErrorText
+                                      : this.state.fileSelectedPP.name
+                                  }
                                 </p>
                               : null
                           }
@@ -906,7 +949,11 @@ export class Settings extends Component {
                           {
                             this.state.fileSelected1
                               ? <p className="settings-page-file-select-input-text">
-                                  { this.state.fileSelected1.name }
+                                  {
+                                    this.state.fileSelected1ErrorText
+                                      ? this.state.fileSelected1ErrorText
+                                      : this.state.fileSelected1.name
+                                  }
                                 </p>
                               : null
                           }
@@ -949,7 +996,11 @@ export class Settings extends Component {
                           {
                             this.state.fileSelected2
                               ? <p className="settings-page-file-select-input-text">
-                                  { this.state.fileSelected2.name }
+                                  {
+                                    this.state.fileSelected2ErrorText
+                                      ? this.state.fileSelected2ErrorText
+                                      : this.state.fileSelected2.name
+                                  }
                                 </p>
                               : null
                           }
@@ -992,7 +1043,11 @@ export class Settings extends Component {
                           {
                             this.state.fileSelected3
                               ? <p className="settings-page-file-select-input-text">
-                                  { this.state.fileSelected3.name }
+                                  {
+                                    this.state.fileSelected3ErrorText
+                                      ? this.state.fileSelected3ErrorText
+                                      : this.state.fileSelected3.name
+                                  }
                                 </p>
                               : null
                           }
@@ -1035,7 +1090,11 @@ export class Settings extends Component {
                           {
                             this.state.fileSelected4
                               ? <p className="settings-page-file-select-input-text">
-                                  { this.state.fileSelected4.name }
+                                  {
+                                    this.state.fileSelected4ErrorText
+                                      ? this.state.fileSelected4ErrorText
+                                      : this.state.fileSelected4.name
+                                  }
                                 </p>
                               : null
                           }

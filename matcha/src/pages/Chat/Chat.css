@@ -195,7 +195,7 @@
   background-color: white;
   box-shadow: 0px 1px 1px 0px silver;
   position: absolute;
-  top: 180px;
+  top: calc(50vh - 42px);
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;

@@ -8,6 +8,8 @@ import UserFilter from '../../components/shared_components/UserFilter/UserFilter
 import UserSort from '../../components/shared_components/UserSort/UserSort'
 import UserCards from '../../components/shared_components/UserCards/UserCards'
 import BlockedUsersProvider from '../../providers/BlockedUsersProvider'
+import getDistance from 'geolib/es/getDistance';
+import TagsProvider from '../../providers/TagsProvider'
 
 import './Browse.css'
 
@@ -24,6 +26,7 @@ export class Browse extends Component {
     this.pendingPromises = []
     this.ownInfo = null
     this.allUsersAndTags = null
+    this.myTags = []
 
     this.getNormalFilterConfig = this.getNormalFilterConfig.bind(this)
     this.getSortConfig = this.getSortConfig.bind(this)
@@ -84,14 +87,20 @@ export class Browse extends Component {
       BlockedUsersProvider.getBlockedUsersBySession()
     )
 
+    const cancelableGetOwnTagsPromise = PromiseCancel.makeCancelable(
+      TagsProvider.getTagsBySession()
+    )
+
     this.pendingPromises.push(cancelableGetOwnInfoPromise)
     this.pendingPromises.push(cancelableGetAllUsersAndTagsPromise)
     this.pendingPromises.push(cancelableGetBlockedUsersPromise)
+    this.pendingPromises.push(cancelableGetOwnTagsPromise)
 
     Promise.all([
       cancelableGetOwnInfoPromise.promise,
       cancelableGetAllUsersAndTagsPromise.promise,
-      cancelableGetBlockedUsersPromise.promise
+      cancelableGetBlockedUsersPromise.promise,
+      cancelableGetOwnTagsPromise.promise
     ])
     .then((json) => {
 
@@ -111,6 +120,60 @@ export class Browse extends Component {
       // Filtering out blocked users
       const blockedUsers = json[2].rows
       this.allUsersAndTags = this.allUsersAndTags.filter((user) => !blockedUsers.some((blocked) => user.username === blocked.blocked_username))
+
+      // Filtering out other sexual preferences
+      this.allUsersAndTags = this.allUsersAndTags.filter((user) => user.sex_pref === this.ownInfo.sex_pref)
+
+      // Removing nulls from the user's tags
+      this.allUsersAndTags.forEach((user) => {
+        user.tags = user.tags.filter((tag) => tag !== null)
+      })
+
+      // Consolidating my tags
+      json[3].rows.forEach((tagObj) => {
+        this.myTags.push(tagObj.tag)
+      })
+
+      // + 1 point for each meter away from me
+      // + 1 point for each tag that isn't in my tag list
+      // + 1 point for each fame_rating point below mine
+      // Then sort from low to high, lower being better.
+
+      this.allUsersAndTags.forEach((user) => {
+
+        let browseRanking = 0
+
+        const myCoords = { latitude: this.ownInfo.latitude, longitude: this.ownInfo.longitude }
+        const userCoords = { latitude: user.latitude, longitude: user.longitude }
+        const distFromMe = getDistance(myCoords, userCoords) // This is in m, not km, but only rates matter, not dist.
+
+        browseRanking += distFromMe
+
+        let myTagsCopy = this.myTags.slice()
+        user.tags.forEach((tag) => {
+          if (myTagsCopy.includes(tag)) {
+            myTagsCopy[myTagsCopy.indexOf(tag)] = ''
+          }
+        })
+        let unmutatedTagsRemaining = 0
+        myTagsCopy.forEach((tag) => {
+          if (tag) {
+            unmutatedTagsRemaining += 1
+          }
+        })
+
+        browseRanking += unmutatedTagsRemaining
+
+        // Assuming my fame_rating is higher always
+        const fameRateDiff = this.ownInfo.fame_rating - user.fame_rating
+
+        // If mine is lower, it'll actually subtract, which is good, lower is better in final sort
+        browseRanking += fameRateDiff
+
+        user.browseRanking = browseRanking
+      })
+
+      this.allUsersAndTags.sort((prevUser, nextUser) => prevUser.browseRanking - nextUser.browseRanking)
 
       let newData = null
 
