@@ -1257,7 +1257,7 @@ export class Settings extends Component {
                             onChange={
                               this.handleChangeDecorator(
                                 'lastNameValid',
-                                InputValidation.isValidName
+                                InputValidation.isValidLastName
                               )
                             }
                             placeholder="Last Name"

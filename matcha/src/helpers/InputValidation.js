@@ -2,6 +2,7 @@ import uuidv4Checker from 'uuidv4'
 
 export class InputValidation {
   static isValidName = (name) => /^\w{1,45}$/.test(name)
+  static isValidLastName = (lastName) => /^[\w\s]{1,45}$/.test(lastName)
   static isValidAge = (age) => /^\d{1,2}$/.test(age) && (age - 0) >= 18 && (age - 0) <= 99
   static isValidAgeChars = (age) => /^\d{1,2}$/.test(age)
   static isValidAgeRange = (age) => (age - 0) >= 18 && (age - 0) <= 99
